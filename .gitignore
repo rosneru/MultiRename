@@ -1,0 +1,39 @@
+# Amiga related
+objects_debug
+*.link
+*.lnk
+*.map
+*.qiq
+*.info
+*.pro.user
+*.autosave
+*.obj
+build-*
+!release/**
+src/etc
+src/makefiles
+src/o
+
+# All custom build directories
+build/
+
+#CMake
+CMakeFiles/**
+CMakeFiles/
+CMakeCache.txt
+*.cmake
+
+# gitignore for C++
+# Compiled Object files
+*.slo
+*.lo
+*.o
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Compiled Static libraries
+*.lai
+*.la
+#*.a
