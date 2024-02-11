@@ -10,8 +10,8 @@ at least *AmigaOS 3.1.4* to use it.
 On the Amiga you need *OS3.2.2* with a fully installed *SAS-C 6.5* and
 [Codecraft](http://boemann.dk/codecraft/) development environment.
 
-Open Codecraft, open the pro `MultiRename.projecttree`, use the Build 
-menu to build, hit `F5` to debug.
+Open Codecraft, open the project file `MultiRename.projecttree`, use the
+Build menu to build, then hit `F5` to run the app in the debugger.
 
 ## Linux
 ### Dependencies
