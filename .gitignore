@@ -10,8 +10,6 @@ objects_debug
 *.obj
 build-*
 !release/**
-src/etc
-src/makefiles
 src/o
 
 # All custom build directories
