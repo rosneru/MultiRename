@@ -4,7 +4,7 @@ objects_debug
 *.lnk
 *.map
 *.qiq
-*.info
+src/*.info
 *.pro.user
 *.autosave
 *.obj

@@ -51,7 +51,8 @@
     "map": "cpp",
     "window.h": "c",
     "alib.h": "c",
-    "window_protos.h": "c"
+    "window_protos.h": "c",
+    "layout_protos.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"
