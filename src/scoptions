@@ -1,2 +1,3 @@
-PROGRAMNAME=bin/sas-c-classic/MultiRen_sas
-OBJECTNAME=o/sas-c-classic/
+DEBUG=SYMBOL
+PROGRAMNAME=/MultiRen_sas
+OBJECTNAME=/build-sas/

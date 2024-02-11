@@ -3,8 +3,8 @@
 
 # paths are relative to the project directory (current directory during make)
 
-EXE    = bin/sas-c-classic/MultiRen_sas
-OBJDIR = o/sas-c-classic/
+EXE    = MultiRen_sas
+OBJDIR = /build-sas/
 
 # compiler and linker
 
@@ -26,5 +26,7 @@ $(EXE) : $(OBJS)
 # target 'clean'
 
 clean:
-	-delete $(EXE)
+	-delete /$(EXE)
+	-delete /$(EXE).info
+	-delete /$(EXE).lnk
 	-delete $(OBJDIR)\*.o
