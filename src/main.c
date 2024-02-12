@@ -65,101 +65,12 @@ int main(void)
     cleanExit(NULL);
   }
 
-	pMainLayout = VGroupObject,
-		ICA_TARGET, ICTARGET_IDCMP,
-
-		LAYOUT_SpaceOuter, TRUE,
-		LAYOUT_BevelStyle, BVS_GROUP,
-		LAYOUT_DeferLayout, TRUE,	/* this tag instructs layout.gadget to
-									 * defer GM_LAYOUT and GM_RENDER and ask
-									 * the application to do them. This
-									 * lessens the load on input.device
-									 */
-		LAYOUT_AddChild, HGroupObject,
-				LAYOUT_SpaceOuter, FALSE,
-				LAYOUT_AddChild, HGroupObject,
-						LAYOUT_SpaceOuter, TRUE,
-						/* the first group is three label-less buttons
-						 * side by side
-						 */
-						LAYOUT_BevelStyle, BVS_GROUP,
-						LAYOUT_Label, "Horizontal",
-						LAYOUT_AddChild, ButtonObject,
-							End,
-						LAYOUT_AddChild, ButtonObject,
-							End,
-						LAYOUT_AddChild, ButtonObject,
-							End,
-					End,
-
-				LAYOUT_AddChild, VGroupObject,
-						LAYOUT_SpaceOuter, TRUE,
-						/* the second group is three label-less buttons
-						 * in a vertical group
-						 */
-						LAYOUT_BevelStyle, BVS_GROUP,
-						LAYOUT_Label, "Vertical",
-						LAYOUT_AddChild, ButtonObject,
-							End,
-						LAYOUT_AddChild, ButtonObject,
-							End,
-						LAYOUT_AddChild, ButtonObject,
-							End,
-					End,
-			End,
-
-		LAYOUT_AddChild, HGroupObject,
-				/* four buttons of varying widths */
-				LAYOUT_BevelStyle, BVS_SBAR_VERT,
-				LAYOUT_Label, "Free, Fixed and Weighted sizes.",
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "25Kg",
-					End,
-					CHILD_WeightedWidth, 25,
-
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "50Kg",
-					End,
-					CHILD_WeightedWidth, 50,
-
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "75Kg",
-					End,
-					CHILD_WeightedWidth, 75,
-
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "100Kg",
-					End,
-					CHILD_WeightedWidth, 100,
-			End,
-			CHILD_WeightedHeight,0,
-
-		LAYOUT_AddChild, HGroupObject,
-				/* four buttons sized in another way */
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "Free",
-					End,
-
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "Fixed",
-					End,
-					CHILD_WeightedWidth, 0,
-
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "Free",
-					End,
-
-				LAYOUT_AddChild, ButtonObject,
-						GA_Text, "Fixed",
-					End,
-					CHILD_WeightedWidth, 0,
-			End,
-			CHILD_WeightedHeight,0,
-			CHILD_MinWidth, 300,
-
-		End;
-
-  if (NULL == pMainLayout)
+  if (NULL == (pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
+                                       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
+                                       LAYOUT_DeferLayout, TRUE,
+                                       LAYOUT_SpaceInner, TRUE,
+                                       LAYOUT_SpaceOuter, TRUE,
+                                       TAG_DONE)))
   {
     cleanExit(NULL);
   }
