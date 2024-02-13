@@ -21,7 +21,7 @@ $(OBJDIR)main.o : src/main.c
 OBJS = $(OBJDIR)main.o
 
 $(EXE) : $(OBJS)
-	$(LD) link $(OBJS)
+	$(LD) link $(OBJS) LIB lib:reaction.lib
 
 # target 'clean'
 
