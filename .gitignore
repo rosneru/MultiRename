@@ -8,12 +8,14 @@ src/*.info
 *.pro.user
 *.autosave
 *.obj
-build-*
 !release/**
 src/o
 
+# CODECRAFT
+*.session
+
 # All custom build directories
-build/
+build*/
 
 #CMake
 CMakeFiles/**
