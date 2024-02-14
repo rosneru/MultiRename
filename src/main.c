@@ -122,9 +122,9 @@ int main(void)
                                */
     LAYOUT_AddChild, HGroupObject,
       LAYOUT_SpaceOuter, FALSE,
+      /* 1st group: Name mask */
       LAYOUT_AddChild, VGroupObject,
         LAYOUT_SpaceOuter, TRUE,
-        /* 1st group: Name mask */
         LAYOUT_BevelStyle, BVS_GROUP,
         LAYOUT_Label, "Name",
 
@@ -155,13 +155,12 @@ int main(void)
         LAYOUT_AddChild, ButtonObject,
           GA_Text, "[C] Counter",
         ButtonEnd,
-
-        CHILD_WeightedHeight, 0,
       LayoutEnd,
+      CHILD_WeightedWidth, 75,
 
+      /* 2nd group Extension VLayout */
       LAYOUT_AddChild, VGroupObject,
         LAYOUT_SpaceOuter, TRUE,
-        /* 2nd group Extension VLayout */
         LAYOUT_BevelStyle, BVS_GROUP,
         LAYOUT_Label, "Extension",
         LAYOUT_AddChild, StringObject,
@@ -177,17 +176,21 @@ int main(void)
           GA_Text, "[C] Counter",
         ButtonEnd,
       LayoutEnd,
+      CHILD_WeightedWidth, 25,
 
 
+      /* 3rd group: counter settings */
       LAYOUT_AddChild, VGroupObject,
         LAYOUT_SpaceOuter, TRUE,
-        /* 3rd group: counter settings */
         LAYOUT_BevelStyle, BVS_GROUP,
         LAYOUT_Label, "Define counter",
         LAYOUT_AddChild, HGroupObject,
           LAYOUT_AddChild, IntegerObject,
             GA_TabCycle, TRUE,
             INTEGER_Number, 1,
+            INTEGER_MaxChars, 2,
+            INTEGER_Minimum, 0,
+            INTEGER_Maximum, 10,
           End,
           CHILD_Label, LabelObject, LABEL_Text, "Start:", End,
         LayoutEnd,
@@ -196,6 +199,9 @@ int main(void)
           LAYOUT_AddChild, IntegerObject,
             GA_TabCycle, TRUE,
             INTEGER_Number, 1,
+            INTEGER_MaxChars, 2,
+            INTEGER_Minimum, 0,
+            INTEGER_Maximum, 10,
           End,
           CHILD_Label, LabelObject, LABEL_Text, "Step:", End,
         End,
@@ -205,16 +211,15 @@ int main(void)
             GA_RelVerify, TRUE,
             CHOOSER_Labels, pChooserList,
             CHOOSER_Selected, 1,
+            CHOOSER_AutoFit, TRUE,
           ChooserEnd,
           CHILD_Label, LabelObject, LABEL_Text, "Places:", End,
         LayoutEnd,
-
-        CHILD_WeightedHeight, 0,
-
       LayoutEnd,
+      CHILD_WeightedWidth, 0,
     LayoutEnd,
     CHILD_WeightedHeight,0,
-    CHILD_MinWidth, 300,
+    CHILD_MinWidth, 500,
     LAYOUT_AddChild, ListBrowserObject,
               GA_ID, 1,
               GA_RelVerify, TRUE,
