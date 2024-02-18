@@ -146,19 +146,17 @@ int main(void)
           LAYOUT_AddChild, ButtonObject,
             GA_Text, "[N #-#] Part",
           ButtonEnd,
-
           LAYOUT_AddChild, ButtonObject,
             GA_Text, "[hms] Time",
           ButtonEnd,
         LayoutEnd,
-
         LAYOUT_AddChild, ButtonObject,
           GA_Text, "[C] Counter",
         ButtonEnd,
       LayoutEnd,
-      CHILD_WeightedWidth, 75,
+      CHILD_WeightedWidth, 70,
 
-      /* 2nd group Extension VLayout */
+      /* 2nd group Extension mask */
       LAYOUT_AddChild, VGroupObject,
         LAYOUT_SpaceOuter, TRUE,
         LAYOUT_BevelStyle, BVS_GROUP,
@@ -176,10 +174,10 @@ int main(void)
           GA_Text, "[C] Counter",
         ButtonEnd,
       LayoutEnd,
-      CHILD_WeightedWidth, 25,
+      CHILD_WeightedWidth, 30,
 
 
-      /* 3rd group: counter settings */
+      /* 3rd group: Counter settings */
       LAYOUT_AddChild, VGroupObject,
         LAYOUT_SpaceOuter, TRUE,
         LAYOUT_BevelStyle, BVS_GROUP,
@@ -204,7 +202,7 @@ int main(void)
             INTEGER_Maximum, 10,
           End,
           CHILD_Label, LabelObject, LABEL_Text, "Step:", End,
-        End,
+        LayoutEnd,
 
         LAYOUT_AddChild, HGroupObject,
           LAYOUT_AddChild, ChooserObject,
