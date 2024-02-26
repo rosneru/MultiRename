@@ -217,7 +217,6 @@ int main(void)
       CHILD_WeightedWidth, 0,
     LayoutEnd,
     CHILD_WeightedHeight, 0,
-    CHILD_MinWidth, 500,
     LAYOUT_AddChild, VGroupObject,
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
