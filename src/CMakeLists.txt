@@ -13,6 +13,7 @@ set(CMAKE_C_LINK_EXECUTABLE "${CMAKE_C_LINK_EXECUTABLE} ${EXTRALIBS_LINK_FLAGS}"
 ##### Pooyan game executable
 
 add_executable (MultiRename_gcc
+                arguments.c
                 main.c)
 
 
