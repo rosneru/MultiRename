@@ -24,6 +24,18 @@ with the following packages installed:
  - [ Bebbos gcc 6.5 toolchain](https://github.com/bebbo/amiga-gcc) 
 which is expected to be installed in /opt
 
+#### reaction.lib
+
+This lib must be manually copied from
+
+    Debian/opt/amiga/m68k-amigaos/vbcc/lib/reaction.lib
+
+
+to
+
+    opt/amiga/lib/libreaction.a
+
+(note the renaming) to make it work.
 
 ### Build
 To build this project a Makefile must be created with cmake:

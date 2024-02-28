@@ -3,22 +3,16 @@ cmake_minimum_required (VERSION 3.5)
 SET(CROSS_COMPILE m68k-amigaos-)
 SET(CMAKE_C_COMPILER m68k-amigaos-gcc)
 
-SET(CMAKE_C_FLAGS "-Os -s -pedantic -noixemul -fomit-frame-pointer -fno-exceptions -Wall -Wno-pointer-sign")
+SET(CMAKE_C_FLAGS "-Os -s -pedantic -noixemul -fomit-frame-pointer -fno-exceptions -Wall -Wno-pointer-sign -DNO_INLINE_STDARG")
 
-set(EXTRALIBS_LINK_FLAGS "") # Add a static linker lib if needed, e.g. "-lpthread"
+set(EXTRALIBS_LINK_FLAGS "-lreaction") # Add a static linker lib if needed, e.g. "-lpthread"
 
 set(CMAKE_C_LINK_EXECUTABLE "<CMAKE_C_COMPILER> <FLAGS> <CMAKE_C_LINK_FLAGS> <OBJECTS> -o <TARGET>")
 set(CMAKE_C_LINK_EXECUTABLE "${CMAKE_C_LINK_EXECUTABLE} ${EXTRALIBS_LINK_FLAGS}")
 
-##### Pooyan game executable
-
 add_executable (MultiRename_gcc
                 arguments.c
                 main.c)
-
-
-#target_include_directories (DonkeyKong_gcc PUBLIC
-#                            .)
 
 add_custom_command(TARGET MultiRename_gcc
                    POST_BUILD
