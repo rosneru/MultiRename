@@ -28,8 +28,7 @@ which is expected to be installed in /opt
 
 This lib must be manually copied from
 
-    Debian/opt/amiga/m68k-amigaos/vbcc/lib/reaction.lib
-
+    /opt/amiga/m68k-amigaos/vbcc/lib/reaction.lib
 
 to
 
