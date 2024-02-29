@@ -52,7 +52,10 @@
     "window.h": "c",
     "alib.h": "c",
     "window_protos.h": "c",
-    "layout_protos.h": "c"
+    "layout_protos.h": "c",
+    "string_protos.h": "c",
+    "classusr.h": "c",
+    "alib_protos.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"
