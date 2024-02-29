@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include <classes/window.h>
+#include <exec/memory.h>
 #include <exec/types.h>
 #include <gadgets/chooser.h>
 #include <gadgets/layout.h>
@@ -11,8 +12,6 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
-#include <reaction/reaction.h>
-#include <reaction/reaction_macros.h>
 
 #ifdef __clang__
   #include <clib/alib_protos.h>
@@ -40,8 +39,6 @@
   #include <proto/window.h>
 #endif
 
-#include <clib/reaction_lib_protos.h>
-
 
 /**
  * Initialize Library bases with NULL to avoid auto opening attempt by
@@ -53,6 +50,12 @@
 struct IntuitionBase* IntuitionBase = NULL;
 struct Library* WindowBase = NULL;
 struct Library* LayoutBase = NULL;
+struct Library* ButtonBase = NULL;
+struct Library* ChooserBase = NULL;
+struct Library* LabelBase = NULL;
+struct Library* IntegerBase = NULL;
+struct Library* StringBase = NULL;
+struct Library* ListBrowserBase = NULL;
 /*
 struct Library* LabelBase = NULL;
 struct Library* IntegerBase = NULL;
@@ -62,166 +65,187 @@ void cleanExit(Object* pWindowObject);
 void processEvents(Object* pWindowObject);
 
 
-UBYTE *chooser[] =
+void freeChooserLabels(struct List* pLabelsList)
 {
-  "1",
-  "2",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  NULL
-};
+  struct Node* pWorkNode;
+  struct Node* pNextNode;
 
+  if(NULL == pLabelsList)
+  {
+    return;
+  }
 
+  pWorkNode = pLabelsList->lh_Head;
+  while(NULL != (pNextNode = pWorkNode->ln_Succ))
+  {
+    FreeChooserNode(pWorkNode);
+    pWorkNode = pNextNode;
+  }
 
+  FreeVec(pLabelsList);
+}
 
-
-int main(void)
+struct List* createChooserLabels()
 {
-  struct Window* pIntuiWin = NULL;
-  Object* pWindowObject = NULL;
-  Object* pMainLayout = NULL;
-  struct List* pChooserList = ChooserLabels( "1","2","3", "4", "5", "6","7", "8", "9", "10", NULL );
+  ULONG i = 0;
+  UBYTE *values[] = { "1", "2", "4", "5", "6", "7", "8", "9", "10", NULL };
+  struct Node* pLabelNode;
+  struct List* pLabelsList;
+  struct TagItem allocTags[2];
+  allocTags[0].ti_Tag = CNA_Text;
+  allocTags[1].ti_Tag = TAG_DONE;
 
-  if  (NULL == pChooserList)
+  if(NULL == (pLabelsList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
   {
-    cleanExit(NULL);
+    return NULL;
   }
 
-  if (NULL == (IntuitionBase = (struct IntuitionBase*)
-                                OpenLibrary("intuition.library", 47)))
-  {
-    FreeChooserLabels(pChooserList);
-    cleanExit(NULL);
-  }
+  NewList(pLabelsList);
 
-  if (NULL == (WindowBase = OpenLibrary("window.class", 0L)))
+  do
   {
-    FreeChooserLabels(pChooserList);
-    cleanExit(NULL);
-  }
+    allocTags[0].ti_Data = (ULONG)values[i];
+    pLabelNode = AllocChooserNodeA(allocTags);
+    if(NULL == pLabelNode)
+    {
+      freeChooserLabels(pLabelsList);
+      return NULL;
+    }
 
-  if (NULL == (LayoutBase = OpenLibrary("gadgets/layout.gadget", 0L)))
-  {
-    FreeChooserLabels(pChooserList);
-    cleanExit(NULL);
-  }
+    AddTail(pLabelsList, pLabelNode);
 
-  pMainLayout = VGroupObject,
-    ICA_TARGET, ICTARGET_IDCMP,
+    i++;
+  }
+  while(values[i] != NULL);
+
+  return pLabelsList;
+}
+
+Object* createLayout(struct List* pChooserLabels)
+{
+  Object *pMainLayout = NULL, *pTopParentHLayout = NULL, 
+         *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
+         *pTopVLayoutCnt = NULL;
+
+  pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
+    LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
+    LAYOUT_SpaceOuter, TRUE,
+    LAYOUT_BevelStyle, BVS_GROUP,
+    LAYOUT_Label, "Name",
+    LAYOUT_AddChild, NewObject(STRING_GetClass(), NULL,
+      STRINGA_TextVal, "[N]",
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+      LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+        GA_Text, "[N] Name",
+      TAG_DONE),
+      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+        GA_Text, "[YMD] Date",
+      TAG_DONE),
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+      LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+        GA_Text, "[N#-#] Part",
+      TAG_DONE),
+      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+        GA_Text, "[hms] Time",
+      TAG_DONE),
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      GA_Text, "[C] Counter",
+    TAG_DONE),
+  TAG_DONE);
+
+  pTopVLayoutExt = NewObject(LAYOUT_GetClass(), NULL,
+    LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
+    LAYOUT_SpaceOuter, TRUE,
+    LAYOUT_BevelStyle, BVS_GROUP,
+    LAYOUT_Label, "Extension",
+    LAYOUT_AddChild, NewObject(STRING_GetClass(), NULL,
+      STRINGA_TextVal, "[E]",
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      GA_Text, "[E] Ext.",
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      GA_Text, "[E#-#] Part",
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      GA_Text, "[C] Counter",
+    TAG_DONE),
+  TAG_DONE),
+
+  pTopVLayoutCnt = NewObject(LAYOUT_GetClass(), NULL,
+    LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
+    LAYOUT_SpaceOuter, TRUE,
+    LAYOUT_BevelStyle, BVS_GROUP,
+    LAYOUT_Label, "Define counter",
+    LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+      LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+      LAYOUT_AddChild, NewObject(INTEGER_GetClass(), NULL,
+        GA_TabCycle, TRUE,
+        INTEGER_Number, 1,
+        INTEGER_MaxChars, 2,
+        INTEGER_Minimum, 0,
+        INTEGER_Maximum, 10,
+      TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Start:", TAG_DONE),
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+      LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+      LAYOUT_AddChild, NewObject(INTEGER_GetClass(), NULL,
+        GA_TabCycle, TRUE,
+        INTEGER_Number, 1,
+        INTEGER_MaxChars, 2,
+        INTEGER_Minimum, 1,
+        INTEGER_Maximum, 10,
+      TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Step:", TAG_DONE),
+    TAG_DONE),
+    LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+      LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+      LAYOUT_AddChild, NewObject(CHOOSER_GetClass(), NULL,
+        GA_TabCycle, TRUE,
+        GA_RelVerify, TRUE,
+        CHOOSER_Labels, pChooserLabels,
+        CHOOSER_Selected, 1,
+        CHOOSER_AutoFit, TRUE,
+      TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Places:", TAG_DONE),
+    TAG_DONE),
+  TAG_DONE);
+
+  pTopParentHLayout = NewObject(LAYOUT_GetClass(), NULL,
+    LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+    LAYOUT_SpaceOuter, FALSE,
+    LAYOUT_AddChild, pTopVLayoutName,
+    CHILD_WeightedWidth, 70,
+    LAYOUT_AddChild, pTopVLayoutExt,
+    CHILD_WeightedWidth, 30,
+    LAYOUT_AddChild, pTopVLayoutCnt,
+    CHILD_WeightedHeight, 0,
+  TAG_DONE);
+
+  pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
+    LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
+    ICA_TARGET, ICTARGET_IDCMP, /* TODO: Remove this?? */
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_DeferLayout, TRUE, /* this tag instructs layout.gadget to
-                               * defer GM_LAYOUT and GM_RENDER and ask
-                               * the application to do them. This
-                               * lessens the load on input.device
-                               */
-    LAYOUT_AddChild, HGroupObject,
-      LAYOUT_SpaceOuter, FALSE,
-      /* 1st group: Name mask */
-      LAYOUT_AddChild, VGroupObject,
-        LAYOUT_SpaceOuter, TRUE,
-        LAYOUT_BevelStyle, BVS_GROUP,
-        LAYOUT_Label, "Name",
-
-        LAYOUT_AddChild, StringObject,
-          STRINGA_TextVal, "[N]",
-        StringEnd,
-
-        LAYOUT_AddChild, HGroupObject,
-          LAYOUT_AddChild, ButtonObject,
-            GA_Text, "[N] Name",
-          ButtonEnd,
-
-          LAYOUT_AddChild, ButtonObject,
-            GA_Text, "[YMD] Date",
-          ButtonEnd,
-        LayoutEnd,
-
-        LAYOUT_AddChild, HGroupObject,
-          LAYOUT_AddChild, ButtonObject,
-            GA_Text, "[N #-#] Part",
-          ButtonEnd,
-          LAYOUT_AddChild, ButtonObject,
-            GA_Text, "[hms] Time",
-          ButtonEnd,
-        LayoutEnd,
-        LAYOUT_AddChild, ButtonObject,
-          GA_Text, "[C] Counter",
-        ButtonEnd,
-      LayoutEnd,
-      CHILD_WeightedWidth, 70,
-
-      /* 2nd group Extension mask */
-      LAYOUT_AddChild, VGroupObject,
-        LAYOUT_SpaceOuter, TRUE,
-        LAYOUT_BevelStyle, BVS_GROUP,
-        LAYOUT_Label, "Extension",
-        LAYOUT_AddChild, StringObject,
-          STRINGA_TextVal, "[E]",
-        StringEnd,
-        LAYOUT_AddChild, ButtonObject,
-          GA_Text, "[E] Erw.",
-        ButtonEnd,
-        LAYOUT_AddChild, ButtonObject,
-          GA_Text, "[N #-#] Part",
-        ButtonEnd,
-        LAYOUT_AddChild, ButtonObject,
-          GA_Text, "[C] Counter",
-        ButtonEnd,
-      LayoutEnd,
-      CHILD_WeightedWidth, 30,
-
-
-      /* 3rd group: Counter settings */
-      LAYOUT_AddChild, VGroupObject,
-        LAYOUT_SpaceOuter, TRUE,
-        LAYOUT_BevelStyle, BVS_GROUP,
-        LAYOUT_Label, "Define counter",
-        LAYOUT_AddChild, HGroupObject,
-          LAYOUT_AddChild, IntegerObject,
-            GA_TabCycle, TRUE,
-            INTEGER_Number, 1,
-            INTEGER_MaxChars, 2,
-            INTEGER_Minimum, 0,
-            INTEGER_Maximum, 10,
-          End,
-          CHILD_Label, LabelObject, LABEL_Text, "Start:", End,
-        LayoutEnd,
-
-        LAYOUT_AddChild, HGroupObject,
-          LAYOUT_AddChild, IntegerObject,
-            GA_TabCycle, TRUE,
-            INTEGER_Number, 1,
-            INTEGER_MaxChars, 2,
-            INTEGER_Minimum, 0,
-            INTEGER_Maximum, 10,
-          End,
-          CHILD_Label, LabelObject, LABEL_Text, "Step:", End,
-        LayoutEnd,
-
-        LAYOUT_AddChild, HGroupObject,
-          LAYOUT_AddChild, ChooserObject,
-            GA_RelVerify, TRUE,
-            CHOOSER_Labels, pChooserList,
-            CHOOSER_Selected, 1,
-            CHOOSER_AutoFit, TRUE,
-          ChooserEnd,
-          CHILD_Label, LabelObject, LABEL_Text, "Places:", End,
-        LayoutEnd,
-      LayoutEnd,
-      CHILD_WeightedWidth, 0,
-    LayoutEnd,
+                                * defer GM_LAYOUT and GM_RENDER and ask
+                                * the application to do them. This
+                                * lessens the load on input.device
+                                */
+    LAYOUT_AddChild, pTopParentHLayout,
     CHILD_WeightedHeight, 0,
-    LAYOUT_AddChild, VGroupObject,
+    LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+      LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
       LAYOUT_Label, "Processing list",
-      LAYOUT_AddChild, ListBrowserObject,
+      LAYOUT_AddChild, NewObject(LISTBROWSER_GetClass(), NULL,
         GA_RelVerify, TRUE,
         // LISTBROWSER_Labels, &list,
         // LISTBROWSER_ColumnInfo, &ci,
@@ -231,20 +255,91 @@ int main(void)
         LISTBROWSER_Editable, TRUE,
         LISTBROWSER_MultiSelect, TRUE,
         LISTBROWSER_ShowSelected, TRUE,
-      ListBrowserEnd,
-    LayoutEnd,
-    LAYOUT_AddChild, HGroupObject,
-      LAYOUT_AddChild, ButtonObject,
-        GA_Text, "Start",
-      ButtonEnd,
-      CHILD_WeightedWidth, 0,
-    LayoutEnd,
-    CHILD_WeightedHeight, 0,
-  LayoutEnd;
+      TAG_DONE),
+      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+        LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+        LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+          GA_Text, "Start",
+        TAG_DONE),
+        CHILD_WeightedWidth, 0,
+      TAG_DONE),
+      CHILD_WeightedHeight, 0,
+    TAG_DONE),
+  TAG_DONE);
 
-  if (NULL == pMainLayout)
+  return pMainLayout;
+}
+
+int main(void)
+{
+  struct Window* pIntuiWin = NULL;
+  Object* pWindowObject = NULL;
+  Object* pMainLayout = NULL;
+  struct List* pChooserList = createChooserLabels();
+
+  if  (NULL == pChooserList)
   {
-    FreeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (IntuitionBase = (struct IntuitionBase*)
+                                OpenLibrary("intuition.library", 47)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (WindowBase = OpenLibrary("window.class", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (LayoutBase = OpenLibrary("gadgets/layout.gadget", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (ButtonBase = OpenLibrary("gadgets/button.gadget", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (ChooserBase = OpenLibrary("gadgets/chooser.gadget", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (LabelBase = OpenLibrary("gadgets/label.gadget", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (IntegerBase = OpenLibrary("gadgets/integer.gadget", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (StringBase = OpenLibrary("gadgets/string.gadget", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (ListBrowserBase = OpenLibrary("gadgets/listbrowser.gadget", 0L)))
+  {
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if(NULL == (pMainLayout = createLayout(pChooserList)))
+  {
+    freeChooserLabels(pChooserList);
     cleanExit(NULL);
   }
 
@@ -262,13 +357,13 @@ int main(void)
                                          WINDOW_Layout, pMainLayout,
                                          TAG_DONE)))
   {
-    FreeChooserLabels(pChooserList);
+    freeChooserLabels(pChooserList);
     cleanExit(NULL);
   }
 
   if (NULL == (pIntuiWin = (struct Window*)DoMethod(pWindowObject, WM_OPEN, NULL)))
   {
-    FreeChooserLabels(pChooserList);
+    freeChooserLabels(pChooserList);
     cleanExit(pWindowObject);
   }
 
