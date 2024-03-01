@@ -1,9 +1,7 @@
-/**
- * Compile: sc main.c LINK NOSTACKCHECK
- */
 #include <stdlib.h>
 
 #include <classes/window.h>
+#include <dos/dos.h>
 #include <exec/memory.h>
 #include <exec/types.h>
 #include <gadgets/chooser.h>
@@ -12,6 +10,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <workbench/startup.h>
 
 #ifdef __clang__
   #include <clib/alib_protos.h>
@@ -43,24 +42,23 @@
 
 
 /**
- * Initialize Library bases with NULL to avoid auto opening attempt by
- * gcc using the wrong library names (wrong: "window.library" instead
- * of right: "window.class" etc.)
+ * The auto-open code of gcc uses the wrong names for some library bases
+ * and then fails to open them:
+ *   "window.library" (wrong) instead of "window.class" (right)
+ *   "label.gadget" (wrong) instead  of "images/label.image" (right)
+ *
+ * To fix this, (only) these libraries are manually opened and closed.
+ * But first their library base variables must be initialized here.
+ * That means NULL must be assigned to the variable names.
  *
  * See: https://eab.abime.net/showpost.php?p=1490638&postcount=1285
  */
 // struct IntuitionBase* IntuitionBase = NULL;
 struct Library* WindowBase = NULL;
 struct Library* LabelBase = NULL;
-// struct Library* LayoutBase = NULL;
-// struct Library* ButtonBase = NULL;
-// struct Library* ChooserBase = NULL;
-// struct Library* IntegerBase = NULL;
-// struct Library* StringBase = NULL;
-// struct Library* ListBrowserBase = NULL;
 
-void cleanExit(Object* pWindowObject);
-void processEvents(Object* pWindowObject);
+
+void intuiEventLoop(Object* pWindowObject);
 
 
 void freeChooserLabels(struct List* pLabelsList)
@@ -269,64 +267,114 @@ Object* createLayout(struct List* pChooserLabels)
   return pMainLayout;
 }
 
-int main(void)
+BOOL ensureOpenLibs(void)
+{
+  if(WindowBase = OpenLibrary("window.class", 47L))
+  {
+    if(LabelBase = OpenLibrary("images/label.image", 47L))
+    {
+      return TRUE;
+    }
+    else
+    {
+      PutStr("Failed to load v47 label.image.\n");
+    }
+  }
+  else
+  {
+    PutStr("Failed to load v47 window.class.\n");
+  }
+
+  return FALSE;
+}
+
+void ensureCloseLibs(void)
+{
+  if(LabelBase != NULL)
+  {
+    CloseLibrary(LabelBase);
+  }
+  
+  if(WindowBase != NULL)
+  {
+    CloseLibrary(WindowBase);
+  }
+}
+
+
+/**
+ * CLI entry point
+ */
+int main(int argc, char **argv)
 {
   struct Window* pIntuiWin = NULL;
   Object* pWindowObject = NULL;
   Object* pMainLayout = NULL;
+  ULONG result = RETURN_OK;
   struct List* pChooserList = createChooserLabels();
 
-  if (NULL == (WindowBase = OpenLibrary("window.class", 47L)))
+  if(TRUE == ensureOpenLibs())
   {
-    PutStr("Failed to load v47 window.class.\n");
-    freeChooserLabels(pChooserList);
-    cleanExit(NULL);
+    if((pMainLayout = createLayout(pChooserList)))
+    {
+      if((pWindowObject = NewObject(WINDOW_GetClass(), NULL,
+                                    WINDOW_Position, WPOS_CENTERSCREEN,
+                                    WA_Activate, TRUE,
+                                    WA_Title, "MultiRename",
+                                    WA_DragBar, TRUE,
+                                    WA_CloseGadget, TRUE,
+                                    WA_DepthGadget, TRUE,
+                                    WA_SizeGadget, TRUE,
+                                    WA_InnerWidth, 600,
+                                    WA_InnerHeight, 400,
+                                    WA_IDCMP, IDCMP_CLOSEWINDOW,
+                                    WINDOW_Layout, pMainLayout,
+                                    TAG_DONE)))
+      {
+        if((pIntuiWin = (struct Window*)DoMethod(pWindowObject, WM_OPEN, NULL)))
+        {
+          result = RETURN_OK;
+          intuiEventLoop(pWindowObject);
+          DoMethod(pWindowObject, WM_CLOSE);
+        }
+        else
+        {
+          PutStr("Failed to open window.\n");
+        }
+
+        DisposeObject(pWindowObject);
+      }
+      else
+      {
+        PutStr("Failed to create window.\n");
+        DisposeObject(pMainLayout);
+      }
+    }
+    else
+    {
+      PutStr("Failed to create layout.\n");
+    }
   }
 
-  if (NULL == (LabelBase = OpenLibrary("images/label.image", 47L)))
-  {
-    PutStr("Failed to load v47 label.image.\n");
-    freeChooserLabels(pChooserList);
-    cleanExit(NULL);
-  }
+  ensureCloseLibs();
 
-  if(NULL == (pMainLayout = createLayout(pChooserList)))
-  {
-    freeChooserLabels(pChooserList);
-    cleanExit(NULL);
-  }
 
-  if (NULL == (pWindowObject = NewObject(WINDOW_GetClass(), NULL,
-                                         WINDOW_Position, WPOS_CENTERSCREEN,
-                                         WA_Activate, TRUE,
-                                         WA_Title, "MultiRename",
-                                         WA_DragBar, TRUE,
-                                         WA_CloseGadget, TRUE,
-                                         WA_DepthGadget, TRUE,
-                                         WA_SizeGadget, TRUE,
-                                         WA_InnerWidth, 600,
-                                         WA_InnerHeight, 400,
-                                         WA_IDCMP, IDCMP_CLOSEWINDOW,
-                                         WINDOW_Layout, pMainLayout,
-                                         TAG_DONE)))
-  {
-    freeChooserLabels(pChooserList);
-    cleanExit(NULL);
-  }
-
-  if (NULL == (pIntuiWin = (struct Window*)DoMethod(pWindowObject, WM_OPEN, NULL)))
-  {
-    freeChooserLabels(pChooserList);
-    cleanExit(pWindowObject);
-  }
-
-  processEvents(pWindowObject);
-  DoMethod(pWindowObject, WM_CLOSE);
-  cleanExit(pWindowObject);
+  exit(result);
 }
 
 
-void processEvents(Object* pWindowObject)
+/**
+ * Workbench entry point.
+ */
+void wbmain(struct WBStartup* wb)
+{
+  // Call the CLI entry point with argc=0
+  main(0, (char **) wb);
+}
+
+
+
+void intuiEventLoop(Object* pWindowObject)
 {
   ULONG winSig;
   ULONG receivedSig;
@@ -349,19 +397,4 @@ void processEvents(Object* pWindowObject)
       }
     }
   }
-}
-
-void cleanExit(Object* pWindowObject)
-{
-  if (pWindowObject)
-  {
-    DisposeObject(pWindowObject);
-  }
-
-  if (WindowBase)
-  {
-    CloseLibrary(WindowBase);
-  }
-
-  exit(0);
 }
