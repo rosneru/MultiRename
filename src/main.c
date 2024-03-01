@@ -51,6 +51,7 @@
  */
 // struct IntuitionBase* IntuitionBase = NULL;
 struct Library* WindowBase = NULL;
+struct Library* LabelBase = NULL;
 // struct Library* LayoutBase = NULL;
 // struct Library* ButtonBase = NULL;
 // struct Library* ChooserBase = NULL;
@@ -188,7 +189,7 @@ Object* createLayout(struct List* pChooserLabels)
         INTEGER_Minimum, 0,
         INTEGER_Maximum, 10,
       TAG_DONE),
-      // CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Start:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Start:", TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -200,7 +201,7 @@ Object* createLayout(struct List* pChooserLabels)
         INTEGER_Maximum, 10,
       TAG_DONE),
       LABEL_Text, "Step",
-      // CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Step:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Step:", TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -211,7 +212,7 @@ Object* createLayout(struct List* pChooserLabels)
         CHOOSER_Selected, 1,
         CHOOSER_AutoFit, TRUE,
       TAG_DONE),
-      // CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Places:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Places:", TAG_DONE),
     TAG_DONE),
   TAG_DONE);
 
@@ -223,7 +224,7 @@ Object* createLayout(struct List* pChooserLabels)
     LAYOUT_AddChild, pTopVLayoutExt,
     CHILD_WeightedWidth, 30,
     LAYOUT_AddChild, pTopVLayoutCnt,
-    CHILD_WeightedHeight, 0,
+    CHILD_WeightedWidth, 0,
   TAG_DONE);
 
   pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
@@ -278,6 +279,13 @@ int main(void)
   if (NULL == (WindowBase = OpenLibrary("window.class", 47L)))
   {
     PutStr("Failed to load v47 window.class.\n");
+    freeChooserLabels(pChooserList);
+    cleanExit(NULL);
+  }
+
+  if (NULL == (LabelBase = OpenLibrary("images/label.image", 47L)))
+  {
+    PutStr("Failed to load v47 label.image.\n");
     freeChooserLabels(pChooserList);
     cleanExit(NULL);
   }
