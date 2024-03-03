@@ -18,61 +18,41 @@
 
 #include "application.h"
 
+
 /**
- * The auto-open code of gcc uses the wrong names for some library bases
- * and then fails to open them:
+ * Private function declarations
+ */
+BOOL openLibs(void);
+void closeLibs(void);
+
+/**
+ * There are 2 problems regarding the use of Reaction BOOPSIES:
+ * 
+ * 1) The auto-open code of gcc uses the wrong names for some library 
+ * bases and then fails to open them:
  *   "window.library" (wrong) instead of "window.class" (right)
  *   "label.gadget" (wrong) instead  of "images/label.image" (right)
  *
- * To fix this, (only) these libraries are manually opened and closed.
+ * 2) SAS-C is only able to auto-open the reaction BOOPSIE library bases
+ * when linking against the recation.lib, what according the OS 
+ * developers currently (2024) shouldn't be done fpr new projects.
+ * 
+ * To fix both problems, the libraries are manually opened and closed.
  * But first their library base variables must be initialized here.
- * That means NULL must be assigned to the variable names.
- *
+ * And initialization means NULL must be assigned to the variable names,
  * See: https://eab.abime.net/showpost.php?p=1490638&postcount=1285
  */
-// struct IntuitionBase* IntuitionBase = NULL;
+struct IntuitionBase *IntuitionBase = NULL;
 struct Library* WindowBase = NULL;
+struct Library* LayoutBase = NULL;
+struct Library* ButtonBase = NULL;
+struct Library* ChooserBase = NULL;
+struct Library* ListBrowserBase = NULL;
 struct Library* LabelBase = NULL;
+struct Library* IntegerBase = NULL;
+struct Library* StringBase = NULL;
 
 
-void intuiEventLoop(Object* pWindowObject);
-
-
-
-
-BOOL ensureOpenLibs(void)
-{
-  if(WindowBase = OpenLibrary("window.class", 47L))
-  {
-    if(LabelBase = OpenLibrary("images/label.image", 47L))
-    {
-      return TRUE;
-    }
-    else
-    {
-      PutStr("Failed to load v47 label.image.\n");
-    }
-  }
-  else
-  {
-    PutStr("Failed to load v47 window.class.\n");
-  }
-
-  return FALSE;
-}
-
-void ensureCloseLibs(void)
-{
-  if(LabelBase != NULL)
-  {
-    CloseLibrary(LabelBase);
-  }
-  
-  if(WindowBase != NULL)
-  {
-    CloseLibrary(WindowBase);
-  }
-}
 
 
 /**
@@ -82,7 +62,7 @@ int main(int argc, char **argv)
 {
   Application* pApp;
   ULONG result = RETURN_FAIL;
-  if(TRUE == ensureOpenLibs())
+  if(TRUE == openLibs())
   {
     if((pApp = createApplication()))
     {
@@ -95,10 +75,9 @@ int main(int argc, char **argv)
     }
   }
 
-  ensureCloseLibs();
+  closeLibs();
   exit(result);
 }
-
 
 /**
  * Workbench entry point.
@@ -107,4 +86,114 @@ void wbmain(struct WBStartup* wb)
 {
   // Call the CLI entry point with argc=0
   main(0, (char **) wb);
+}
+
+
+
+BOOL openLibs(void)
+{
+  if(NULL == (IntuitionBase = (struct IntuitionBase *)
+    OpenLibrary("intuition.library", 47)))
+  {
+    PutStr("Failed to open intuition.library v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (WindowBase = OpenLibrary("window.class", 47)))
+  {
+    PutStr("Failed to open window.class v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (LayoutBase = OpenLibrary("gadgets/layout.gadget", 47)))
+  {
+    PutStr("Failed to open layout.gadget v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (ButtonBase = OpenLibrary("gadgets/button.gadget", 47)))
+  {
+    PutStr("Failed to open button.gadget v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (ChooserBase = OpenLibrary("gadgets/chooser.gadget", 47)))
+  {
+    PutStr("Failed to open chooser.gadget v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (ListBrowserBase = OpenLibrary("gadgets/listbrowser.gadget", 47)))
+  {
+    PutStr("Failed to open listbrowser.gadget v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (LabelBase = OpenLibrary("images/label.image", 47)))
+  {
+    PutStr("Failed to open label.image v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (IntegerBase = OpenLibrary("gadgets/integer.gadget", 47)))
+  {
+    PutStr("Failed to open integer.gadget v47.\n");
+    return FALSE;
+  }
+  
+  if(NULL == (StringBase = OpenLibrary("gadgets/string.gadget", 47)))
+  {
+    PutStr("Failed to open string.gadget v47.\n");
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+void closeLibs(void)
+{
+  if(NULL != StringBase)
+  {
+    CloseLibrary(StringBase);
+  }
+
+  if(NULL != IntegerBase)
+  {
+    CloseLibrary(IntegerBase);
+  }
+
+  if(NULL != LabelBase)
+  {
+    CloseLibrary(LabelBase);
+  }
+
+  if(NULL != ListBrowserBase)
+  {
+    CloseLibrary(ListBrowserBase);
+  }
+
+  if(NULL != ChooserBase)
+  {
+    CloseLibrary(ChooserBase);
+  }
+
+  if(NULL != ButtonBase)
+  {
+    CloseLibrary(ButtonBase);
+  }
+
+  if(NULL != LayoutBase)
+  {
+    CloseLibrary(LayoutBase);
+  }
+
+  if(NULL != WindowBase)
+  {
+    CloseLibrary(WindowBase);
+  }
+
+  if(NULL != IntuitionBase)
+  {
+    CloseLibrary((struct Library*)IntuitionBase);
+  }
 }
