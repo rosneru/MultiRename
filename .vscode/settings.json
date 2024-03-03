@@ -55,7 +55,9 @@
     "layout_protos.h": "c",
     "string_protos.h": "c",
     "classusr.h": "c",
-    "alib_protos.h": "c"
+    "alib_protos.h": "c",
+    "dos.h": "c",
+    "memory.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

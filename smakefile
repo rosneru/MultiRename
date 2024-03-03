@@ -15,13 +15,16 @@ LD = sc:c/sc
 
 all : $(EXE)
 
+$(OBJDIR)application.o : src/application.c
+	$(CC) nolink src/application.c
+
 $(OBJDIR)arguments.o : src/arguments.c
 	$(CC) nolink src/arguments.c
 
 $(OBJDIR)main.o : src/main.c
 	$(CC) nolink src/main.c
 
-OBJS = $(OBJDIR)main.o $(OBJDIR)arguments.o
+OBJS = $(OBJDIR)main.o $(OBJDIR)application.o $(OBJDIR)arguments.o
 
 $(EXE) : $(OBJS)
 	$(LD) link $(OBJS) LIB lib:reaction.lib
