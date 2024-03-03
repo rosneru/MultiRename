@@ -90,6 +90,8 @@ int main(int argc, char **argv)
       {
         result = RETURN_OK;
       }
+
+      disposeApplication(pApp);
     }
   }
 
