@@ -39,21 +39,42 @@
 /**
  * Private function declarations
  */
-void intuiEventLoop(Application* pApp);
 struct List* createChooserLabels(void);
 void freeChooserLabels(struct List* pLabelsList);
-Object* createLayout(struct List* pChooserLabels);
+struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2);
+void freeFilesList(struct List* pFilesList);
 
+void intuiEventLoop(Application* pApp);
+Object* createLayout(struct List* pChooserLabelsList,
+                     struct List* pFilesList);
+
+
+UBYTE *dummyCol1[] =
+{
+  "My_1st_file_is_older_than.md",
+  "my_2nd_one_and_even_more_than.txt",
+  "My_3rd_attempt.doc",
+  NULL
+};
+
+UBYTE *dummyCol2[] =
+{
+  "File-1.md",
+  "File-2.txt",
+  "File-3.doc",
+  NULL
+};
 
 Application* createApplication(void)
 {
   Object* pMainLayout;
   Application* pApp;
   struct List* pChooserList = createChooserLabels();
+  struct List* pFilesList = createFilesList(dummyCol1, dummyCol2);
 
   if((pApp = AllocVec(sizeof(Application), MEMF_PUBLIC|MEMF_CLEAR)))
   {
-    if((pMainLayout = createLayout(pChooserList)))
+    if((pMainLayout = createLayout(pChooserList, pFilesList)))
     {
       if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
                                        WINDOW_Position, WPOS_CENTERSCREEN,
@@ -220,11 +241,94 @@ void freeChooserLabels(struct List* pLabelsList)
 }
 
 
-Object* createLayout(struct List* pChooserLabels)
+struct TagItem columnTags[] = { {LBNA_Column, 0},
+                                  {LBNCA_CopyText, TRUE},
+                                  {LBNCA_Editable, TRUE},
+                                  {LBNCA_MaxChars, 101},
+                                  {LBNCA_Text, NULL},
+                                {LBNA_Column, 1},
+                                  {LBNCA_CopyText, TRUE},
+                                  {LBNCA_Editable, TRUE},
+                                  {LBNCA_MaxChars, 101},
+                                  {LBNCA_Text, NULL},
+                                {TAG_DONE}
+                              };
+
+struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2)
+{
+  struct Node *pNode;
+  struct List* pFilesList;
+  ULONG i = 0;
+
+  if(NULL == (pFilesList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
+  {
+    return NULL;
+  }
+
+  NewList(pFilesList);
+
+  while (NULL != *ppLabels1)
+  {
+    if(*ppLabels2 == NULL)
+    {
+      break;
+    }
+
+    columnTags[4].ti_Data = (ULONG)*ppLabels1;
+    columnTags[9].ti_Data = (ULONG)*ppLabels2;
+
+    if (NULL != (pNode = AllocListBrowserNodeA(2, columnTags)))
+    {
+      AddTail(pFilesList, pNode);
+    }
+    else
+    {
+      break;
+    }
+
+    ppLabels1++;
+    ppLabels2++;
+    i++;
+  }
+
+  return pFilesList;
+}
+
+
+void freeFilesList(struct List* pFilesList)
+{
+  struct Node* pWorkNode;
+  struct Node* pNextNode;
+
+  if(NULL == pFilesList)
+  {
+    return;
+  }
+
+  pWorkNode = pFilesList->lh_Head;
+  while(NULL != (pNextNode = pWorkNode->ln_Succ))
+  {
+    FreeListBrowserNode(pWorkNode);
+    pWorkNode = pNextNode;
+  }
+
+  FreeVec(pFilesList);
+}
+
+
+Object* createLayout(struct List* pChooserLabelsList,
+                     struct List* pFilesList)
 {
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL, 
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
+
+  struct ColumnInfo columnInfo[] =
+  {
+    { 50, "Old name", 0 },
+    { 50, "New name", 0 },
+    { -1, (STRPTR)~0, -1 }
+  };
 
   pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
@@ -309,7 +413,7 @@ Object* createLayout(struct List* pChooserLabels)
       LAYOUT_AddChild, NewObject(CHOOSER_GetClass(), NULL,
         GA_TabCycle, TRUE,
         GA_RelVerify, TRUE,
-        CHOOSER_Labels, pChooserLabels,
+        CHOOSER_Labels, pChooserLabelsList,
         CHOOSER_Selected, 1,
         CHOOSER_AutoFit, TRUE,
       TAG_DONE),
@@ -347,8 +451,8 @@ Object* createLayout(struct List* pChooserLabels)
       LAYOUT_Label, "Processing list",
       LAYOUT_AddChild, NewObject(LISTBROWSER_GetClass(), NULL,
         GA_RelVerify, TRUE,
-        // LISTBROWSER_Labels, &list,
-        // LISTBROWSER_ColumnInfo, &ci,
+        LISTBROWSER_Labels, pFilesList,
+        LISTBROWSER_ColumnInfo, &columnInfo,
         LISTBROWSER_ColumnTitles, TRUE,
         LISTBROWSER_Separators, TRUE,
         LISTBROWSER_Hierarchical, TRUE,
