@@ -190,9 +190,6 @@ struct List* createChooserLabels(void)
   UBYTE *values[] = { "1", "2", "4", "5", "6", "7", "8", "9", "10", NULL };
   struct Node* pLabelNode;
   struct List* pLabelsList;
-  struct TagItem allocTags[2];
-  allocTags[0].ti_Tag = CNA_Text;
-  allocTags[1].ti_Tag = TAG_DONE;
 
   if(NULL == (pLabelsList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
   {
@@ -203,8 +200,8 @@ struct List* createChooserLabels(void)
 
   do
   {
-    allocTags[0].ti_Data = (ULONG)values[i];
-    pLabelNode = AllocChooserNodeA(allocTags);
+    pLabelNode = AllocChooserNode(CNA_Text, (ULONG)values[i],
+                                  TAG_DONE);
     if(NULL == pLabelNode)
     {
       freeChooserLabels(pLabelsList);
@@ -240,20 +237,6 @@ void freeChooserLabels(struct List* pLabelsList)
   FreeVec(pLabelsList);
 }
 
-
-struct TagItem columnTags[] = { {LBNA_Column, 0},
-                                  {LBNCA_CopyText, TRUE},
-                                  {LBNCA_Editable, TRUE},
-                                  {LBNCA_MaxChars, 101},
-                                  {LBNCA_Text, NULL},
-                                {LBNA_Column, 1},
-                                  {LBNCA_CopyText, TRUE},
-                                  {LBNCA_Editable, TRUE},
-                                  {LBNCA_MaxChars, 101},
-                                  {LBNCA_Text, NULL},
-                                {TAG_DONE}
-                              };
-
 struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2)
 {
   struct Node *pNode;
@@ -274,10 +257,18 @@ struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2)
       break;
     }
 
-    columnTags[4].ti_Data = (ULONG)*ppLabels1;
-    columnTags[9].ti_Data = (ULONG)*ppLabels2;
-
-    if (NULL != (pNode = AllocListBrowserNodeA(2, columnTags)))
+    if (NULL != (pNode = AllocListBrowserNode(2, 
+                                              LBNA_Column, 0,
+                                                LBNCA_CopyText, TRUE,
+                                                LBNCA_Editable, TRUE,
+                                                LBNCA_MaxChars, 101,
+                                                LBNCA_Text, (ULONG)*ppLabels1,
+                                              LBNA_Column, 1,
+                                                LBNCA_CopyText, TRUE,
+                                                LBNCA_Editable, TRUE,
+                                                LBNCA_MaxChars, 101,
+                                                LBNCA_Text, (ULONG)*ppLabels2,
+                                              TAG_DONE)))
     {
       AddTail(pFilesList, pNode);
     }
