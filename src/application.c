@@ -41,6 +41,7 @@
  */
 struct List* createChooserLabels(void);
 void freeChooserLabels(struct List* pLabelsList);
+
 struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2);
 void freeFilesList(struct List* pFilesList);
 
@@ -49,7 +50,32 @@ Object* createLayout(struct List* pChooserLabelsList,
                      struct List* pFilesList);
 
 
-UBYTE *dummyCol1[] =
+/**
+ * Private variables
+ */
+enum gadids
+{
+    GID_START = 1
+  , GID_STRING_NAME
+  , GID_BTN_NAME
+  , GID_BTN_NAME_PART
+  , GID_BTN_NAME_DATE
+  , GID_BTN_NAME_TIME
+  , GID_BTN_NAME_COUNTER
+  , GID_STRING_EXTENSION
+  , GID_EXTENSION
+  , GID_EXTENSION_PART
+  , GID_EXTENSION_COUNTER
+  , GID_INTEGER_COUNTER_START
+  , GID_INTEGER_COUNTER_STEP
+  , GID_CHOOSER_COUNTER_PLACES
+  , GID_LISTBROWSER
+  , MAXGADGETS
+};
+
+static Object* gadgets[MAXGADGETS];
+
+UBYTE* dummyCol1[] =
 {
   "My_1st_file_is_older_than.md",
   "my_2nd_one_and_even_more_than.txt",
@@ -57,7 +83,7 @@ UBYTE *dummyCol1[] =
   NULL
 };
 
-UBYTE *dummyCol2[] =
+UBYTE* dummyCol2[] =
 {
   "File-1.md",
   "File-2.txt",
@@ -259,12 +285,12 @@ struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2)
 
     if (NULL != (pNode = AllocListBrowserNode(2, 
                                               LBNA_Column, 0,
-                                                LBNCA_CopyText, TRUE,
-                                                LBNCA_Editable, TRUE,
+                                                LBNCA_CopyText, FALSE,
+                                                LBNCA_Editable, FALSE,
                                                 LBNCA_MaxChars, 101,
                                                 LBNCA_Text, (ULONG)*ppLabels1,
                                               LBNA_Column, 1,
-                                                LBNCA_CopyText, TRUE,
+                                                LBNCA_CopyText, FALSE,
                                                 LBNCA_Editable, TRUE,
                                                 LBNCA_MaxChars, 101,
                                                 LBNCA_Text, (ULONG)*ppLabels2,
@@ -326,7 +352,8 @@ Object* createLayout(struct List* pChooserLabelsList,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_Label, (ULONG)"Name",
-    LAYOUT_AddChild, NewObject(STRING_GetClass(), NULL,
+    LAYOUT_AddChild, gadgets[GID_STRING_NAME] = NewObject(STRING_GetClass(), NULL,
+      GA_ID, GID_STRING_NAME,
       STRINGA_TextVal, (ULONG)"[N]",
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
