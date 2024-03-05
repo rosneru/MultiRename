@@ -55,21 +55,21 @@ Object* createLayout(struct List* pChooserLabelsList,
  */
 enum gadids
 {
-    GID_START = 1
-  , GID_STRING_NAME
+    GID_STRING_NAME = 1
   , GID_BTN_NAME
   , GID_BTN_NAME_PART
   , GID_BTN_NAME_DATE
   , GID_BTN_NAME_TIME
   , GID_BTN_NAME_COUNTER
   , GID_STRING_EXTENSION
-  , GID_EXTENSION
-  , GID_EXTENSION_PART
-  , GID_EXTENSION_COUNTER
+  , GID_BTN_EXTENSION
+  , GID_BTN_EXTENSION_PART
+  , GID_BTN_EXTENSION_COUNTER
   , GID_INTEGER_COUNTER_START
   , GID_INTEGER_COUNTER_STEP
   , GID_CHOOSER_COUNTER_PLACES
   , GID_LISTBROWSER
+  , GID_BTN_START
   , MAXGADGETS
 };
 
@@ -358,23 +358,28 @@ Object* createLayout(struct List* pChooserLabelsList,
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_BTN_NAME] = NewObject(BUTTON_GetClass(), NULL,
+        GA_ID, GID_BTN_NAME,
         GA_Text, (ULONG)"[N] Name",
       TAG_DONE),
-      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_BTN_NAME_DATE] = NewObject(BUTTON_GetClass(), NULL,
         GA_Text, (ULONG)"[YMD] Date",
+        GA_ID, GID_BTN_NAME_DATE,
       TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_BTN_NAME_PART] = NewObject(BUTTON_GetClass(), NULL,
+        GA_ID, GID_BTN_NAME_PART,
         GA_Text, (ULONG)"[N#-#] Part",
       TAG_DONE),
-      LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_BTN_NAME_TIME] = NewObject(BUTTON_GetClass(), NULL,
+        GA_ID, GID_BTN_NAME_TIME,
         GA_Text, (ULONG)"[hms] Time",
       TAG_DONE),
     TAG_DONE),
-    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, gadgets[GID_BTN_NAME_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
+      GA_ID, GID_BTN_NAME_COUNTER,
       GA_Text, (ULONG)"[C] Counter",
     TAG_DONE),
   TAG_DONE);
@@ -384,16 +389,20 @@ Object* createLayout(struct List* pChooserLabelsList,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_Label, (ULONG)"Extension",
-    LAYOUT_AddChild, NewObject(STRING_GetClass(), NULL,
+    LAYOUT_AddChild, gadgets[GID_STRING_EXTENSION] = NewObject(STRING_GetClass(), NULL,
+      GA_ID, GID_STRING_EXTENSION,
       STRINGA_TextVal, (ULONG)"[E]",
     TAG_DONE),
-    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, gadgets[GID_BTN_EXTENSION] = NewObject(BUTTON_GetClass(), NULL,
+      GA_ID, GID_BTN_EXTENSION,
       GA_Text, (ULONG)"[E] Ext.",
     TAG_DONE),
-    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, gadgets[GID_BTN_EXTENSION_PART] = NewObject(BUTTON_GetClass(), NULL,
+      GA_ID, GID_BTN_EXTENSION_PART,
       GA_Text, (ULONG)"[E#-#] Part",
     TAG_DONE),
-    LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, gadgets[GID_BTN_EXTENSION_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
+      GA_ID, GID_BTN_EXTENSION_COUNTER,
       GA_Text, (ULONG)"[C] Counter",
     TAG_DONE),
   TAG_DONE),
@@ -405,7 +414,8 @@ Object* createLayout(struct List* pChooserLabelsList,
     LAYOUT_Label, (ULONG)"Define counter",
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, NewObject(INTEGER_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_INTEGER_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
+        GA_ID, GID_INTEGER_COUNTER_START,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
         INTEGER_MaxChars, 2,
@@ -416,7 +426,8 @@ Object* createLayout(struct List* pChooserLabelsList,
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, NewObject(INTEGER_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_INTEGER_COUNTER_STEP] = NewObject(INTEGER_GetClass(), NULL,
+        GA_ID, GID_INTEGER_COUNTER_STEP,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
         INTEGER_MaxChars, 2,
@@ -428,7 +439,8 @@ Object* createLayout(struct List* pChooserLabelsList,
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, NewObject(CHOOSER_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_CHOOSER_COUNTER_PLACES] = NewObject(CHOOSER_GetClass(), NULL,
+        GA_ID, GID_CHOOSER_COUNTER_PLACES,
         GA_TabCycle, TRUE,
         GA_RelVerify, TRUE,
         CHOOSER_Labels, (ULONG)pChooserLabelsList,
@@ -467,7 +479,8 @@ Object* createLayout(struct List* pChooserLabelsList,
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
       LAYOUT_Label, (ULONG)"Processing list",
-      LAYOUT_AddChild, NewObject(LISTBROWSER_GetClass(), NULL,
+      LAYOUT_AddChild, gadgets[GID_LISTBROWSER] = NewObject(LISTBROWSER_GetClass(), NULL,
+        GA_ID, GID_LISTBROWSER,
         GA_RelVerify, TRUE,
         GA_ReadOnly, TRUE,
         LISTBROWSER_Labels, (ULONG)pFilesList,
@@ -476,7 +489,8 @@ Object* createLayout(struct List* pChooserLabelsList,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-        LAYOUT_AddChild, NewObject(BUTTON_GetClass(), NULL,
+        LAYOUT_AddChild, gadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
+          GA_ID, GID_BTN_START,
           GA_Text, (ULONG)"Start",
         TAG_DONE),
         CHILD_WeightedWidth, 0,
