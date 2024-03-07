@@ -13,6 +13,7 @@ set(CMAKE_C_LINK_EXECUTABLE "${CMAKE_C_LINK_EXECUTABLE} ${EXTRALIBS_LINK_FLAGS}"
 add_executable (MultiRename_gcc
                 application.c
                 arguments.c
+                file_node.c
                 main.c
                 rename_algorithm.c)
 

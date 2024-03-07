@@ -57,7 +57,8 @@
     "classusr.h": "c",
     "alib_protos.h": "c",
     "dos.h": "c",
-    "memory.h": "c"
+    "memory.h": "c",
+    "chooser.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

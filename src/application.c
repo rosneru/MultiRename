@@ -34,20 +34,14 @@
   #include <proto/window.h>
 #endif
 
+#include "file_node.h"
 #include "application.h"
 
 /**
  * Private function declarations
  */
-struct List* createChooserLabels(void);
-void freeChooserLabels(struct List* pLabelsList);
-
-struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2);
-void freeFilesList(struct List* pFilesList);
-
 void intuiEventLoop(Application* pApp);
-Object* createLayout(struct List* pChooserLabelsList,
-                     struct List* pFilesList);
+Object* createLayout();
 
 
 /**
@@ -75,32 +69,15 @@ enum gadids
 
 static Object* gadgets[MAXGADGETS];
 
-UBYTE* dummyCol1[] =
-{
-  "My_1st_file_is_older_than.md",
-  "my_2nd_one_and_even_more_than.txt",
-  "My_3rd_attempt.doc",
-  NULL
-};
-
-UBYTE* dummyCol2[] =
-{
-  "File-1.md",
-  "File-2.txt",
-  "File-3.doc",
-  NULL
-};
 
 Application* createApplication(void)
 {
   Object* pMainLayout;
   Application* pApp;
-  struct List* pChooserList = createChooserLabels();
-  struct List* pFilesList = createFilesList(dummyCol1, dummyCol2);
 
   if((pApp = AllocVec(sizeof(Application), MEMF_PUBLIC|MEMF_CLEAR)))
   {
-    if((pMainLayout = createLayout(pChooserList, pFilesList)))
+    if((pMainLayout = createLayout()))
     {
       if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
                                        WINDOW_Position, WPOS_CENTERSCREEN,
@@ -157,23 +134,40 @@ void disposeApplication(Application* pApp)
 
 BOOL runApplication(Application* pApp)
 {
+  struct List* pFileList;
+
   if(NULL == pApp)
   {
     return FALSE;
   }
 
+  if((pFileList = createDummyFileList()))
+  {
+      SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
+                      NULL, NULL,
+                      LISTBROWSER_Labels, (ULONG)pFileList,
+                      TAG_DONE);
+  }
+
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
+
     intuiEventLoop(pApp);
 
     // TODO: ClearMenuStrip()? before this..once a menu exists
     DoMethod(pApp->pWinObject, WM_CLOSE);
+
     return TRUE;
   }
   else
   {
     PutStr("Failed to open window.\n");
+  }
+
+  if(pFileList != NULL)
+  {
+    freeFileList(pFileList);
   }
 
   return FALSE;
@@ -208,139 +202,17 @@ void intuiEventLoop(Application* pApp)
 }
 
 
-
-
-struct List* createChooserLabels(void)
-{
-  ULONG i = 0;
-  UBYTE *values[] = { "1", "2", "4", "5", "6", "7", "8", "9", "10", NULL };
-  struct Node* pLabelNode;
-  struct List* pLabelsList;
-
-  if(NULL == (pLabelsList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
-  {
-    return NULL;
-  }
-
-  NewList(pLabelsList);
-
-  do
-  {
-    pLabelNode = AllocChooserNode(CNA_Text, (ULONG)values[i],
-                                  TAG_DONE);
-    if(NULL == pLabelNode)
-    {
-      freeChooserLabels(pLabelsList);
-      return NULL;
-    }
-
-    AddTail(pLabelsList, pLabelNode);
-
-    i++;
-  }
-  while(values[i] != NULL);
-
-  return pLabelsList;
-}
-
-void freeChooserLabels(struct List* pLabelsList)
-{
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
-
-  if(NULL == pLabelsList)
-  {
-    return;
-  }
-
-  pWorkNode = pLabelsList->lh_Head;
-  while(NULL != (pNextNode = pWorkNode->ln_Succ))
-  {
-    FreeChooserNode(pWorkNode);
-    pWorkNode = pNextNode;
-  }
-
-  FreeVec(pLabelsList);
-}
-
-struct List* createFilesList(UBYTE **ppLabels1, UBYTE **ppLabels2)
-{
-  struct Node *pNode;
-  struct List* pFilesList;
-  ULONG i = 0;
-
-  if(NULL == (pFilesList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
-  {
-    return NULL;
-  }
-
-  NewList(pFilesList);
-
-  while (NULL != *ppLabels1)
-  {
-    if(*ppLabels2 == NULL)
-    {
-      break;
-    }
-
-    if (NULL != (pNode = AllocListBrowserNode(2, 
-                                              LBNA_Column, 0,
-                                                LBNCA_CopyText, FALSE,
-                                                LBNCA_Editable, FALSE,
-                                                LBNCA_MaxChars, 101,
-                                                LBNCA_Text, (ULONG)*ppLabels1,
-                                              LBNA_Column, 1,
-                                                LBNCA_CopyText, FALSE,
-                                                LBNCA_Editable, TRUE,
-                                                LBNCA_MaxChars, 101,
-                                                LBNCA_Text, (ULONG)*ppLabels2,
-                                              TAG_DONE)))
-    {
-      AddTail(pFilesList, pNode);
-    }
-    else
-    {
-      break;
-    }
-
-    ppLabels1++;
-    ppLabels2++;
-    i++;
-  }
-
-  return pFilesList;
-}
-
-
-void freeFilesList(struct List* pFilesList)
-{
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
-
-  if(NULL == pFilesList)
-  {
-    return;
-  }
-
-  pWorkNode = pFilesList->lh_Head;
-  while(NULL != (pNextNode = pWorkNode->ln_Succ))
-  {
-    FreeListBrowserNode(pWorkNode);
-    pWorkNode = pNextNode;
-  }
-
-  FreeVec(pFilesList);
-}
-
-struct ColumnInfo columnInfo[] =
+static struct ColumnInfo columnInfo[] =
 {
   { 50, "Old name", CIF_WEIGHTED },
   { 50, "New name", CIF_WEIGHTED },
   { -1, (STRPTR)~0, -1 }
 };
 
-Object* createLayout(struct List* pChooserLabelsList,
-                     struct List* pFilesList)
+static UBYTE *ppCounterPlaces[] = { "1", "2", "3", "4", "5",
+                                    "6", "7", "8", "9", "10", NULL };
+
+Object* createLayout()
 {
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL, 
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
@@ -443,7 +315,8 @@ Object* createLayout(struct List* pChooserLabelsList,
         GA_ID, GID_CHOOSER_COUNTER_PLACES,
         GA_TabCycle, TRUE,
         GA_RelVerify, TRUE,
-        CHOOSER_Labels, (ULONG)pChooserLabelsList,
+        CHOOSER_LabelArray, (ULONG)ppCounterPlaces,
+        CHOOSER_Justification, CHJ_RIGHT,
         CHOOSER_Selected, 1,
         CHOOSER_AutoFit, TRUE,
       TAG_DONE),
@@ -467,7 +340,7 @@ Object* createLayout(struct List* pChooserLabelsList,
     ICA_TARGET, ICTARGET_IDCMP, /* TODO: Remove this?? */
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_DeferLayout, TRUE, /* this tag instructs layout.gadget to
+    LAYOUT_DeferLayout, TRUE,  /* this tag instructs layout.gadget to
                                 * defer GM_LAYOUT and GM_RENDER and ask
                                 * the application to do them. This
                                 * lessens the load on input.device
@@ -483,7 +356,6 @@ Object* createLayout(struct List* pChooserLabelsList,
         GA_ID, GID_LISTBROWSER,
         GA_RelVerify, TRUE,
         GA_ReadOnly, TRUE,
-        LISTBROWSER_Labels, (ULONG)pFilesList,
         LISTBROWSER_ColumnInfo, (ULONG)&columnInfo,
         LISTBROWSER_ColumnTitles, TRUE,
       TAG_DONE),
