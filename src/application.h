@@ -8,6 +8,7 @@ typedef struct Application
 {
   Object* pWinObject;
   struct Window* pIntuiWindow;
+  struct List* pFileList;
 } Application;
 
 

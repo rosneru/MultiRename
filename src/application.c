@@ -41,7 +41,7 @@
  * Private function declarations
  */
 void intuiEventLoop(Application* pApp);
-Object* createLayout();
+Object* createLayout(void);
 
 
 /**
@@ -131,21 +131,26 @@ void disposeApplication(Application* pApp)
   FreeVec(pApp);
 }
 
+UBYTE* dummyFileNames[] =
+{
+  "File-1.md",
+  "File-2.txt",
+  "File-3.doc",
+  NULL
+};
 
 BOOL runApplication(Application* pApp)
 {
-  struct List* pFileList;
-
   if(NULL == pApp)
   {
     return FALSE;
   }
 
-  if((pFileList = createDummyFileList()))
+  if((pApp->pFileList = createFileList(dummyFileNames)))
   {
       SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
                       NULL, NULL,
-                      LISTBROWSER_Labels, (ULONG)pFileList,
+                      LISTBROWSER_Labels, (ULONG)pApp->pFileList,
                       TAG_DONE);
   }
 
@@ -165,9 +170,9 @@ BOOL runApplication(Application* pApp)
     PutStr("Failed to open window.\n");
   }
 
-  if(pFileList != NULL)
+  if(NULL != pApp->pFileList)
   {
-    freeFileList(pFileList);
+    freeFileList(pApp->pFileList);
   }
 
   return FALSE;
@@ -212,7 +217,7 @@ static struct ColumnInfo columnInfo[] =
 static UBYTE *ppCounterPlaces[] = { "1", "2", "3", "4", "5",
                                     "6", "7", "8", "9", "10", NULL };
 
-Object* createLayout()
+Object* createLayout(void)
 {
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL, 
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
