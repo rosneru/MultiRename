@@ -27,7 +27,20 @@ ParsedArgs* createParsedArgs(int argc, char **argv)
 
   if(!(pParsedArgs = AllocVec(sizeof(ParsedArgs), MEMF_CLEAR|MEMF_PUBLIC)))
   {
+    PutStr("Failed to allocate memory for parsed arguments.\n");
     return NULL;
+  }
+
+  if(argc == 0)
+  {
+    // Started from Workbench
+    readWorkbenchArgs(pParsedArgs, argv);
+
+  }
+  else
+  {
+    // Started from CLI
+    readCommandLineArgs(pParsedArgs);
   }
 
   return pParsedArgs;

@@ -64,7 +64,7 @@ int main(int argc, char **argv)
   ULONG result = RETURN_FAIL;
   if(TRUE == openLibs())
   {
-    if((pApp = createApplication()))
+    if((pApp = createApplication(argc, argv)))
     {
       if(TRUE == runApplication(pApp))
       {

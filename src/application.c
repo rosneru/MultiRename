@@ -70,41 +70,49 @@ enum gadids
 static Object* gadgets[MAXGADGETS];
 
 
-Application* createApplication(void)
+Application* createApplication(int argc, char **argv)
 {
   Object* pMainLayout;
   Application* pApp;
 
   if((pApp = AllocVec(sizeof(Application), MEMF_PUBLIC|MEMF_CLEAR)))
   {
-    if((pMainLayout = createLayout()))
+    if(pApp->pParsedArgs = createParsedArgs(argc, argv))
     {
-      if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                       WINDOW_Position, WPOS_CENTERSCREEN,
-                                       WA_Activate, TRUE,
-                                       WA_Title, "MultiRename",
-                                       WA_DragBar, TRUE,
-                                       WA_CloseGadget, TRUE,
-                                       WA_DepthGadget, TRUE,
-                                       WA_SizeGadget, TRUE,
-                                       WA_InnerWidth, 600,
-                                       WA_InnerHeight, 400,
-                                       WA_IDCMP, IDCMP_CLOSEWINDOW,
-                                       WINDOW_Layout, pMainLayout,
-                                       TAG_DONE)))
+      if((pMainLayout = createLayout()))
       {
-        return pApp;
+        if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
+                                        WINDOW_Position, WPOS_CENTERSCREEN,
+                                        WA_Activate, TRUE,
+                                        WA_Title, "MultiRename",
+                                        WA_DragBar, TRUE,
+                                        WA_CloseGadget, TRUE,
+                                        WA_DepthGadget, TRUE,
+                                        WA_SizeGadget, TRUE,
+                                        WA_InnerWidth, 600,
+                                        WA_InnerHeight, 400,
+                                        WA_IDCMP, IDCMP_CLOSEWINDOW,
+                                        WINDOW_Layout, pMainLayout,
+                                        TAG_DONE)))
+        {
+          return pApp;
+        }
+        else
+        {
+          PutStr("Failed to create window.\n");
+          DisposeObject(pMainLayout);
+          FreeVec(pApp);
+        }
       }
       else
       {
-        PutStr("Failed to create window.\n");
-        DisposeObject(pMainLayout);
+        PutStr("Failed to create layout.\n");
         FreeVec(pApp);
       }
+
     }
     else
     {
-      PutStr("Failed to create layout.\n");
       FreeVec(pApp);
     }
   }
@@ -131,28 +139,24 @@ void disposeApplication(Application* pApp)
   FreeVec(pApp);
 }
 
-UBYTE* dummyFileNames[] =
-{
-  "File-1.md",
-  "File-2.txt",
-  "File-3.doc",
-  NULL
-};
 
 BOOL runApplication(Application* pApp)
 {
+  ParsedArgs* pParsedArgs;
   if(NULL == pApp)
   {
     return FALSE;
   }
 
-  if((pApp->pFileList = createFileList(dummyFileNames)))
+  if((pApp->pFileList = createFileList(pApp->pParsedArgs->ppFiles)))
   {
       SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
                       NULL, NULL,
                       LISTBROWSER_Labels, (ULONG)pApp->pFileList,
                       TAG_DONE);
   }
+
+
 
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
