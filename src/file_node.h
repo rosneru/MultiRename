@@ -9,8 +9,8 @@
 typedef struct FileNode
 {
   struct Node en_Node;
-  UBYTE OldName[MAXNAMELEN + 1]; // Max length + \0 termination
-  UBYTE NewName[MAXNAMELEN + 1];
+  char OldName[MAXNAMELEN + 1]; // Max length + \0 termination
+  char NewName[MAXNAMELEN + 1];
 } FileNode;
 
 struct List* createFileList(UBYTE** ppFileNames);

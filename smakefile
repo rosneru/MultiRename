@@ -18,19 +18,19 @@ all : $(EXE)
 $(OBJDIR)application.o : src/application.c
 	$(CC) nolink src/application.c
 
-$(OBJDIR)arguments.o : src/arguments.c
-	$(CC) nolink src/arguments.c
-
 $(OBJDIR)file_node.o : src/file_node.c
 	$(CC) nolink src/file_node.c
 
 $(OBJDIR)main.o : src/main.c
 	$(CC) nolink src/main.c
 
+$(OBJDIR)parsed_args.o : src/parsed_args.c
+	$(CC) nolink src/parsed_args.c
+
 $(OBJDIR)rename_algorithm.o : src/rename_algorithm.c
 	$(CC) nolink src/rename_algorithm.c
 
-OBJS = $(OBJDIR)application.o $(OBJDIR)arguments.o $(OBJDIR)file_node.o $(OBJDIR)main.o $(OBJDIR)rename_algorithm.o
+OBJS = $(OBJDIR)application.o $(OBJDIR)parsed_args.o $(OBJDIR)file_node.o $(OBJDIR)main.o $(OBJDIR)rename_algorithm.o
 
 $(EXE) : $(OBJS)
 	$(LD) link $(OBJS)
