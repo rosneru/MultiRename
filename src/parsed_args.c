@@ -48,12 +48,12 @@ ParsedArgs* createParsedArgs(int argc, char **argv)
 
 void freeParsedArgs(ParsedArgs* pParsedArgs)
 {
-  if(NULL != pReadArgs)
+  if(pReadArgs)
   {
     FreeArgs(pReadArgs);
   }
 
-  if(NULL != pParsedArgs)
+  if(pParsedArgs)
   {
     FreeVec(pParsedArgs);
   }
@@ -68,7 +68,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs)
   LONG args[] = {0, 0};
 
   struct RDArgs* pReadArgs = ReadArgs(argTempl, args, NULL);
-  if(pReadArgs == NULL)
+  if(!pReadArgs)
   {
     return;
   }

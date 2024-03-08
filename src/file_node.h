@@ -13,7 +13,7 @@ typedef struct FileNode
   char NewName[MAXNAMELEN + 1];
 } FileNode;
 
-struct List* createFileList(UBYTE** ppFileNames);
+struct List* createFileList(STRPTR* ppFileNames);
 void freeFileList(struct List* pFilesList);
 
 #endif

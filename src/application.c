@@ -82,18 +82,18 @@ Application* createApplication(int argc, char **argv)
       if((pMainLayout = createLayout()))
       {
         if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                        WINDOW_Position, WPOS_CENTERSCREEN,
-                                        WA_Activate, TRUE,
-                                        WA_Title, "MultiRename",
-                                        WA_DragBar, TRUE,
-                                        WA_CloseGadget, TRUE,
-                                        WA_DepthGadget, TRUE,
-                                        WA_SizeGadget, TRUE,
-                                        WA_InnerWidth, 600,
-                                        WA_InnerHeight, 400,
-                                        WA_IDCMP, IDCMP_CLOSEWINDOW,
-                                        WINDOW_Layout, pMainLayout,
-                                        TAG_DONE)))
+                                         WINDOW_Position, WPOS_CENTERSCREEN,
+                                         WA_Activate, TRUE,
+                                         WA_Title, "MultiRename",
+                                         WA_DragBar, TRUE,
+                                         WA_CloseGadget, TRUE,
+                                         WA_DepthGadget, TRUE,
+                                         WA_SizeGadget, TRUE,
+                                         WA_InnerWidth, 600,
+                                         WA_InnerHeight, 400,
+                                         WA_IDCMP, IDCMP_CLOSEWINDOW,
+                                         WINDOW_Layout, pMainLayout,
+                                         TAG_DONE)))
         {
           return pApp;
         }

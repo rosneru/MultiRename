@@ -15,33 +15,38 @@
 
 #include "file_node.h"
 
-struct List* createFileList(UBYTE** ppFileNames)
+struct List* createFileList(STRPTR* ppFileNames)
 {
   struct Node *pNode;
   struct List* pFilesList;
   FileNode* pFileNode;
   ULONG i = 0;
 
-  if(NULL == (pFilesList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
+  if(!(pFilesList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
   {
     return NULL;
   }
 
   NewList(pFilesList);
 
-  while (NULL != *ppFileNames)
+  if(!ppFileNames)
   {
-    if (NULL != (pNode = AllocListBrowserNode(2, 
-                                              LBNA_NodeSize, sizeof(FileNode),
-                                              LBNA_Column, 0,
-                                                LBNCA_CopyText, FALSE,
-                                                LBNCA_Editable, FALSE,
-                                                LBNCA_MaxChars, MAXNAMELEN,
-                                              LBNA_Column, 1,
-                                                LBNCA_CopyText, FALSE,
-                                                LBNCA_Editable, FALSE,
-                                                LBNCA_MaxChars, MAXNAMELEN,
-                                              TAG_DONE)))
+    return pFilesList;
+  }
+
+  while (*ppFileNames)
+  {
+    if ((pNode = AllocListBrowserNode(2, 
+                                      LBNA_NodeSize, sizeof(FileNode),
+                                      LBNA_Column, 0,
+                                        LBNCA_CopyText, FALSE,
+                                        LBNCA_Editable, FALSE,
+                                        LBNCA_MaxChars, MAXNAMELEN,
+                                      LBNA_Column, 1,
+                                        LBNCA_CopyText, FALSE,
+                                        LBNCA_Editable, FALSE,
+                                        LBNCA_MaxChars, MAXNAMELEN,
+                                      TAG_DONE)))
     {
       pFileNode = (FileNode*) pNode;
       Strncpy(pFileNode->OldName, *ppFileNames, MAXNAMELEN);
@@ -72,13 +77,13 @@ void freeFileList(struct List* pFilesList)
   struct Node* pWorkNode;
   struct Node* pNextNode;
 
-  if(NULL == pFilesList)
+  if(!pFilesList)
   {
     return;
   }
 
   pWorkNode = pFilesList->lh_Head;
-  while(NULL != (pNextNode = pWorkNode->ln_Succ))
+  while((pNextNode = pWorkNode->ln_Succ))
   {
     FreeListBrowserNode(pWorkNode);
     pWorkNode = pNextNode;
