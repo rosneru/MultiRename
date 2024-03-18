@@ -59,7 +59,8 @@
     "dos.h": "c",
     "memory.h": "c",
     "chooser.h": "c",
-    "utility.h": "c"
+    "utility.h": "c",
+    "exec_protos.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

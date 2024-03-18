@@ -3,11 +3,13 @@
 
 #ifdef __clang__
   #include <clib/alib_protos.h>
+  #include <clib/dos_protos.h>
   #include <clib/exec_protos.h>
   #include <clib/utility_protos.h>
   #include <clib/listbrowser_protos.h>
 #else
   #include <proto/alib.h>
+  #include <proto/dos.h>
   #include <proto/exec.h>
   #include <proto/utility.h>
   #include <proto/listbrowser.h>
@@ -15,8 +17,59 @@
 
 #include "file_node.h"
 
+
+
+struct Node* createFileNode(STRPTR pFileName)
+{
+  STRPTR pPathEnd, pNameStart;
+  ULONG pathLength;
+  struct Node *pNode;
+  FileNode* pFileNode;
+
+
+  if ((pNode = AllocListBrowserNode(2, 
+                                    LBNA_NodeSize, sizeof(FileNode),
+                                    LBNA_Column, 0,
+                                      LBNCA_CopyText, FALSE,
+                                      LBNCA_Editable, FALSE,
+                                      LBNCA_MaxChars, MAXNAMELEN,
+                                    LBNA_Column, 1,
+                                      LBNCA_CopyText, FALSE,
+                                      LBNCA_Editable, FALSE,
+                                      LBNCA_MaxChars, MAXNAMELEN,
+                                    TAG_DONE)))
+  {
+    pFileNode = (FileNode*) pNode;
+
+    pPathEnd = PathPart(pFileName);
+    pNameStart = FilePart(pFileName);
+    pathLength = pPathEnd - pFileName;
+    if(pathLength > MAXPATHLEN)
+    {
+      // TODO: Notify truncation
+      pathLength = MAXPATHLEN;
+    }
+
+    Strncpy(pFileNode->Path, pFileName, pathLength);
+    Strncpy(pFileNode->OldName, pNameStart, MAXNAMELEN);
+    Strncpy(pFileNode->NewName, pNameStart , MAXNAMELEN);
+    SetListBrowserNodeAttrs(pNode,
+                            LBNA_Column, 0,
+                              LBNCA_Text, pFileNode->OldName,
+                            LBNA_Column, 1,
+                              LBNCA_Text, pFileNode->NewName,
+                            TAG_DONE);
+    return pNode;
+  }
+  else
+  {
+    return NULL;
+  }
+}
+
 struct List* createFileList(STRPTR* ppFileNames)
 {
+
   struct Node *pNode;
   struct List* pFilesList;
   FileNode* pFileNode;
@@ -36,27 +89,8 @@ struct List* createFileList(STRPTR* ppFileNames)
 
   while (*ppFileNames)
   {
-    if ((pNode = AllocListBrowserNode(2, 
-                                      LBNA_NodeSize, sizeof(FileNode),
-                                      LBNA_Column, 0,
-                                        LBNCA_CopyText, FALSE,
-                                        LBNCA_Editable, FALSE,
-                                        LBNCA_MaxChars, MAXNAMELEN,
-                                      LBNA_Column, 1,
-                                        LBNCA_CopyText, FALSE,
-                                        LBNCA_Editable, FALSE,
-                                        LBNCA_MaxChars, MAXNAMELEN,
-                                      TAG_DONE)))
+    if ((pNode = createFileNode(*ppFileNames)))
     {
-      pFileNode = (FileNode*) pNode;
-      Strncpy(pFileNode->OldName, *ppFileNames, MAXNAMELEN);
-      Strncpy(pFileNode->NewName, *ppFileNames, MAXNAMELEN);
-      SetListBrowserNodeAttrs(pNode,
-                              LBNA_Column, 0,
-                                LBNCA_Text, pFileNode->OldName,
-                              LBNA_Column, 1,
-                                LBNCA_Text, pFileNode->NewName,
-                              TAG_DONE);
       AddTail(pFilesList, pNode);
     }
     else

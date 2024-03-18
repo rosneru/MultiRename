@@ -9,6 +9,7 @@
 typedef struct FileNode
 {
   struct Node en_Node;
+  char Path[MAXPATHLEN + 1];
   char OldName[MAXNAMELEN + 1]; // Max length + \0 termination
   char NewName[MAXNAMELEN + 1];
 } FileNode;
