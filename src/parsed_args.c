@@ -64,19 +64,19 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 void readCommandLineArgs(ParsedArgs* pParsedArgs)
 {
   STRPTR* pFiles;
-  const char argTempl[] = "FILES/M,PUBSCREEN/K";
-  LONG args[] = {0, 0};
+  LONG args[ARG_ARRAY_SIZE];
 
-  struct RDArgs* pReadArgs = ReadArgs(argTempl, args, NULL);
+  struct RDArgs* pReadArgs = ReadArgs(ARG_TEMPLATE, args, NULL);
   if(!pReadArgs)
   {
     return;
   }
 
-  if(args[0] != 0)
+  if(args[ARG_FILES] != 0)
   {
-    // args[0] contains a array of pointers to the passed FILEs.
-    pFiles = (STRPTR*) args[0];
+    // When the FILES argument was parsed, the ARG_FILES array item
+    // points to an array of pointers to the passed FILEs (path + name).
+    pFiles = (STRPTR*) args[ARG_FILES];
 
     if(pFiles[0] != NULL)
     {
@@ -84,9 +84,9 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs)
     }
   }
 
-  if(args[1] != 0)
+  if(args[ARG_PUBSCREEN] != 0)
   {
-    pParsedArgs->pPubScreenName = args[1];
+    pParsedArgs->pPubScreenName = (char*)args[ARG_PUBSCREEN];
   }
 }
 

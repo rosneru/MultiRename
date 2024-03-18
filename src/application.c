@@ -77,7 +77,7 @@ Application* createApplication(int argc, char **argv)
 
   if((pApp = AllocVec(sizeof(Application), MEMF_PUBLIC|MEMF_CLEAR)))
   {
-    if(pApp->pParsedArgs = createParsedArgs(argc, argv))
+    if((pApp->pParsedArgs = createParsedArgs(argc, argv)))
     {
       if((pMainLayout = createLayout()))
       {
@@ -126,12 +126,12 @@ Application* createApplication(int argc, char **argv)
 
 void disposeApplication(Application* pApp)
 {
-  if(NULL == pApp)
+  if(!pApp)
   {
     return;
   }
 
-  if(NULL != pApp->pWinObject)
+  if(pApp->pWinObject)
   {
     DisposeObject(pApp->pWinObject);
   }
@@ -142,8 +142,7 @@ void disposeApplication(Application* pApp)
 
 BOOL runApplication(Application* pApp)
 {
-  ParsedArgs* pParsedArgs;
-  if(NULL == pApp)
+  if(!pApp)
   {
     return FALSE;
   }
@@ -174,7 +173,7 @@ BOOL runApplication(Application* pApp)
     PutStr("Failed to open window.\n");
   }
 
-  if(NULL != pApp->pFileList)
+  if(pApp->pFileList)
   {
     freeFileList(pApp->pFileList);
   }
