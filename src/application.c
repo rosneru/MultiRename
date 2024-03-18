@@ -34,6 +34,8 @@
   #include <proto/window.h>
 #endif
 
+#include <string.h>
+
 #include "file_node.h"
 #include "application.h"
 
@@ -142,6 +144,8 @@ void disposeApplication(Application* pApp)
 
 BOOL runApplication(Application* pApp)
 {
+  char buf[1024];
+  STRPTR pFirstPath;
   if(!pApp)
   {
     return FALSE;
@@ -149,10 +153,16 @@ BOOL runApplication(Application* pApp)
 
   if((pApp->pFileList = createFileList(pApp->pParsedArgs->ppFiles)))
   {
-      SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
-                      NULL, NULL,
-                      LISTBROWSER_Labels, (ULONG)pApp->pFileList,
-                      TAG_DONE);
+    if(strlen(pApp->FilesPath) < 1)
+    {
+      if((pFirstPath = getFirstFilePath(pApp->pFileList)))
+      strcpy(pApp->FilesPath, pFirstPath);
+    }
+
+    SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
+                   NULL, NULL,
+                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                   TAG_DONE);
   }
 
 
@@ -160,6 +170,13 @@ BOOL runApplication(Application* pApp)
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
+    if(strlen(pApp->FilesPath) > 0)
+    {
+      strcpy(buf, "MultiRename in drawer [");
+      strcat(buf, pApp->FilesPath);
+      strcat(buf, "]");
+      SetWindowTitles(pApp->pIntuiWindow, buf, (UBYTE *)~0);
+    }
 
     intuiEventLoop(pApp);
 

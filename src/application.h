@@ -4,6 +4,7 @@
 #include <intuition/classusr.h>
 #include <intuition/intuition.h>
 
+#include "file_node.h"
 #include "parsed_args.h"
 
 typedef struct Application
@@ -11,6 +12,7 @@ typedef struct Application
   Object* pWinObject;
   struct Window* pIntuiWindow;
   struct List* pFileList;
+  char FilesPath[MAXPATHLEN + 1];
   ParsedArgs* pParsedArgs;
 } Application;
 

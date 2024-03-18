@@ -1,3 +1,4 @@
+#include <exec/lists.h>
 #include <gadgets/chooser.h>
 #include <gadgets/listbrowser.h>
 
@@ -43,7 +44,7 @@ struct Node* createFileNode(STRPTR pFileName)
 
     pPathEnd = PathPart(pFileName);
     pNameStart = FilePart(pFileName);
-    pathLength = pPathEnd - pFileName;
+    pathLength = pPathEnd - pFileName + 1;
     if(pathLength > MAXPATHLEN)
     {
       // TODO: Notify truncation
@@ -72,7 +73,6 @@ struct List* createFileList(STRPTR* ppFileNames)
 
   struct Node *pNode;
   struct List* pFilesList;
-  FileNode* pFileNode;
   ULONG i = 0;
 
   if(!(pFilesList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
@@ -124,4 +124,14 @@ void freeFileList(struct List* pFilesList)
   }
 
   FreeVec(pFilesList);
+}
+
+STRPTR getFirstFilePath(struct List* pFilesList)
+{
+  if(NULL == pFilesList->lh_Head->ln_Succ)
+  {
+    return NULL;
+  }
+
+  return ((FileNode*)pFilesList->lh_Head)->Path;
 }

@@ -17,4 +17,6 @@ typedef struct FileNode
 struct List* createFileList(STRPTR* ppFileNames);
 void freeFileList(struct List* pFilesList);
 
+STRPTR getFirstFilePath(struct List* pFilesList);
+
 #endif
