@@ -14,7 +14,15 @@ typedef struct FileNode
   char NewName[MAXNAMELEN + 1];
 } FileNode;
 
-struct List* createFileList(STRPTR* ppFileNames);
+/**
+ * Creates and returns the list of file nodes according to the given
+ * file names. File names whose paths are different than that one of
+ * the first created node ares skipped. The number of skipped files
+ * is set into the parameter variable pNumSkipped.
+ * 
+ * Returns NULL on error.
+ */
+struct List* createFileList(STRPTR* ppFileNames, ULONG *pNumSkipped);
 void freeFileList(struct List* pFilesList);
 
 STRPTR getFirstFilePath(struct List* pFilesList);

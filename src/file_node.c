@@ -16,6 +16,8 @@
   #include <proto/listbrowser.h>
 #endif
 
+#include <string.h>
+
 #include "file_node.h"
 
 
@@ -68,9 +70,10 @@ struct Node* createFileNode(STRPTR pFileName)
   }
 }
 
-struct List* createFileList(STRPTR* ppFileNames)
+struct List* createFileList(STRPTR* ppFileNames, ULONG *pNumSkipped)
 {
-
+  ULONG numSkipped = 0;
+  char* pFirstPath = NULL;
   struct Node *pNode;
   struct List* pFilesList;
   ULONG i = 0;
@@ -91,7 +94,23 @@ struct List* createFileList(STRPTR* ppFileNames)
   {
     if ((pNode = createFileNode(*ppFileNames)))
     {
-      AddTail(pFilesList, pNode);
+      if(!pFirstPath)
+      {
+        pFirstPath = ((FileNode*)pNode)->Path;
+      }
+
+      if(strcmp(((FileNode*)pNode)->Path, pFirstPath) == 0)
+      {
+        // This file has the same path as the former ones: add it
+        AddTail(pFilesList, pNode);
+      }
+      else
+      {
+        // This file has a different path as the former ones: skip it
+        numSkipped++;
+        FreeListBrowserNode(pNode);
+      }
+
     }
     else
     {
@@ -100,6 +119,11 @@ struct List* createFileList(STRPTR* ppFileNames)
 
     ppFileNames++;
     i++;
+  }
+
+  if(pNumSkipped)
+  {
+    *pNumSkipped = numSkipped;
   }
 
   return pFilesList;

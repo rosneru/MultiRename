@@ -35,6 +35,7 @@
 #endif
 
 #include <string.h>
+#include <stdio.h>
 
 #include "file_node.h"
 #include "application.h"
@@ -141,9 +142,31 @@ void disposeApplication(Application* pApp)
   FreeVec(pApp);
 }
 
+LONG easy_req(struct Window *win,
+              char *reqtext,
+              char *reqgads,
+              char *reqargs,
+              ...)
+{
+  struct EasyStruct general_es =
+  {
+    sizeof(struct EasyStruct),
+    0,
+    "SBGen",
+    NULL,
+    NULL
+  };
+
+  general_es.es_TextFormat = reqtext;
+  general_es.es_GadgetFormat = reqgads;
+
+  return(EasyRequestArgs(win, &general_es, NULL, &reqargs));
+}
+
 
 BOOL runApplication(Application* pApp)
 {
+  ULONG numSkippedFiles = 0;
   char buf[1024];
   STRPTR pFirstPath;
   if(!pApp)
@@ -151,12 +174,13 @@ BOOL runApplication(Application* pApp)
     return FALSE;
   }
 
-  if((pApp->pFileList = createFileList(pApp->pParsedArgs->ppFiles)))
+  if((pApp->pFileList = createFileList(pApp->pParsedArgs->ppFiles,
+                                       &numSkippedFiles)))
   {
     if(strlen(pApp->FilesPath) < 1)
     {
       if((pFirstPath = getFirstFilePath(pApp->pFileList)))
-      strcpy(pApp->FilesPath, pFirstPath);
+      strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
     }
 
     SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
@@ -172,10 +196,18 @@ BOOL runApplication(Application* pApp)
   {
     if(strlen(pApp->FilesPath) > 0)
     {
-      strcpy(buf, "MultiRename in drawer [");
+      strcpy(buf, "MultiRename in path [");
       strcat(buf, pApp->FilesPath);
       strcat(buf, "]");
       SetWindowTitles(pApp->pIntuiWindow, buf, (UBYTE *)~0);
+    }
+
+    if(numSkippedFiles > 0)
+    {
+      sprintf(buf, "Skipped %d file(s) because they had different paths "
+                   "than the files already added.", numSkippedFiles);
+
+      easy_req(pApp->pIntuiWindow, buf, "Ok", "");
     }
 
     intuiEventLoop(pApp);
