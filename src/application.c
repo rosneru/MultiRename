@@ -38,6 +38,7 @@
 #include <stdio.h>
 
 #include "file_node.h"
+#include "requester.h"
 #include "application.h"
 
 /**
@@ -142,27 +143,6 @@ void disposeApplication(Application* pApp)
   FreeVec(pApp);
 }
 
-LONG easy_req(struct Window *win,
-              char *reqtext,
-              char *reqgads,
-              char *reqargs,
-              ...)
-{
-  struct EasyStruct general_es =
-  {
-    sizeof(struct EasyStruct),
-    0,
-    "SBGen",
-    NULL,
-    NULL
-  };
-
-  general_es.es_TextFormat = reqtext;
-  general_es.es_GadgetFormat = reqgads;
-
-  return(EasyRequestArgs(win, &general_es, NULL, &reqargs));
-}
-
 
 BOOL runApplication(Application* pApp)
 {
@@ -207,7 +187,7 @@ BOOL runApplication(Application* pApp)
       sprintf(buf, "Skipped %d file(s) because they had different paths "
                    "than the files already added.", numSkippedFiles);
 
-      easy_req(pApp->pIntuiWindow, buf, "Ok", "");
+      showEasyRequest(pApp->pIntuiWindow, "Ok", buf);
     }
 
     intuiEventLoop(pApp);

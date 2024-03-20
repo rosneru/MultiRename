@@ -15,7 +15,8 @@ add_executable (MultiRename_gcc
                 parsed_args.c
                 file_node.c
                 main.c
-                rename_algorithm.c)
+                rename_algorithm.c
+                requester.c)
 
 add_custom_command(TARGET MultiRename_gcc
                    POST_BUILD

@@ -30,7 +30,10 @@ $(OBJDIR)parsed_args.o : src/parsed_args.c
 $(OBJDIR)rename_algorithm.o : src/rename_algorithm.c
 	$(CC) nolink src/rename_algorithm.c
 
-OBJS = $(OBJDIR)application.o $(OBJDIR)parsed_args.o $(OBJDIR)file_node.o $(OBJDIR)main.o $(OBJDIR)rename_algorithm.o
+$(OBJDIR)requester.o : src/requester.c
+	$(CC) nolink src/requester.c
+
+OBJS = $(OBJDIR)application.o $(OBJDIR)parsed_args.o $(OBJDIR)file_node.o $(OBJDIR)main.o $(OBJDIR)rename_algorithm.o $(OBJDIR)requester.o
 
 $(EXE) : $(OBJS)
 	$(LD) link $(OBJS)
