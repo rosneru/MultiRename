@@ -147,7 +147,6 @@ void disposeApplication(Application* pApp)
 BOOL runApplication(Application* pApp)
 {
   ULONG numSkippedFiles = 0;
-  char buf[1024];
   STRPTR pFirstPath;
   if(!pApp)
   {
@@ -174,20 +173,15 @@ BOOL runApplication(Application* pApp)
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
-    if(strlen(pApp->FilesPath) > 0)
-    {
-      strcpy(buf, "MultiRename in path [");
-      strcat(buf, pApp->FilesPath);
-      strcat(buf, "]");
-      SetWindowTitles(pApp->pIntuiWindow, buf, (UBYTE *)~0);
-    }
+    updateApplicationWindowTitle(pApp);
 
     if(numSkippedFiles > 0)
     {
-      sprintf(buf, "Skipped %d file(s) because they had different paths "
-                   "than the files already added.", numSkippedFiles);
+      sprintf(pApp->ScratchBuf,
+              "Skipped %d file(s) because they had different paths "
+              "than the files already added.", numSkippedFiles);
 
-      showEasyRequest(pApp->pIntuiWindow, "Ok", buf);
+      showEasyRequest(pApp->pIntuiWindow, "Ok", pApp->ScratchBuf);
     }
 
     intuiEventLoop(pApp);
@@ -409,4 +403,15 @@ Object* createLayout(void)
   TAG_DONE);
 
   return pMainLayout;
+}
+
+void updateApplicationWindowTitle(Application* pApp)
+{
+  if(strlen(pApp->FilesPath) > 0)
+  {
+    strcpy(pApp->WindowTitle, "MultiRename in [");
+    strcat(pApp->WindowTitle, pApp->FilesPath);
+    strcat(pApp->WindowTitle, "]");
+    SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
+  }
 }

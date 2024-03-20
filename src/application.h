@@ -13,14 +13,20 @@ typedef struct Application
   struct Window* pIntuiWindow;
   struct List* pFileList;
   char FilesPath[MAXPATHLEN + 1];
+  char WindowTitle[MAXPATHLEN + 32];
+  char ScratchBuf[1024];
   ParsedArgs* pParsedArgs;
 } Application;
-
 
 Application* createApplication(int argc, char **argv);
 void disposeApplication(Application* pApp);
 
 BOOL runApplication(Application* pApp);
 
+
+/**
+ * Set current files path as window title
+ */
+void updateApplicationWindowTitle(Application* pApp);
 
 #endif
