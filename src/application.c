@@ -81,43 +81,53 @@ Application* createApplication(int argc, char **argv)
 
   if((pApp = AllocVec(sizeof(Application), MEMF_PUBLIC|MEMF_CLEAR)))
   {
-    if((pApp->pParsedArgs = createParsedArgs(argc, argv)))
+    if((pApp->pFileList = createFileList()))
     {
-      if((pMainLayout = createLayout()))
+      if((pApp->pParsedArgs = createParsedArgs(argc, argv, pApp->pFileList)))
       {
-        if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                         WINDOW_Position, WPOS_CENTERSCREEN,
-                                         WA_Activate, TRUE,
-                                         WA_Title, "MultiRename",
-                                         WA_DragBar, TRUE,
-                                         WA_CloseGadget, TRUE,
-                                         WA_DepthGadget, TRUE,
-                                         WA_SizeGadget, TRUE,
-                                         WA_InnerWidth, 600,
-                                         WA_InnerHeight, 400,
-                                         WA_IDCMP, IDCMP_CLOSEWINDOW,
-                                         WINDOW_Layout, pMainLayout,
-                                         TAG_DONE)))
+        if((pMainLayout = createLayout()))
         {
-          return pApp;
+          if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
+                                          WINDOW_Position, WPOS_CENTERSCREEN,
+                                          WA_Activate, TRUE,
+                                          WA_Title, "MultiRename",
+                                          WA_DragBar, TRUE,
+                                          WA_CloseGadget, TRUE,
+                                          WA_DepthGadget, TRUE,
+                                          WA_SizeGadget, TRUE,
+                                          WA_InnerWidth, 600,
+                                          WA_InnerHeight, 400,
+                                          WA_IDCMP, IDCMP_CLOSEWINDOW,
+                                          WINDOW_Layout, pMainLayout,
+                                          TAG_DONE)))
+          {
+            return pApp;
+          }
+          else
+          {
+            PutStr("Failed to create window.\n");
+            DisposeObject(pMainLayout);
+            disposeApplication(pApp);
+          }
         }
         else
         {
-          PutStr("Failed to create window.\n");
-          DisposeObject(pMainLayout);
-          FreeVec(pApp);
+          PutStr("Failed to create layout.\n");
+          disposeApplication(pApp);
         }
+
       }
       else
       {
-        PutStr("Failed to create layout.\n");
-        FreeVec(pApp);
+        PutStr("Failed to parse the arguments.\n");
+        disposeApplication(pApp);
       }
 
     }
     else
     {
-      FreeVec(pApp);
+      PutStr("Failed to create the files list.\n");
+      disposeApplication(pApp);
     }
   }
   else
@@ -135,14 +145,19 @@ void disposeApplication(Application* pApp)
     return;
   }
 
-  if(pApp->pFileList)
-  {
-    freeFileList(pApp->pFileList);
-  }
-
   if(pApp->pWinObject)
   {
     DisposeObject(pApp->pWinObject);
+  }
+
+  if(pApp->pParsedArgs)
+  {
+    freeParsedArgs(pApp->pParsedArgs);
+  }
+
+  if(pApp->pFileList)
+  {
+    freeFileList(pApp->pFileList);
   }
 
   FreeVec(pApp);
@@ -158,28 +173,25 @@ BOOL runApplication(Application* pApp)
     return FALSE;
   }
 
-  if((pApp->pFileList = createFileList(pApp->pParsedArgs->ppFiles,
-                                       &numSkippedFiles)))
+  // Does list contain at least one file?
+  if((pFirstPath = getFirstFilePath(pApp->pFileList)))
   {
-    if(strlen(pApp->FilesPath) < 1)
-    {
-      if((pFirstPath = getFirstFilePath(pApp->pFileList)))
-      strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
-    }
-
+    // Display the files list in ListBrowser
     SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
                    NULL, NULL,
                    LISTBROWSER_Labels, (ULONG)pApp->pFileList,
                    TAG_DONE);
+
+    // Apply the file path for this session
+    strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
   }
-
-
 
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
     updateApplicationWindowTitle(pApp);
 
+    // TODO Re-apply numSkipped
     if(numSkippedFiles > 0)
     {
       sprintf(pApp->ScratchBuf,

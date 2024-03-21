@@ -22,8 +22,10 @@ typedef struct FileNode
  * 
  * Returns NULL on error.
  */
-struct List* createFileList(STRPTR* ppFileNames, ULONG *pNumSkipped);
+struct List* createFileList(void);
 void freeFileList(struct List* pFilesList);
+
+BOOL appendFileNode(struct List* pFilesList, STRPTR pFileFullPath);
 
 STRPTR getFirstFilePath(struct List* pFilesList);
 

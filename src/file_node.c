@@ -70,62 +70,16 @@ struct Node* createFileNode(STRPTR pFileName)
   }
 }
 
-struct List* createFileList(STRPTR* ppFileNames, ULONG *pNumSkipped)
-{
-  ULONG numSkipped = 0;
-  char* pFirstPath = NULL;
-  struct Node *pNode;
-  struct List* pFilesList;
-  ULONG i = 0;
 
+struct List* createFileList(void)
+{
+  struct List* pFilesList;
   if(!(pFilesList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
   {
     return NULL;
   }
 
   NewList(pFilesList);
-
-  if(!ppFileNames)
-  {
-    return pFilesList;
-  }
-
-  while (*ppFileNames)
-  {
-    if ((pNode = createFileNode(*ppFileNames)))
-    {
-      if(!pFirstPath)
-      {
-        pFirstPath = ((FileNode*)pNode)->Path;
-      }
-
-      if(strcmp(((FileNode*)pNode)->Path, pFirstPath) == 0)
-      {
-        // This file has the same path as the former ones: add it
-        AddTail(pFilesList, pNode);
-      }
-      else
-      {
-        // This file has a different path as the former ones: skip it
-        numSkipped++;
-        FreeListBrowserNode(pNode);
-      }
-
-    }
-    else
-    {
-      break;
-    }
-
-    ppFileNames++;
-    i++;
-  }
-
-  if(pNumSkipped)
-  {
-    *pNumSkipped = numSkipped;
-  }
-
   return pFilesList;
 }
 
@@ -149,6 +103,36 @@ void freeFileList(struct List* pFilesList)
 
   FreeVec(pFilesList);
 }
+
+
+BOOL appendFileNode(struct List* pFilesList, STRPTR pFileFullPath)
+{
+  struct Node *pNode;
+  STRPTR pFirstPath;
+
+  if(!pFilesList || !pFileFullPath)
+  {
+    return FALSE;
+  }
+
+  pFirstPath = getFirstFilePath(pFilesList);
+  if(!(pNode = createFileNode(pFileFullPath)))
+  {
+    return FALSE;
+  }
+
+  if(pFirstPath && strcmp(((FileNode*)pNode)->Path, pFirstPath) != 0)
+  {
+    // This file has a different path as the former ones: skip it
+    FreeListBrowserNode(pNode);
+    return FALSE;
+  }
+
+  // This file has the same path as the former ones: add it
+  AddTail(pFilesList, pNode);
+  return TRUE;
+}
+
 
 STRPTR getFirstFilePath(struct List* pFilesList)
 {

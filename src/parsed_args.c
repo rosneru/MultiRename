@@ -14,14 +14,16 @@
 #include <workbench/startup.h>
 #include <workbench/workbench.h>
 
+#include "file_node.h"
 #include "parsed_args.h"
 
-void readCommandLineArgs(ParsedArgs* pParsedArgs);
-void readWorkbenchArgs(ParsedArgs* pParsedArgs, char **argv);
+void readCommandLineArgs(ParsedArgs* pParsedArgs, struct List* pFilesList);
+void readWorkbenchArgs(ParsedArgs* pParsedArgs, char **argv, struct List* pFilesList);
+
 static struct RDArgs* pReadArgs = NULL;
 
 
-ParsedArgs* createParsedArgs(int argc, char **argv)
+ParsedArgs* createParsedArgs(int argc, char **argv, struct List* pFilesList)
 {
   ParsedArgs* pParsedArgs;
 
@@ -34,13 +36,13 @@ ParsedArgs* createParsedArgs(int argc, char **argv)
   if(argc == 0)
   {
     // Started from Workbench
-    readWorkbenchArgs(pParsedArgs, argv);
+    readWorkbenchArgs(pParsedArgs, argv, pFilesList);
 
   }
   else
   {
     // Started from CLI
-    readCommandLineArgs(pParsedArgs);
+    readCommandLineArgs(pParsedArgs, pFilesList);
   }
 
   return pParsedArgs;
@@ -61,9 +63,9 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 }
 
 
-void readCommandLineArgs(ParsedArgs* pParsedArgs)
+void readCommandLineArgs(ParsedArgs* pParsedArgs, struct List* pFilesList)
 {
-  STRPTR* pFiles;
+  STRPTR* ppFiles;
   LONG args[ARG_ARRAY_SIZE] = {0};
 
 
@@ -77,11 +79,12 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs)
   {
     // When the FILES argument was parsed, the ARG_FILES array item
     // points to an array of pointers to the passed FILEs (path + name).
-    pFiles = (STRPTR*) args[ARG_FILES];
+    ppFiles = (STRPTR*) args[ARG_FILES];
 
-    if(pFiles[0] != NULL)
+    while(*ppFiles)
     {
-      pParsedArgs->ppFiles = pFiles;
+      appendFileNode(pFilesList, *ppFiles);
+      ppFiles++;
     }
   }
 
@@ -98,7 +101,7 @@ char* toolTypeValue(const STRPTR* ppTooltypeArray, const char* pTooltypeName)
 }
 
 
-void readWorkbenchArgs(ParsedArgs* pParsedArgs, char **argv)
+void readWorkbenchArgs(ParsedArgs* pParsedArgs, char **argv, struct List* pFilesList)
 {
   // int i;
   // int bufLen = 2048;  // TODO How to get rid of this fixed maximum?
@@ -145,17 +148,18 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs, char **argv)
   //     {
   //       if(NameFromLock(pWbArg[i].wa_Lock, pBuf, bufLen) != 0)
   //       {
+  //         printf("%s\n", pBuf);
   //         if(AddPart(pBuf,(STRPTR) pWbArg[i].wa_Name, bufLen))
   //         {
-
-  //           if(i == 1)
-  //           {
-  //             m_LeftFilePath = pBuf;
-  //           }
-  //           else
-  //           {
-  //             m_RightFilePath = pBuf;
-  //           }
+  //           printf("    %s\n", pBuf);
+  //           // if(i == 1)
+  //           // {
+  //           //   m_LeftFilePath = pBuf;
+  //           // }
+  //           // else
+  //           // {
+  //           //   m_RightFilePath = pBuf;
+  //           // }
   //         }
   //       }
   //     }
