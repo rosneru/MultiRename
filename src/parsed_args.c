@@ -64,7 +64,8 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 void readCommandLineArgs(ParsedArgs* pParsedArgs)
 {
   STRPTR* pFiles;
-  LONG args[ARG_ARRAY_SIZE];
+  LONG args[ARG_ARRAY_SIZE] = {0};
+
 
   struct RDArgs* pReadArgs = ReadArgs(ARG_TEMPLATE, args, NULL);
   if(!pReadArgs)
