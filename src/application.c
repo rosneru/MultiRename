@@ -135,6 +135,11 @@ void disposeApplication(Application* pApp)
     return;
   }
 
+  if(pApp->pFileList)
+  {
+    freeFileList(pApp->pFileList);
+  }
+
   if(pApp->pWinObject)
   {
     DisposeObject(pApp->pWinObject);
@@ -194,11 +199,6 @@ BOOL runApplication(Application* pApp)
   else
   {
     PutStr("Failed to open window.\n");
-  }
-
-  if(pApp->pFileList)
-  {
-    freeFileList(pApp->pFileList);
   }
 
   return FALSE;
