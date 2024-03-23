@@ -61,7 +61,8 @@
     "chooser.h": "c",
     "utility.h": "c",
     "exec_protos.h": "c",
-    "application.h": "c"
+    "application.h": "c",
+    "string.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

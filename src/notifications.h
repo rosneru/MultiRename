@@ -3,16 +3,18 @@
 
 #include <exec/types.h>
 
-typedef enum NotificationType
+typedef enum NotificationNodeType
 {
-  NT_Skipped,
-} NotificationType;
+  NNT_SELECTED_PATH_INFO,
+  NNT_SKIPPED_WRONG_PATH,
+  NNT_SKIPPED_PATH_TOO_LONG
+} NotificationNodeType;
 
 typedef struct NotificationNode
 {
   struct Node en_Node;
-  NotificationType NotificationType;
-  char* pItemName;
+  NotificationNodeType Type;
+  STRPTR pItemText;
 } NotificationNode;
 
 typedef struct NotificationCollector
@@ -23,9 +25,19 @@ typedef struct NotificationCollector
 
 
 NotificationCollector* createNotificationCollector(void);
-void freeNotificationCollector(NotificationCollector* pNotificationCollector);
+void freeNotificationCollector(NotificationCollector* pCollector);
 
-void clearNotifications(NotificationCollector* pNotificationCollector);
+void addNotification(NotificationCollector* pCollector,
+                     NotificationNodeType type,
+                     STRPTR pItemText);
 
+void clearNotifications(NotificationCollector* pCollector);
+void printNotifications(NotificationCollector* pCollector);
+
+struct NotificationNode* findFirstNotificationByType(
+  NotificationCollector* pCollector, NotificationNodeType type);
+
+ULONG getNotificationCountByType(NotificationCollector* pCollector,
+                                 NotificationNodeType type);
 
 #endif
