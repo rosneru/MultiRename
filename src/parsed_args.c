@@ -65,6 +65,7 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs, struct List* pFilesList)
 {
+  BPTR lock;
   STRPTR* ppFiles;
   LONG args[ARG_ARRAY_SIZE] = {0};
 
@@ -83,7 +84,23 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs, struct List* pFilesList)
 
     while(*ppFiles)
     {
-      appendFileNode(pFilesList, *ppFiles);
+      if((lock = Lock(*ppFiles, SHARED_LOCK)))
+      {
+        if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAXPATHLEN))
+        {
+          appendFileNode(pFilesList, pParsedArgs->pScratchPathBuf);
+        }
+        else
+        {
+          if(IoErr() == ERROR_LINE_TOO_LONG)
+          {
+            // TODO Propagate error;
+          }
+        }
+
+        UnLock(lock);
+      }
+
       ppFiles++;
     }
   }

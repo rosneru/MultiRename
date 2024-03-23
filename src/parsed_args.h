@@ -14,6 +14,7 @@ typedef struct ParsedArgs
   STRPTR pProcessingDir;
   char* pPubScreenName;
   struct DiskObject* pDiskObject;
+  char pScratchPathBuf[MAXPATHLEN + 1];
 } ParsedArgs;
 
 ParsedArgs* createParsedArgs(int argc, char **argv, struct List* pFilesList);
