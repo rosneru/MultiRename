@@ -60,7 +60,8 @@
     "memory.h": "c",
     "chooser.h": "c",
     "utility.h": "c",
-    "exec_protos.h": "c"
+    "exec_protos.h": "c",
+    "application.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"
