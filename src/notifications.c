@@ -14,84 +14,66 @@
 #include "notifications.h"
 
 
-NotificationCollector* createNotificationCollector(void)
+struct List* createNotificationList(void)
 {
-  NotificationCollector* pCollector;
-  if((pCollector = AllocVec(sizeof(NotificationCollector),
-                                        MEMF_PUBLIC|MEMF_CLEAR)))
+  struct List* pList;
+  if(!(pList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
   {
-    if((pCollector->pErrorList = AllocVec(sizeof(struct List),
-                                                      MEMF_PUBLIC|MEMF_CLEAR)))
-    {
-      NewList(pCollector->pErrorList);
-      return pCollector;
-    }
-    else
-    {
-      freeNotificationCollector(pCollector);
-    }
-
-    return pCollector;
+    return NULL;
   }
-  
-  return NULL;
+
+  NewList(pList);
+  return pList;
 }
 
-void freeNotificationCollector(NotificationCollector* pCollector)
+void freeNotificationList(struct List* pList)
 {
-  if(!pCollector)
+  if(!pList)
   {
     return;
   }
 
-  if(pCollector->pErrorList)
-  {
-    clearNotifications(pCollector);
-
-    FreeVec(pCollector->pErrorList);
-    pCollector->pErrorList = NULL;
-  }
-
-  FreeVec(pCollector);
+  clearNotifications(pList);
+  FreeVec(pList);
 }
 
-void addNotification(NotificationCollector* pCollector,
+void addNotification(struct List* pList,
                      NotificationNodeType type,
                      STRPTR pItemText)
 {
   NotificationNode* pNode;
   ULONG textNumChars;
 
-  if(!pItemText)
+  if(!pList || !pItemText)
   {
     return;
   }
 
-  if((pNode = AllocVec(sizeof(NotificationNode), MEMF_PUBLIC|MEMF_CLEAR)))
+  if((pNode = AllocVec(sizeof(NotificationNode), MEMF_CLEAR)))
   {
     textNumChars = strlen(pItemText);
-    if((pNode->pItemText = AllocVec(textNumChars + 1, MEMF_PUBLIC)))
+    if((pNode->pItemText = AllocVec(textNumChars + 1, MEMF_CLEAR)))
     {
       strcpy(pNode->pItemText, pItemText);
       pNode->Type = type;
 
-      AddTail(pCollector->pErrorList, (struct Node*)pNode);
+      AddTail(pList, (struct Node*)pNode);
     }
   }
 }
 
-void clearNotifications(NotificationCollector* pCollector)
+void clearNotifications(struct List* pList)
 {
   NotificationNode* pNotificationNode;
   struct Node* pWorkNode;
   struct Node* pNextNode;
 
-  if(!pCollector || !pCollector->pErrorList)
+  if(!pList)
   {
     return;
   }
 
-  pWorkNode = pCollector->pErrorList->lh_Head;
+  pWorkNode = pList->lh_Head;
   while((pNextNode = pWorkNode->ln_Succ))
   {
     pNotificationNode = (NotificationNode*)pWorkNode;
@@ -100,34 +82,34 @@ void clearNotifications(NotificationCollector* pCollector)
       FreeVec(pNotificationNode->pItemText);
     }
 
+    Remove(pWorkNode);
+
     FreeVec(pWorkNode);
     pWorkNode = pNextNode;
   }
 }
 
-void printNotifications(NotificationCollector* pCollector)
+void printNotifications(struct List* pList)
 {
   ULONG count;
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
+  struct Node* pNode;
   NotificationNode* pNotificationNode;
 
 
-  if((pNotificationNode = findFirstNotificationByType(pCollector,
+  if((pNotificationNode = findFirstNotificationByType(pList,
                                                       NNT_SELECTED_PATH_INFO)))
   {
     printf("Selected path is '%s'\n\n", pNotificationNode->pItemText);
   }
 
-  if(0 < (count = getNotificationCountByType(pCollector,
+  if(0 < (count = getNotificationCountByType(pList,
                                              NNT_SKIPPED_WRONG_PATH)))
   {
     printf("Skipped %u input file(s) because of wrong paths:\n", count);
 
-    pWorkNode = pCollector->pErrorList->lh_Head;
-    while((pNextNode = pWorkNode->ln_Succ))
+    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      pNotificationNode = (NotificationNode*)pWorkNode;
+      pNotificationNode = (NotificationNode*)pNode;
       if(pNotificationNode->Type == NNT_SKIPPED_WRONG_PATH)
       {
         printf("  %s\n", pNotificationNode->pItemText);
@@ -137,16 +119,15 @@ void printNotifications(NotificationCollector* pCollector)
     printf("\n");
   }
 
-  if(0 < (count = getNotificationCountByType(pCollector,
+  if(0 < (count = getNotificationCountByType(pList,
                                              NNT_SKIPPED_PATH_TOO_LONG)))
   {
     printf("Skipped %u input file(s) because of over long / "
            "truncated paths:\n", count);
 
-    pWorkNode = pCollector->pErrorList->lh_Head;
-    while((pNextNode = pWorkNode->ln_Succ))
+    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      pNotificationNode = (NotificationNode*)pWorkNode;
+      pNotificationNode = (NotificationNode*)pNode;
       if(pNotificationNode->Type == NNT_SKIPPED_PATH_TOO_LONG)
       {
         printf("  %s\n", pNotificationNode->pItemText);
@@ -157,17 +138,15 @@ void printNotifications(NotificationCollector* pCollector)
   }
 }
 
-NotificationNode* findFirstNotificationByType(
-  NotificationCollector* pCollector, NotificationNodeType type)
+NotificationNode* findFirstNotificationByType(struct List* pList,
+                                              NotificationNodeType type)
 {
   NotificationNode* pNotificationNode;
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
+  struct Node* pNode;
 
-  pWorkNode = pCollector->pErrorList->lh_Head;
-  while((pNextNode = pWorkNode->ln_Succ))
+  for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pNotificationNode = (NotificationNode*)pWorkNode;
+    pNotificationNode = (NotificationNode*)pNode;
     if(pNotificationNode->Type == type)
     {
       return pNotificationNode;
@@ -177,18 +156,16 @@ NotificationNode* findFirstNotificationByType(
   return NULL;
 }
 
-ULONG getNotificationCountByType(NotificationCollector* pCollector,
+ULONG getNotificationCountByType(struct List* pList,
                                  NotificationNodeType type)
 {
   ULONG count = 0;
   NotificationNode* pNotificationNode;
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
+  struct Node* pNode;
 
-  pWorkNode = pCollector->pErrorList->lh_Head;
-  while((pNextNode = pWorkNode->ln_Succ))
+  for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pNotificationNode = (NotificationNode*)pWorkNode;
+    pNotificationNode = (NotificationNode*)pNode;
     if(pNotificationNode->Type == type)
     {
       count++;

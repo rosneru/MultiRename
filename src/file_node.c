@@ -18,6 +18,7 @@
 
 #include <string.h>
 
+#include "notifications.h"
 #include "file_node.h"
 
 
@@ -74,7 +75,7 @@ struct Node* createFileNode(STRPTR pFileName)
 struct List* createFileList(void)
 {
   struct List* pFilesList;
-  if(!(pFilesList = AllocVec(sizeof(struct List), MEMF_PUBLIC|MEMF_CLEAR)))
+  if(!(pFilesList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
   {
     return NULL;
   }
@@ -105,25 +106,31 @@ void freeFileList(struct List* pFilesList)
 }
 
 
-BOOL appendFileNode(struct List* pFilesList, STRPTR pFileFullPath)
+BOOL appendFileNode(struct List* pFilesList,
+                    STRPTR pFileFullPath,
+                    struct List* pNotificationsList)
 {
   struct Node *pNode;
   STRPTR pFirstPath;
 
-  if(!pFilesList || !pFileFullPath)
+  if(!pFilesList || !pFileFullPath || !pNotificationsList)
   {
     return FALSE;
   }
 
   pFirstPath = getFirstFilePath(pFilesList);
+
   if(!(pNode = createFileNode(pFileFullPath)))
   {
     return FALSE;
   }
 
-  if(pFirstPath && strcmp(((FileNode*)pNode)->Path, pFirstPath) != 0)
+  if(pFirstPath && (strcmp(((FileNode*)pNode)->Path, pFirstPath) != 0))
   {
     // This file has a different path as the former ones: skip it
+    addNotification(pNotificationsList,
+                    NNT_SKIPPED_WRONG_PATH,
+                    ((FileNode*)pNode)->Path);
     FreeListBrowserNode(pNode);
     return FALSE;
   }

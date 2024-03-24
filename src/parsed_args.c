@@ -15,19 +15,29 @@
 #include <workbench/workbench.h>
 
 #include "file_node.h"
+#include "notifications.h"
 #include "parsed_args.h"
 
-void readCommandLineArgs(ParsedArgs* pParsedArgs, struct List* pFilesList);
-void readWorkbenchArgs(ParsedArgs* pParsedArgs, char **argv, struct List* pFilesList);
+void readCommandLineArgs(ParsedArgs* pParsedArgs,
+                         struct List* pFilesList,
+                         struct List* pNotificationsList);
+
+void readWorkbenchArgs(ParsedArgs* pParsedArgs,
+                       char **argv,
+                       struct List* pFilesList,
+                       struct List* pNotificationsList);
 
 static struct RDArgs* pReadArgs = NULL;
 
 
-ParsedArgs* createParsedArgs(int argc, char **argv, struct List* pFilesList)
+ParsedArgs* createParsedArgs(int argc,
+                             char **argv,
+                             struct List* pFilesList,
+                             struct List* pNotificationsList)
 {
   ParsedArgs* pParsedArgs;
 
-  if(!(pParsedArgs = AllocVec(sizeof(ParsedArgs), MEMF_CLEAR|MEMF_PUBLIC)))
+  if(!(pParsedArgs = AllocVec(sizeof(ParsedArgs), MEMF_CLEAR)))
   {
     PutStr("Failed to allocate memory for parsed arguments.\n");
     return NULL;
@@ -36,13 +46,13 @@ ParsedArgs* createParsedArgs(int argc, char **argv, struct List* pFilesList)
   if(argc == 0)
   {
     // Started from Workbench
-    readWorkbenchArgs(pParsedArgs, argv, pFilesList);
+    readWorkbenchArgs(pParsedArgs, argv, pFilesList, pNotificationsList);
 
   }
   else
   {
     // Started from CLI
-    readCommandLineArgs(pParsedArgs, pFilesList);
+    readCommandLineArgs(pParsedArgs, pFilesList, pNotificationsList);
   }
 
   return pParsedArgs;
@@ -63,7 +73,9 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 }
 
 
-void readCommandLineArgs(ParsedArgs* pParsedArgs, struct List* pFilesList)
+void readCommandLineArgs(ParsedArgs* pParsedArgs,
+                         struct List* pFilesList,
+                         struct List* pNotificationsList)
 {
   BPTR lock;
   STRPTR* ppFiles;
@@ -88,13 +100,17 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs, struct List* pFilesList)
       {
         if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAXPATHLEN))
         {
-          appendFileNode(pFilesList, pParsedArgs->pScratchPathBuf);
+          appendFileNode(pFilesList,
+                         pParsedArgs->pScratchPathBuf,
+                         pNotificationsList);
         }
         else
         {
           if(IoErr() == ERROR_LINE_TOO_LONG)
           {
-            // TODO Propagate error;
+            addNotification(pNotificationsList,
+                            NNT_SKIPPED_PATH_TOO_LONG,
+                            *ppFiles);
           }
         }
 
@@ -118,7 +134,10 @@ char* toolTypeValue(const STRPTR* ppTooltypeArray, const char* pTooltypeName)
 }
 
 
-void readWorkbenchArgs(ParsedArgs* pParsedArgs, char **argv, struct List* pFilesList)
+void readWorkbenchArgs(ParsedArgs* pParsedArgs,
+                       char **argv,
+                       struct List* pFilesList,
+                       struct List* pNotificationsList)
 {
   // int i;
   // int bufLen = 2048;  // TODO How to get rid of this fixed maximum?

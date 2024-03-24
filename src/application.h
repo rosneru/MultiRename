@@ -1,21 +1,27 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#include <exec/lists.h>
+#include <exec/types.h>
 #include <intuition/classusr.h>
 #include <intuition/intuition.h>
 
 #include "file_node.h"
+#include "notifications.h"
 #include "parsed_args.h"
+
+#define SCRATCH_BUF_SIZE 1024
 
 typedef struct Application
 {
+  struct List* pNotificationsList;
+  ParsedArgs* pParsedArgs;
+  struct List* pFileList;
   Object* pWinObject;
   struct Window* pIntuiWindow;
-  struct List* pFileList;
   char FilesPath[MAXPATHLEN + 1];
   char WindowTitle[MAXPATHLEN + 32];
-  char ScratchBuf[1024];
-  ParsedArgs* pParsedArgs;
+  char ScratchBuf[SCRATCH_BUF_SIZE];
 } Application;
 
 Application* createApplication(int argc, char **argv);

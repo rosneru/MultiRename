@@ -3,6 +3,8 @@
 
 #include <exec/types.h>
 
+#include "notifications.h"
+
 #define MAXPATHLEN 255
 #define MAXNAMELEN 107  // 107 maximum in FFS, PFS
 
@@ -25,7 +27,9 @@ typedef struct FileNode
 struct List* createFileList(void);
 void freeFileList(struct List* pFilesList);
 
-BOOL appendFileNode(struct List* pFilesList, STRPTR pFileFullPath);
+BOOL appendFileNode(struct List* pFilesList,
+                    STRPTR pFileFullPath,
+                    struct List* pNotificationsList);
 
 STRPTR getFirstFilePath(struct List* pFilesList);
 

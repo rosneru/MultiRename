@@ -38,6 +38,7 @@
 #include <stdio.h>
 
 #include "file_node.h"
+#include "notifications.h"
 #include "requester.h"
 #include "application.h"
 
@@ -79,54 +80,66 @@ Application* createApplication(int argc, char **argv)
   Object* pMainLayout;
   Application* pApp;
 
-  if((pApp = AllocVec(sizeof(Application), MEMF_PUBLIC|MEMF_CLEAR)))
+  if((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
-    if((pApp->pFileList = createFileList()))
+    if((pApp->pNotificationsList = createNotificationList()))
     {
-      if((pApp->pParsedArgs = createParsedArgs(argc, argv, pApp->pFileList)))
+      if((pApp->pFileList = createFileList()))
       {
-        if((pMainLayout = createLayout()))
+        if((pApp->pParsedArgs = createParsedArgs(argc,
+                                                 argv,
+                                                 pApp->pFileList,
+                                                 pApp->pNotificationsList)))
         {
-          if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                          WINDOW_Position, WPOS_CENTERSCREEN,
-                                          WA_Activate, TRUE,
-                                          WA_Title, "MultiRename",
-                                          WA_DragBar, TRUE,
-                                          WA_CloseGadget, TRUE,
-                                          WA_DepthGadget, TRUE,
-                                          WA_SizeGadget, TRUE,
-                                          WA_InnerWidth, 600,
-                                          WA_InnerHeight, 400,
-                                          WA_IDCMP, IDCMP_CLOSEWINDOW,
-                                          WINDOW_Layout, pMainLayout,
-                                          TAG_DONE)))
+          if((pMainLayout = createLayout()))
           {
-            return pApp;
+            if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
+                                             WINDOW_Position, WPOS_CENTERSCREEN,
+                                             WA_Activate, TRUE,
+                                             WA_Title, "MultiRename",
+                                             WA_DragBar, TRUE,
+                                             WA_CloseGadget, TRUE,
+                                             WA_DepthGadget, TRUE,
+                                             WA_SizeGadget, TRUE,
+                                             WA_InnerWidth, 600,
+                                             WA_InnerHeight, 400,
+                                             WA_IDCMP, IDCMP_CLOSEWINDOW,
+                                             WINDOW_Layout, pMainLayout,
+                                             TAG_DONE)))
+            {
+              return pApp;
+            }
+            else
+            {
+              PutStr("Failed to create window.\n");
+              DisposeObject(pMainLayout);
+              disposeApplication(pApp);
+            }
           }
           else
           {
-            PutStr("Failed to create window.\n");
-            DisposeObject(pMainLayout);
+            PutStr("Failed to create layout.\n");
             disposeApplication(pApp);
           }
+
         }
         else
         {
-          PutStr("Failed to create layout.\n");
+          PutStr("Failed to parse the arguments.\n");
           disposeApplication(pApp);
         }
 
       }
       else
       {
-        PutStr("Failed to parse the arguments.\n");
+        PutStr("Failed to create the files list.\n");
         disposeApplication(pApp);
       }
 
     }
     else
     {
-      PutStr("Failed to create the files list.\n");
+      PutStr("Failed to create the notifications object.\n");
       disposeApplication(pApp);
     }
   }
@@ -160,13 +173,17 @@ void disposeApplication(Application* pApp)
     freeFileList(pApp->pFileList);
   }
 
+  if(pApp->pNotificationsList)
+  {
+    freeNotificationList(pApp->pNotificationsList);
+  }
+
   FreeVec(pApp);
 }
 
 
 BOOL runApplication(Application* pApp)
 {
-  ULONG numSkippedFiles = 0;
   STRPTR pFirstPath;
   if(!pApp)
   {
@@ -184,6 +201,7 @@ BOOL runApplication(Application* pApp)
 
     // Apply the file path for this session
     strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
+    addNotification(pApp->pNotificationsList, NNT_SELECTED_PATH_INFO, pFirstPath);
   }
 
   if((pApp->pIntuiWindow =
@@ -191,14 +209,19 @@ BOOL runApplication(Application* pApp)
   {
     updateApplicationWindowTitle(pApp);
 
-    // TODO Re-apply numSkipped
-    if(numSkippedFiles > 0)
+    if(0 < getNotificationCountByType(pApp->pNotificationsList, NNT_SKIPPED_PATH_TOO_LONG)
+    || 0 < getNotificationCountByType(pApp->pNotificationsList, NNT_SKIPPED_WRONG_PATH))
     {
       sprintf(pApp->ScratchBuf,
-              "Skipped %d file(s) because they had different paths "
-              "than the files already added.", numSkippedFiles);
+              "Not all input files");
 
-      showEasyRequest(pApp->pIntuiWindow, "Ok", pApp->ScratchBuf);
+      if(showEasyRequest(pApp->pIntuiWindow,
+                         "Show errors|Continue",
+                         "Failed to add some of the input files"))
+      {
+        printNotifications(pApp->pNotificationsList);
+        clearNotifications(pApp->pNotificationsList);
+      }
     }
 
     intuiEventLoop(pApp);

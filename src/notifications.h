@@ -1,6 +1,7 @@
 #ifndef NOTIFICATIONS_H
 #define NOTIFICATIONS_H
 
+#include <exec/lists.h>
 #include <exec/types.h>
 
 typedef enum NotificationNodeType
@@ -17,27 +18,21 @@ typedef struct NotificationNode
   STRPTR pItemText;
 } NotificationNode;
 
-typedef struct NotificationCollector
-{
-  struct List* pErrorList;
-} NotificationCollector;
 
+struct List* createNotificationList(void);
+void freeNotificationList(struct List* pList);
 
-
-NotificationCollector* createNotificationCollector(void);
-void freeNotificationCollector(NotificationCollector* pCollector);
-
-void addNotification(NotificationCollector* pCollector,
+void addNotification(struct List* pList,
                      NotificationNodeType type,
                      STRPTR pItemText);
 
-void clearNotifications(NotificationCollector* pCollector);
-void printNotifications(NotificationCollector* pCollector);
+void clearNotifications(struct List* pList);
+void printNotifications(struct List* pList);
 
-struct NotificationNode* findFirstNotificationByType(
-  NotificationCollector* pCollector, NotificationNodeType type);
+struct NotificationNode* findFirstNotificationByType(struct List* pList,
+                                                     NotificationNodeType type);
 
-ULONG getNotificationCountByType(NotificationCollector* pCollector,
+ULONG getNotificationCountByType(struct List* pList,
                                  NotificationNodeType type);
 
 #endif
