@@ -209,8 +209,7 @@ BOOL runApplication(Application* pApp)
   {
     updateApplicationWindowTitle(pApp);
 
-    if(0 < getNotificationCountByType(pApp->pNotificationsList, NNT_SKIPPED_PATH_TOO_LONG)
-    || 0 < getNotificationCountByType(pApp->pNotificationsList, NNT_SKIPPED_WRONG_PATH))
+    if(containsSkippedNotifications(pApp->pNotificationsList))
     {
       sprintf(pApp->ScratchBuf,
               "Not all input files");

@@ -143,6 +143,21 @@ void printNotifications(struct List* pList)
   }
 }
 
+BOOL containsSkippedNotifications(struct List* pList)
+{
+  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG))
+  {
+    return TRUE;
+  }
+
+  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH))
+  {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 struct Node* findFirstNotificationByType(struct List* pList,
                                          NotificationNodeType type)
 {

@@ -24,6 +24,8 @@ void clearNotifications(struct List* pList);
 void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptType);
 void printNotifications(struct List* pList);
 
+BOOL containsSkippedNotifications(struct List* pList);
+
 struct Node* findFirstNotificationByType(struct List* pList,
                                          NotificationNodeType type);
 
