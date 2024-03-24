@@ -143,73 +143,63 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        struct List* pFilesList,
                        struct List* pNotificationsList)
 {
-  // int i;
-  // int bufLen = 2048;  // TODO How to get rid of this fixed maximum?
-  // STRPTR* ppTooltypeArray;
+  int i;
+  STRPTR* ppTooltypeArray;
+  STRPTR pFileName;
 
-  // STRPTR pBuf = (STRPTR) AllocVec(bufLen, MEMF_ANY);
-  // if(pBuf == NULL)
-  // {
-  //   return;
-  // }
+  struct WBStartup* pWbStartup = (struct WBStartup*) argv;
+  struct WBArg* pWbArg = pWbStartup->sm_ArgList;
+  for(i=0; i < pWbStartup->sm_NumArgs; i++)
+  {
+    if((pWbArg[i].wa_Lock != 0))  // TODO check. Was 'NULL' before.
+    {
+      if(i == 0)
+      {
+        //
+        // The first pWbArg is the application icon itself. Getting
+        // the PUBSCREEN tooltype from it
+        //
 
-  // struct WBStartup* pWbStartup = (struct WBStartup*) argv;
-  // struct WBArg* pWbArg = pWbStartup->sm_ArgList;
-  // for(i=0; i < pWbStartup->sm_NumArgs; i++)
-  // {
-  //   if((pWbArg[i].wa_Lock != 0))  // TODO check. Was 'NULL' before.
-  //   {
-  //     if(i == 0)
-  //     {
-  //       //
-  //       // The first pWbArg is the application icon itself. Getting
-  //       // the PUBSCREEN tooltype from it
-  //       //
+        // Change current directory the application location
+        BPTR oldDir = CurrentDir(pWbArg[i].wa_Lock);
 
-  //       // Change current directory the application location
-  //       BPTR oldDir = CurrentDir(pWbArg[i].wa_Lock);
+        pParsedArgs->pDiskObject = GetDiskObjectNew((STRPTR) pWbArg[i].wa_Name);
 
-  //       pParsedArgs->pDiskObject = GetDiskObjectNew((STRPTR) pWbArg[i].wa_Name);
+        if(NULL == pParsedArgs->pDiskObject)
+        {
+          ppTooltypeArray = pParsedArgs->pDiskObject->do_ToolTypes;
 
-  //       if(NULL == pParsedArgs->pDiskObject)
-  //       {
-  //         ppTooltypeArray = pParsedArgs->pDiskObject->do_ToolTypes;
-
-  //         char* pValue = toolTypeValue(ppTooltypeArray, "PUBSCREEN");
-  //         if(pValue != NULL)
-  //         {
-  //           pParsedArgs->pPubScreenName = pValue;
-  //         }
-  //       }
-  //       // Change current directory back to the former one
-  //       CurrentDir(oldDir);
-  //     }
-  //     else if(i < 3)
-  //     {
-  //       if(NameFromLock(pWbArg[i].wa_Lock, pBuf, bufLen) != 0)
-  //       {
-  //         printf("%s\n", pBuf);
-  //         if(AddPart(pBuf,(STRPTR) pWbArg[i].wa_Name, bufLen))
-  //         {
-  //           printf("    %s\n", pBuf);
-  //           // if(i == 1)
-  //           // {
-  //           //   m_LeftFilePath = pBuf;
-  //           // }
-  //           // else
-  //           // {
-  //           //   m_RightFilePath = pBuf;
-  //           // }
-  //         }
-  //       }
-  //     }
-  //     else
-  //     {
-  //       // We only need the filenames of the first 2 selected icons
-  //       break;
-  //     }
-  //   }
-  // }
-
-  // FreeVec(pBuf);
+          char* pValue = toolTypeValue(ppTooltypeArray, "PUBSCREEN");
+          if(pValue != NULL)
+          {
+            pParsedArgs->pPubScreenName = pValue;
+          }
+        }
+        // Change current directory back to the former one
+        CurrentDir(oldDir);
+      }
+      else
+      {
+        pFileName = pWbArg[i].wa_Name;
+        if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pScratchPathBuf, MAXPATHLEN))
+        {
+          AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
+          appendFileNode(pFilesList,
+                         pParsedArgs->pScratchPathBuf,
+                         pNotificationsList);
+        }
+        else
+        {
+          if(IoErr() == ERROR_LINE_TOO_LONG)
+          {
+            // For the error notification only the file name not the
+            // relative path is needed.
+            addNotification(pNotificationsList,
+                            NNT_SKIPPED_PATH_TOO_LONG,
+                            pFileName);
+          }
+        }
+      }
+    }
+  }
 }
