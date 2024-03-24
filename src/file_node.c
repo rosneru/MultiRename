@@ -130,7 +130,7 @@ BOOL appendFileNode(struct List* pFilesList,
     // This file has a different path as the former ones: skip it
     addNotification(pNotificationsList,
                     NNT_SKIPPED_WRONG_PATH,
-                    ((FileNode*)pNode)->Path);
+                    pFileFullPath);
     FreeListBrowserNode(pNode);
     return FALSE;
   }

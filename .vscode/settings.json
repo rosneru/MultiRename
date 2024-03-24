@@ -62,7 +62,9 @@
     "utility.h": "c",
     "exec_protos.h": "c",
     "application.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "lists.h": "c",
+    "nodes.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

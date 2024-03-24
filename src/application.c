@@ -215,8 +215,8 @@ BOOL runApplication(Application* pApp)
       sprintf(pApp->ScratchBuf,
               "Not all input files");
 
-      if(showEasyRequest(pApp->pIntuiWindow,
-                         "Show errors|Continue",
+      if(!showEasyRequest(pApp->pIntuiWindow,
+                         "Continue|Show errors",
                          "Failed to add some of the input files"))
       {
         printNotifications(pApp->pNotificationsList);
