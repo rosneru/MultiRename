@@ -79,6 +79,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
 {
   BPTR lock;
   STRPTR* ppFiles;
+  STRPTR pFileName;
   LONG args[ARG_ARRAY_SIZE] = {0};
 
 
@@ -108,9 +109,12 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
         {
           if(IoErr() == ERROR_LINE_TOO_LONG)
           {
+            // For the error notification only the file name not the
+            // relative path is needed.
+            pFileName = FilePart(*ppFiles);
             addNotification(pNotificationsList,
                             NNT_SKIPPED_PATH_TOO_LONG,
-                            *ppFiles);
+                            pFileName);
           }
         }
 
