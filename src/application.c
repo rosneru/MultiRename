@@ -5,6 +5,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <utility/hooks.h>
 
 #ifdef __clang__
   #include <clib/alib_protos.h>
@@ -49,9 +50,14 @@ void intuiEventLoop(Application* pApp);
 Object* createLayout(void);
 
 
+
 /**
  * Private variables
  */
+
+struct ColumnInfo *m_pColumnInfo = NULL;
+struct Hook m_CompareHook;
+
 enum gadids
 {
     GID_STRING_NAME = 1
@@ -72,7 +78,7 @@ enum gadids
   , MAXGADGETS
 };
 
-static Object* gadgets[MAXGADGETS];
+static Object* m_ppGadgets[MAXGADGETS];
 
 
 Application* createApplication(int argc, char **argv)
@@ -163,6 +169,11 @@ void disposeApplication(Application* pApp)
     DisposeObject(pApp->pWinObject);
   }
 
+  if(m_pColumnInfo)
+  {
+    FreeLBColumnInfo(m_pColumnInfo);
+  }
+
   if(pApp->pParsedArgs)
   {
     freeParsedArgs(pApp->pParsedArgs);
@@ -194,7 +205,7 @@ BOOL runApplication(Application* pApp)
   if((pFirstPath = getFirstFilePath(pApp->pFileList)))
   {
     // Display the files list in ListBrowser
-    SetGadgetAttrs((struct Gadget *) gadgets[GID_LISTBROWSER],
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
                    NULL, NULL,
                    LISTBROWSER_Labels, (ULONG)pApp->pFileList,
                    TAG_DONE);
@@ -268,12 +279,23 @@ void intuiEventLoop(Application* pApp)
 }
 
 
-static struct ColumnInfo columnInfo[] =
+// static struct ColumnInfo columnInfo[] =
+// {
+//   { 50, "Old name", CIF_WEIGHTED },
+//   { 50, "New name", CIF_WEIGHTED },
+//   { -1, (STRPTR)~0, -1 }
+// };
+
+// static ULONG __SAVE_DS__ __ASM__ myCompare(__REG__(a0, struct Hook *hook), __REG__(a2, Object *obj),
+// __REG__(a1, struct LBSortMsg *msg))
+// {
+//   return asValue(msg->lbsm_DataA.Text) - asValue(msg->lbsm_DataB.Text);
+// }
+
+static ULONG myCompare(struct Hook *pHook, Object *pObj, struct LBSortMsg *pMsg)
 {
-  { 50, "Old name", CIF_WEIGHTED },
-  { 50, "New name", CIF_WEIGHTED },
-  { -1, (STRPTR)~0, -1 }
-};
+  return 0;
+}
 
 static UBYTE *ppCounterPlaces[] = { "1", "2", "3", "4", "5",
                                     "6", "7", "8", "9", "10", NULL };
@@ -284,39 +306,59 @@ Object* createLayout(void)
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
 
+  // Initialize CompareHook for sorting the "Old name" column
+  m_CompareHook.h_Entry = (ULONG (*)()) myCompare;
+  m_CompareHook.h_SubEntry = NULL;
+  m_CompareHook.h_Data = NULL;
+
+  m_pColumnInfo = AllocLBColumnInfo(2,
+                                    LBCIA_Column, 0,
+                                    LBCIA_Flags, CIF_WEIGHTED,
+                                    LBCIA_AutoSort, TRUE,
+                                    LBCIA_SortArrow, TRUE,
+                                    LBCIA_SortDirection, LBMSORT_FORWARD,
+                                    LBCIA_Title, "Old name",
+                                    LBCIA_Weight, 50,
+                                    // LBCIA_CompareHook, &m_CompareHook,
+                                    LBCIA_Column, 1,
+                                    LBCIA_Flags, CIF_WEIGHTED,
+                                    LBCIA_Sortable, FALSE,
+                                    LBCIA_Title, "New name",
+                                    LBCIA_Weight, 50,
+                                    TAG_DONE);
 
   pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_Label, (ULONG)"Name",
-    LAYOUT_AddChild, gadgets[GID_STRING_NAME] = NewObject(STRING_GetClass(), NULL,
+    LAYOUT_AddChild, m_ppGadgets[GID_STRING_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STRING_NAME,
       STRINGA_TextVal, (ULONG)"[N]",
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, gadgets[GID_BTN_NAME] = NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME,
         GA_Text, (ULONG)"[N] Name",
       TAG_DONE),
-      LAYOUT_AddChild, gadgets[GID_BTN_NAME_DATE] = NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_DATE] = NewObject(BUTTON_GetClass(), NULL,
         GA_Text, (ULONG)"[YMD] Date",
         GA_ID, GID_BTN_NAME_DATE,
       TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, gadgets[GID_BTN_NAME_PART] = NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_PART] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_PART,
         GA_Text, (ULONG)"[N#-#] Part",
       TAG_DONE),
-      LAYOUT_AddChild, gadgets[GID_BTN_NAME_TIME] = NewObject(BUTTON_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_TIME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_TIME,
         GA_Text, (ULONG)"[hms] Time",
       TAG_DONE),
     TAG_DONE),
-    LAYOUT_AddChild, gadgets[GID_BTN_NAME_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_NAME_COUNTER,
       GA_Text, (ULONG)"[C] Counter",
     TAG_DONE),
@@ -327,19 +369,19 @@ Object* createLayout(void)
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_Label, (ULONG)"Extension",
-    LAYOUT_AddChild, gadgets[GID_STRING_EXTENSION] = NewObject(STRING_GetClass(), NULL,
+    LAYOUT_AddChild, m_ppGadgets[GID_STRING_EXTENSION] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STRING_EXTENSION,
       STRINGA_TextVal, (ULONG)"[E]",
     TAG_DONE),
-    LAYOUT_AddChild, gadgets[GID_BTN_EXTENSION] = NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION,
       GA_Text, (ULONG)"[E] Ext.",
     TAG_DONE),
-    LAYOUT_AddChild, gadgets[GID_BTN_EXTENSION_PART] = NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_PART] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_PART,
       GA_Text, (ULONG)"[E#-#] Part",
     TAG_DONE),
-    LAYOUT_AddChild, gadgets[GID_BTN_EXTENSION_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
+    LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_COUNTER,
       GA_Text, (ULONG)"[C] Counter",
     TAG_DONE),
@@ -352,7 +394,7 @@ Object* createLayout(void)
     LAYOUT_Label, (ULONG)"Define counter",
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, gadgets[GID_INTEGER_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_INTEGER_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
         GA_ID, GID_INTEGER_COUNTER_START,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
@@ -364,7 +406,7 @@ Object* createLayout(void)
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, gadgets[GID_INTEGER_COUNTER_STEP] = NewObject(INTEGER_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_INTEGER_COUNTER_STEP] = NewObject(INTEGER_GetClass(), NULL,
         GA_ID, GID_INTEGER_COUNTER_STEP,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
@@ -377,7 +419,7 @@ Object* createLayout(void)
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, gadgets[GID_CHOOSER_COUNTER_PLACES] = NewObject(CHOOSER_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_CHOOSER_COUNTER_PLACES] = NewObject(CHOOSER_GetClass(), NULL,
         GA_ID, GID_CHOOSER_COUNTER_PLACES,
         GA_TabCycle, TRUE,
         GA_RelVerify, TRUE,
@@ -418,16 +460,17 @@ Object* createLayout(void)
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
       LAYOUT_Label, (ULONG)"Processing list",
-      LAYOUT_AddChild, gadgets[GID_LISTBROWSER] = NewObject(LISTBROWSER_GetClass(), NULL,
+      LAYOUT_AddChild, m_ppGadgets[GID_LISTBROWSER] = NewObject(LISTBROWSER_GetClass(), NULL,
         GA_ID, GID_LISTBROWSER,
         GA_RelVerify, TRUE,
         GA_ReadOnly, TRUE,
-        LISTBROWSER_ColumnInfo, (ULONG)&columnInfo,
+        LISTBROWSER_ColumnInfo, (ULONG)m_pColumnInfo,
         LISTBROWSER_ColumnTitles, TRUE,
+        LISTBROWSER_TitleClickable, TRUE,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-        LAYOUT_AddChild, gadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
+        LAYOUT_AddChild, m_ppGadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_START,
           GA_Text, (ULONG)"Start",
         TAG_DONE),
@@ -439,6 +482,7 @@ Object* createLayout(void)
 
   return pMainLayout;
 }
+
 
 void updateApplicationWindowTitle(Application* pApp)
 {
