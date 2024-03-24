@@ -64,6 +64,11 @@ void addNotification(struct List* pList,
 
 void clearNotifications(struct List* pList)
 {
+  clearNotificationsExcept(pList, NNT_NONE);
+}
+
+void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptType)
+{
   struct Node* pWorkNode;
   struct Node* pNextNode;
 
@@ -75,6 +80,16 @@ void clearNotifications(struct List* pList)
   pWorkNode = pList->lh_Head;
   while((pNextNode = pWorkNode->ln_Succ))
   {
+    if(exceptType != NNT_NONE)
+    {
+      if(pWorkNode->ln_Type == exceptType)
+      {
+        // Skip / don't delete this node
+        pWorkNode = pNextNode;
+        continue;
+      }
+    }
+
     if(pWorkNode->ln_Name)
     {
       FreeVec(pWorkNode->ln_Name);

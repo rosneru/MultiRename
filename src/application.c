@@ -220,7 +220,8 @@ BOOL runApplication(Application* pApp)
                          "Failed to add some of the input files"))
       {
         printNotifications(pApp->pNotificationsList);
-        clearNotifications(pApp->pNotificationsList);
+        clearNotificationsExcept(pApp->pNotificationsList,
+                                 NNT_SELECTED_PATH_INFO);
       }
     }
 

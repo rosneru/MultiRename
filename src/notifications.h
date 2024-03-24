@@ -21,6 +21,7 @@ void addNotification(struct List* pList,
                      STRPTR pItemText);
 
 void clearNotifications(struct List* pList);
+void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptType);
 void printNotifications(struct List* pList);
 
 struct Node* findFirstNotificationByType(struct List* pList,
