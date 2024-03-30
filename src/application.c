@@ -109,7 +109,7 @@ Application* createApplication(int argc, char **argv)
                                              WA_SizeGadget, TRUE,
                                              WA_InnerWidth, 600,
                                              WA_InnerHeight, 400,
-                                             WA_IDCMP, IDCMP_CLOSEWINDOW,
+                                             WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
                                              WINDOW_Layout, pMainLayout,
                                              TAG_DONE)))
             {
@@ -250,7 +250,15 @@ BOOL runApplication(Application* pApp)
   return FALSE;
 }
 
-
+void handleGadgets(Application* pApp, ULONG result)
+{
+  switch ((result & WMHI_GADGETMASK))
+  {
+  case GID_BTN_NAME:
+    printf("name\n");
+    break;
+  }
+}
 
 
 void intuiEventLoop(Application* pApp)
@@ -263,34 +271,31 @@ void intuiEventLoop(Application* pApp)
 
   GetAttr(WINDOW_SigMask, pApp->pWinObject, &winSig);
 
-  while (FALSE == end)
+  while (!end)
   {
     receivedSig = Wait(winSig);
-    while ((result = DoMethod(pApp->pWinObject, WM_HANDLEINPUT, &code)) != WMHI_LASTMSG)
+    while ((result = DoMethod(pApp->pWinObject, WM_HANDLEINPUT, &code)))
     {
       switch (result & WMHI_CLASSMASK)
       {
-      case WMHI_CLOSEWINDOW:
-        end = TRUE;
-        break;
+        case WMHI_CLOSEWINDOW:
+          end = TRUE;
+          break;
+        case WMHI_GADGETUP:
+          printf("GADGETUP\n");
+          switch(result & WMHI_GADGETMASK)
+          {
+              case GID_BTN_NAME:
+                printf("Name button\n");
+                break;
+          }
+
+          break;
       }
     }
   }
 }
 
-
-// static struct ColumnInfo columnInfo[] =
-// {
-//   { 50, "Old name", CIF_WEIGHTED },
-//   { 50, "New name", CIF_WEIGHTED },
-//   { -1, (STRPTR)~0, -1 }
-// };
-
-// static ULONG __SAVE_DS__ __ASM__ myCompare(__REG__(a0, struct Hook *hook), __REG__(a2, Object *obj),
-// __REG__(a1, struct LBSortMsg *msg))
-// {
-//   return asValue(msg->lbsm_DataA.Text) - asValue(msg->lbsm_DataB.Text);
-// }
 
 static ULONG myCompare(struct Hook *pHook, Object *pObj, struct LBSortMsg *pMsg)
 {
