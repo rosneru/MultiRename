@@ -282,14 +282,7 @@ void intuiEventLoop(Application* pApp)
           end = TRUE;
           break;
         case WMHI_GADGETUP:
-          printf("GADGETUP\n");
-          switch(result & WMHI_GADGETMASK)
-          {
-              case GID_BTN_NAME:
-                printf("Name button\n");
-                break;
-          }
-
+          handleGadgets(pApp, result);
           break;
       }
     }
@@ -338,32 +331,38 @@ Object* createLayout(void)
     LAYOUT_Label, (ULONG)"Name",
     LAYOUT_AddChild, m_ppGadgets[GID_STRING_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STRING_NAME,
+      GA_RelVerify, TRUE,
       STRINGA_TextVal, (ULONG)"[N]",
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME,
+        GA_RelVerify, TRUE,
         GA_Text, (ULONG)"[N] Name",
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_DATE] = NewObject(BUTTON_GetClass(), NULL,
         GA_Text, (ULONG)"[YMD] Date",
         GA_ID, GID_BTN_NAME_DATE,
+        GA_RelVerify, TRUE,
       TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_PART] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_PART,
+        GA_RelVerify, TRUE,
         GA_Text, (ULONG)"[N#-#] Part",
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_TIME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_TIME,
+        GA_RelVerify, TRUE,
         GA_Text, (ULONG)"[hms] Time",
       TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_NAME_COUNTER,
+      GA_RelVerify, TRUE,
       GA_Text, (ULONG)"[C] Counter",
     TAG_DONE),
   TAG_DONE);
@@ -375,18 +374,22 @@ Object* createLayout(void)
     LAYOUT_Label, (ULONG)"Extension",
     LAYOUT_AddChild, m_ppGadgets[GID_STRING_EXTENSION] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STRING_EXTENSION,
+      GA_RelVerify, TRUE,
       STRINGA_TextVal, (ULONG)"[E]",
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION,
+      GA_RelVerify, TRUE,
       GA_Text, (ULONG)"[E] Ext.",
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_PART] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_PART,
+      GA_RelVerify, TRUE,
       GA_Text, (ULONG)"[E#-#] Part",
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_COUNTER,
+      GA_RelVerify, TRUE,
       GA_Text, (ULONG)"[C] Counter",
     TAG_DONE),
   TAG_DONE),
@@ -400,6 +403,7 @@ Object* createLayout(void)
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_AddChild, m_ppGadgets[GID_INTEGER_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
         GA_ID, GID_INTEGER_COUNTER_START,
+        GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
         INTEGER_MaxChars, 2,
@@ -412,6 +416,7 @@ Object* createLayout(void)
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_AddChild, m_ppGadgets[GID_INTEGER_COUNTER_STEP] = NewObject(INTEGER_GetClass(), NULL,
         GA_ID, GID_INTEGER_COUNTER_STEP,
+        GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
         INTEGER_MaxChars, 2,
@@ -425,8 +430,8 @@ Object* createLayout(void)
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_AddChild, m_ppGadgets[GID_CHOOSER_COUNTER_PLACES] = NewObject(CHOOSER_GetClass(), NULL,
         GA_ID, GID_CHOOSER_COUNTER_PLACES,
-        GA_TabCycle, TRUE,
         GA_RelVerify, TRUE,
+        GA_TabCycle, TRUE,
         CHOOSER_LabelArray, (ULONG)ppCounterPlaces,
         CHOOSER_Justification, CHJ_RIGHT,
         CHOOSER_Selected, 1,
@@ -475,6 +480,7 @@ Object* createLayout(void)
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
         LAYOUT_AddChild, m_ppGadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_START,
+          GA_RelVerify, TRUE,
           GA_Text, (ULONG)"Start",
         TAG_DONE),
         CHILD_WeightedWidth, 0,
