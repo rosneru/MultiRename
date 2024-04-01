@@ -255,7 +255,7 @@ void handleGadgets(Application* pApp, ULONG result)
   switch ((result & WMHI_GADGETMASK))
   {
   case GID_BTN_NAME:
-    printf("name\n");
+    printFileListNewName(pApp->pFileList);
     break;
   }
 }

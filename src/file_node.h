@@ -27,6 +27,8 @@ typedef struct FileNode
 struct List* createFileList(void);
 void freeFileList(struct List* pFilesList);
 
+void printFileListNewName(struct List* pFilesList);
+
 BOOL appendFileNode(struct List* pFilesList,
                     STRPTR pFileFullPath,
                     struct List* pNotificationsList);

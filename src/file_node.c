@@ -17,10 +17,10 @@
 #endif
 
 #include <string.h>
+#include <stdio.h>
 
 #include "notifications.h"
 #include "file_node.h"
-
 
 
 struct Node* createFileNode(STRPTR pFileName)
@@ -105,6 +105,20 @@ void freeFileList(struct List* pFilesList)
   FreeVec(pFilesList);
 }
 
+void printFileListNewName(struct List* pFilesList)
+{
+  struct Node* pNode;
+  FileNode* pFileNode;
+  printf("New name list\n");
+  printf("=============\n");
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    printf("  %s\n", pFileNode->NewName);
+  }
+
+  printf("\n");
+}
 
 BOOL appendFileNode(struct List* pFilesList,
                     STRPTR pFileFullPath,
