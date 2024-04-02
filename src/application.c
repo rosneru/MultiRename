@@ -6,6 +6,7 @@
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
 #include <utility/hooks.h>
+#include <workbench/workbench.h>
 
 #ifdef __clang__
   #include <clib/alib_protos.h>
@@ -81,72 +82,128 @@ enum gadids
 static Object* m_ppGadgets[MAXGADGETS];
 
 
+#ifdef __SASC  
+#define ASM __asm
+#define ASMR(x) register __ ## x
+#define ASMREG(x)
+#define SAVEDS __saveds
+#else /* __SASC */
+#ifdef __GNUC__
+#define ASM
+#define ASMR(x) register
+#define ASMREG(x) __asm("" #x "")
+#define SAVEDS __saveds 
+#else /* __GNUC__ */
+#ifdef __VBCC__
+#define ASM
+#define ASMR(x) __reg("" #x "")
+#define ASMREG(x)
+#define SAVEDS __saveds
+#else /* __VBCC__ */
+#error "Compiler not supported yet in asminterface.h"
+#endif /* __VBCC__ */
+#endif /* __GNUC__ */ 
+#endif /* __SASC */
+
+
+void ASM SAVEDS AppMsgFunc(ASMR(a0) struct Hook *Hook,
+                           ASMR(a2) Object *Window,
+                           ASMR(a1) struct AppMessage *Msg)
+  struct Window *Win;
+  struct WBArg *arg = Msg->am_ArgList;
+  
+  GetAttr(WINDOW_Window, Window, (ULONG *)&Win );
+
+  // NameFromLock( arg->wa_Lock, name, sizeof(name) );
+  // AddPart( name, arg->wa_Name, sizeof(name) );
+
+  // printf("App message\n");
+}
+
+struct Hook apphook;
+
+
 Application* createApplication(int argc, char **argv)
 {
   Object* pMainLayout;
   Application* pApp;
 
+  apphook.h_Entry = (ULONG (* )())AppMsgFunc;
+  apphook.h_SubEntry = NULL;
+
   if((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
-    if((pApp->pNotificationsList = createNotificationList()))
+    if((pApp->pAppWindowPort = CreateMsgPort()))
     {
-      if((pApp->pFileList = createFileList()))
+      if((pApp->pNotificationsList = createNotificationList()))
       {
-        if((pApp->pParsedArgs = createParsedArgs(argc,
-                                                 argv,
-                                                 pApp->pFileList,
-                                                 pApp->pNotificationsList)))
+        if((pApp->pFileList = createFileList()))
         {
-          if((pMainLayout = createLayout()))
+          if((pApp->pParsedArgs = createParsedArgs(argc,
+                                                  argv,
+                                                  pApp->pFileList,
+                                                  pApp->pNotificationsList)))
           {
-            if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                             WINDOW_Position, WPOS_CENTERSCREEN,
-                                             WA_Activate, TRUE,
-                                             WA_Title, "MultiRename",
-                                             WA_DragBar, TRUE,
-                                             WA_CloseGadget, TRUE,
-                                             WA_DepthGadget, TRUE,
-                                             WA_SizeGadget, TRUE,
-                                             WA_InnerWidth, 600,
-                                             WA_InnerHeight, 400,
-                                             WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
-                                             WINDOW_Layout, pMainLayout,
-                                             TAG_DONE)))
+            if((pMainLayout = createLayout()))
             {
-              return pApp;
+              if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
+                                              WINDOW_Position, WPOS_CENTERSCREEN,
+                                              WA_Activate, TRUE,
+                                              WA_Title, "MultiRename",
+                                              WA_DragBar, TRUE,
+                                              WA_CloseGadget, TRUE,
+                                              WA_DepthGadget, TRUE,
+                                              WA_SizeGadget, TRUE,
+                                              WA_InnerWidth, 600,
+                                              WA_InnerHeight, 400,
+                                              WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
+                                              WINDOW_Layout, pMainLayout,
+                                              WINDOW_AppPort, pApp->pAppWindowPort,
+                                              WINDOW_AppWindow, TRUE,
+                                              WINDOW_AppMsgHook, &apphook,
+                                              TAG_DONE)))
+              {
+                return pApp;
+              }
+              else
+              {
+                PutStr("Failed to create window.\n");
+                DisposeObject(pMainLayout);
+                disposeApplication(pApp);
+              }
             }
             else
             {
-              PutStr("Failed to create window.\n");
-              DisposeObject(pMainLayout);
+              PutStr("Failed to create layout.\n");
               disposeApplication(pApp);
             }
+
           }
           else
           {
-            PutStr("Failed to create layout.\n");
+            PutStr("Failed to parse the arguments.\n");
             disposeApplication(pApp);
           }
 
         }
         else
         {
-          PutStr("Failed to parse the arguments.\n");
+          PutStr("Failed to create the files list.\n");
           disposeApplication(pApp);
         }
 
       }
       else
       {
-        PutStr("Failed to create the files list.\n");
+        PutStr("Failed to create the notifications object.\n");
         disposeApplication(pApp);
       }
 
     }
     else
     {
-      PutStr("Failed to create the notifications object.\n");
-      disposeApplication(pApp);
+        PutStr("Failed to create the message port for window drag'n drop.\n");
+        disposeApplication(pApp);
     }
   }
   else
@@ -187,6 +244,11 @@ void disposeApplication(Application* pApp)
   if(pApp->pNotificationsList)
   {
     freeNotificationList(pApp->pNotificationsList);
+  }
+
+  if(pApp->pAppWindowPort)
+  {
+    DeleteMsgPort(pApp->pAppWindowPort);
   }
 
   FreeVec(pApp);
@@ -267,10 +329,10 @@ void handleGadgets(Application* pApp, ULONG result)
     // TODO: Debug only. Changes new names!
     {
       SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
-                    pApp->pIntuiWindow, 
-                    NULL,
-                    LISTBROWSER_Labels, ~0,
-                    TAG_DONE);
+                     pApp->pIntuiWindow, 
+                     NULL,
+                     LISTBROWSER_Labels, ~0,
+                     TAG_DONE);
 
       for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
       {

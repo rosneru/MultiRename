@@ -64,7 +64,8 @@
     "application.h": "c",
     "string.h": "c",
     "lists.h": "c",
-    "nodes.h": "c"
+    "nodes.h": "c",
+    "ports.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

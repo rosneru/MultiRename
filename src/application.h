@@ -2,6 +2,7 @@
 #define APPLICATION_H
 
 #include <exec/lists.h>
+#include <exec/ports.h>
 #include <exec/types.h>
 #include <intuition/classusr.h>
 #include <intuition/intuition.h>
@@ -14,6 +15,7 @@
 
 typedef struct Application
 {
+  struct MsgPort* pAppWindowPort;
   struct List* pNotificationsList;
   ParsedArgs* pParsedArgs;
   struct List* pFileList;
