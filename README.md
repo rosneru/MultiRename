@@ -65,3 +65,13 @@ the *cmake* generated Makefile inside the *build* directory.
 
 So, after cmake is prepared for debug or release (see above), building
 can be started with *Ctrl + Shift + b* from within VSCode.
+
+### Debug the ActionParser test with Linux
+
+To debug the ActionParser test in the `scr/_tests` directory with Linux,
+the cmake run, see above, must've been done with the
+`-DCMAKE_BUILD_TYPE=Debug` option. Only then the breakpoints you set in
+VSCode will be hit.
+
+With this done properly the `test_action_parser.c` entry point can be
+build and run in debug mode by simply hitting `F5` in VScode.

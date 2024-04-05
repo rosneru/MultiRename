@@ -37,3 +37,6 @@ CMakeCache.txt
 *.lai
 *.la
 #*.a
+
+# draw.io backup files
+*.bkp

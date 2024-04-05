@@ -1,3 +1,4 @@
+
 {
   // Use IntelliSense to learn about possible attributes.
   // Hover to view descriptions of existing attributes.
@@ -5,25 +6,26 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "C++ Build and debug BOOST tests.",
+      "name": "cpp build and debug active file",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build-tests/DiffEngine_test_boost",
+      "program": "${workspaceFolder}/build-gcc/src/_tests/test_action_parser",
+      //"program": "${command:cmake.launchTargetPath}",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
       "externalConsole": false,
+      "preLaunchTask": "Make project",
       "MIMode": "gdb",
+      "miDebuggerPath": "/usr/bin/gdb",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
           "text": "-enable-pretty-printing",
           "ignoreFailures": true
         }
-      ],
-      "preLaunchTask": "Make boost-Tests",
-      "miDebuggerPath": "/usr/bin/gdb"
+      ]
     }
   ]
 }
