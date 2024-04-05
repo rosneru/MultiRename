@@ -1,4 +1,3 @@
-#include <exec/lists.h>
 #include <gadgets/chooser.h>
 #include <gadgets/listbrowser.h>
 

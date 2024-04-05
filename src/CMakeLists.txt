@@ -17,6 +17,7 @@ add_executable (MultiRename_gcc
                 notifications.c
                 parsed_args.c
                 rename_algorithm.c
+                rename_parser.c
                 requester.c)
 
 add_custom_command(TARGET MultiRename_gcc

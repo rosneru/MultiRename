@@ -1,5 +1,8 @@
 #include <stdio.h>
 
+#include "amiga-types.h"
+#include "../file_node.h"
+
 int main(void)
 {
   int i;

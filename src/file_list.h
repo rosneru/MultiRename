@@ -1,20 +1,9 @@
 #ifndef FILE_LIST_H
 #define FILE_LIST_H
 
-#include <exec/types.h>
-
+#include "file_node.h"
 #include "notifications.h"
 
-#define MAXPATHLEN 255
-#define MAXNAMELEN 107  // 107 maximum in FFS, PFS
-
-typedef struct FileNode
-{
-  struct Node en_Node;
-  char Path[MAXPATHLEN + 1];
-  char OldName[MAXNAMELEN + 1]; // Max length + \0 termination
-  char NewName[MAXNAMELEN + 1];
-} FileNode;
 
 /**
  * Creates and returns the list of file nodes according to the given
