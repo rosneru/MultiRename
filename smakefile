@@ -18,8 +18,8 @@ all : $(EXE)
 $(OBJDIR)application.o : src/application.c
 	$(CC) nolink src/application.c
 
-$(OBJDIR)file_node.o : src/file_node.c
-	$(CC) nolink src/file_node.c
+$(OBJDIR)file_list.o : src/file_list.c
+	$(CC) nolink src/file_list.c
 
 $(OBJDIR)main.o : src/main.c
 	$(CC) nolink src/main.c
@@ -36,7 +36,7 @@ $(OBJDIR)rename_algorithm.o : src/rename_algorithm.c
 $(OBJDIR)requester.o : src/requester.c
 	$(CC) nolink src/requester.c
 
-OBJS = $(OBJDIR)application.o  $(OBJDIR)file_node.o $(OBJDIR)main.o
+OBJS = $(OBJDIR)application.o  $(OBJDIR)file_list.o $(OBJDIR)main.o
 OBJS = $(OBJS) $(OBJDIR)notifications.o $(OBJDIR)parsed_args.o
 OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)requester.o
 

@@ -39,7 +39,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "file_node.h"
+#include "file_list.h"
 #include "notifications.h"
 #include "requester.h"
 #include "application.h"

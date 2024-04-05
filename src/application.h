@@ -7,7 +7,7 @@
 #include <intuition/classusr.h>
 #include <intuition/intuition.h>
 
-#include "file_node.h"
+#include "file_list.h"
 #include "notifications.h"
 #include "parsed_args.h"
 

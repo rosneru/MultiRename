@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #include "notifications.h"
-#include "file_node.h"
+#include "file_list.h"
 
 
 struct Node* createFileNode(STRPTR pFileName)

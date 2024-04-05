@@ -14,7 +14,7 @@
 #include <workbench/startup.h>
 #include <workbench/workbench.h>
 
-#include "file_node.h"
+#include "file_list.h"
 #include "notifications.h"
 #include "parsed_args.h"
 
