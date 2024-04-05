@@ -146,6 +146,8 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
   int i;
   STRPTR* ppTooltypeArray;
   STRPTR pFileName;
+  BPTR oldDir;
+  char* pValue;
 
   struct WBStartup* pWbStartup = (struct WBStartup*) argv;
   struct WBArg* pWbArg = pWbStartup->sm_ArgList;
@@ -161,7 +163,7 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
         //
 
         // Change current directory the application location
-        BPTR oldDir = CurrentDir(pWbArg[i].wa_Lock);
+        oldDir = CurrentDir(pWbArg[i].wa_Lock);
 
         pParsedArgs->pDiskObject = GetDiskObjectNew((STRPTR) pWbArg[i].wa_Name);
 
@@ -169,7 +171,7 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
         {
           ppTooltypeArray = pParsedArgs->pDiskObject->do_ToolTypes;
 
-          char* pValue = toolTypeValue(ppTooltypeArray, "PUBSCREEN");
+          pValue = toolTypeValue(ppTooltypeArray, "PUBSCREEN");
           if(pValue != NULL)
           {
             pParsedArgs->pPubScreenName = pValue;
