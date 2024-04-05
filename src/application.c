@@ -109,6 +109,7 @@ static Object* m_ppGadgets[MAXGADGETS];
 void ASM SAVEDS AppMsgFunc(ASMR(a0) struct Hook *Hook,
                            ASMR(a2) Object *Window,
                            ASMR(a1) struct AppMessage *Msg)
+{
   struct Window *Win;
   struct WBArg *arg = Msg->am_ArgList;
   
@@ -117,7 +118,7 @@ void ASM SAVEDS AppMsgFunc(ASMR(a0) struct Hook *Hook,
   // NameFromLock( arg->wa_Lock, name, sizeof(name) );
   // AddPart( name, arg->wa_Name, sizeof(name) );
 
-  // printf("App message\n");
+  printf("App message\n");
 }
 
 struct Hook apphook;
