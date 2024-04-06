@@ -315,52 +315,55 @@ BOOL runApplication(Application* pApp)
 
 static char* fakeNewNames[] = {"Abc\0", "Def", "Ghi", NULL};
 
-void handleGadgets(Application* pApp, ULONG result)
+void updateNewNames(Application* pApp)
 {
   struct Node* pNode;
   FileNode* pFileNode;
   ULONG i = 0;
 
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, ~0,
+                  TAG_DONE);
+
+  for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    if(fakeNewNames[i] == NULL)
+    {
+      break;
+    }
+
+    pFileNode = (FileNode*)pNode;
+    strcpy(pFileNode->NewName, fakeNewNames[i]);
+
+    SetListBrowserNodeAttrs(pNode,
+                            LBNA_Column, 1,
+                              LBNCA_Text, pFileNode->NewName,
+                            TAG_DONE);
+
+    i++;
+  }
+
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                  TAG_DONE);
+}
+
+
+void handleGadgets(Application* pApp, ULONG result)
+{
   switch ((result & WMHI_GADGETMASK))
   {
   case GID_BTN_NAME:
     printFileListNewName(pApp->pFileList);
     break;
   case GID_BTN_NAME_PART:
-    // TODO: Debug only. Changes new names!
-    {
-      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
-                     pApp->pIntuiWindow, 
-                     NULL,
-                     LISTBROWSER_Labels, ~0,
-                     TAG_DONE);
-
-      for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
-      {
-        if(fakeNewNames[i] == NULL)
-        {
-          break;
-        }
-
-        pFileNode = (FileNode*)pNode;
-        strcpy(pFileNode->NewName, fakeNewNames[i]);
-
-        SetListBrowserNodeAttrs(pNode,
-                                LBNA_Column, 1,
-                                  LBNCA_Text, pFileNode->NewName,
-                                TAG_DONE);
-
-        i++;
-      }
-
-      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
-                    pApp->pIntuiWindow, 
-                    NULL,
-                    LISTBROWSER_Labels, (ULONG)pApp->pFileList,
-                    TAG_DONE);
-
-      break;
-    }
+    // TODO: Remove after testing/debugging. Changes new names!
+    updateNewNames(pApp);
+    break;
   }
 }
 
