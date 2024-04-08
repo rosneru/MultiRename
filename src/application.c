@@ -321,6 +321,7 @@ void updateNewNames(Application* pApp)
   FileNode* pFileNode;
   ULONG i = 0;
 
+  // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
                   pApp->pIntuiWindow, 
                   NULL,
@@ -345,6 +346,28 @@ void updateNewNames(Application* pApp)
     i++;
   }
 
+  // Attatch changed list to ListBrowser.
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                  TAG_DONE);
+}
+
+void addNode(Application* pApp)
+{
+  // Detach list from ListBrowser. Must be done before changing the list.
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, ~0,
+                  TAG_DONE);
+
+  appendFileNode(pApp->pFileList,
+                 "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc",
+                 pApp->pNotificationsList);
+
+  // Attatch changed list to ListBrowser.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
                   pApp->pIntuiWindow, 
                   NULL,
@@ -363,6 +386,10 @@ void handleGadgets(Application* pApp, ULONG result)
   case GID_BTN_NAME_PART:
     // TODO: Remove after testing/debugging. Changes new names!
     updateNewNames(pApp);
+    break;
+  case GID_BTN_NAME_DATE:
+    // TODO: Remove after testing/debugging. Changes new names!
+    addNode(pApp);
     break;
   }
 }
