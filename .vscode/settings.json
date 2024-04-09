@@ -69,7 +69,8 @@
     "requester.h": "c",
     "notifications.h": "c",
     "types.h": "c",
-    "file_node.h": "c"
+    "file_node.h": "c",
+    "amiga-types.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

@@ -1,8 +1,7 @@
 #ifndef AMIGA_EXEC_NODES_H
 #define AMIGA_EXEC_NODES_H
 
-typedef signed char	BYTE;
-typedef unsigned char	UBYTE;
+#include <exec/types.h>
 
 struct Node {
     struct  Node *ln_Succ;

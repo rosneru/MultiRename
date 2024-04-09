@@ -1,5 +1,5 @@
-#ifndef	AMIGA_TYPES_H
-#define	AMIGA_TYPES_H
+#ifndef AMIGA_EXEC_TYPES_H
+#define AMIGA_EXEC_TYPES_H
 
 #define GLOBAL   extern		/* the declaratory use of an external */
 #define IMPORT   extern		/* reference to an external */
@@ -40,5 +40,6 @@ typedef ULONG		CPTR;
 #endif
 
 #define BYTEMASK	0xFF
+
 
 #endif
