@@ -6,4 +6,5 @@ set(default_build_type "Debug")
 include_directories(SYSTEM "amiga-compatibility")
 
 add_executable(test_action_parser
-               test_action_parser.c)
+               test_action_parser.c
+               ../rename_counter.c)

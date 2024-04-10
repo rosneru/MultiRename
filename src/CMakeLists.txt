@@ -16,6 +16,7 @@ add_executable (MultiRename_gcc
                 main.c
                 notifications.c
                 parsed_args.c
+                rename_counter.c
                 rename_algorithm.c
                 rename_parser.c
                 requester.c)

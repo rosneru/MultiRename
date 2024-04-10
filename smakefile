@@ -33,6 +33,9 @@ $(OBJDIR)parsed_args.o : src/parsed_args.c
 $(OBJDIR)rename_algorithm.o : src/rename_algorithm.c
 	$(CC) nolink src/rename_algorithm.c
 
+$(OBJDIR)rename_counter.o : src/rename_counter.c
+	$(CC) nolink src/rename_counter.c
+
 $(OBJDIR)rename_parser.o : src/rename_parser.c
 	$(CC) nolink src/rename_parser.c
 
@@ -41,8 +44,8 @@ $(OBJDIR)requester.o : src/requester.c
 
 OBJS = $(OBJDIR)application.o  $(OBJDIR)file_list.o $(OBJDIR)main.o
 OBJS = $(OBJS) $(OBJDIR)notifications.o $(OBJDIR)parsed_args.o
-OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_parser.o
-OBJS = $(OBJS) $(OBJDIR)requester.o
+OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_counter.o
+OBJS = $(OBJS) $(OBJDIR)rename_parser.o $(OBJDIR)requester.o
 
 $(EXE) : $(OBJS)
 	$(LD) link $(OBJS)

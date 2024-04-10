@@ -4,6 +4,7 @@
 #include <exec/lists.h>
 #include <exec/types.h>
 #include "../file_node.h"
+#include "../rename_counter.h"
 
 
 void printFileList(struct List* pFilesList, const char* pTitle)
@@ -58,6 +59,7 @@ int main(void)
 {
   int i;
   struct List fileList;
+  Counter counter;
 
   // Initialize the list (NEWLIST)
   fileList.lh_Head = (struct Node*)&fileList.lh_Tail;
@@ -67,6 +69,15 @@ int main(void)
   AddTail(&fileList, (struct Node*) &node1);
   AddTail(&fileList, (struct Node*) &node2);
   AddTail(&fileList, (struct Node*) &node3);
+
+  initCounter(&counter, 2, 2, 2);
+  printf("Testing a Counter(2, 2, 2) with init value and 2 iterations..\n");
+  printf("  %s\n", getCounterValue(&counter));
+  incrementCounter(&counter);
+  printf("  %s\n", getCounterValue(&counter));
+  incrementCounter(&counter);
+  printf("  %s\n", getCounterValue(&counter));
+
 
   printFileList(&fileList, "Initial file list");
 }

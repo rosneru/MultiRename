@@ -18,6 +18,8 @@ typedef unsigned char	UBYTE;		/* unsigned 8-bit quantity */
 typedef unsigned char	BYTEBITS;	/* 8 bits manipulated individually */
 typedef unsigned short	RPTR;		/* unsigned relative pointer */
 
+typedef unsigned char*	STRPTR;
+
 /* For compatibility with Kickstart/Workbench 1.x (1985) only!
  * Do not use these in newer code!
  */
