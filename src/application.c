@@ -106,15 +106,13 @@ static Object* m_ppGadgets[MAXGADGETS];
 #endif /* __SASC */
 
 
-void ASM SAVEDS AppMsgFunc(ASMR(a0) struct Hook *Hook,
-                           ASMR(a2) Object *Window,
-                           ASMR(a1) struct AppMessage *Msg)
+void ASM SAVEDS AppMsgFunc(ASMR(a0) struct Hook *pHook,
+                           ASMR(a2) Object *pWindow,
+                           ASMR(a1) struct AppMessage *pMsg)
 {
-  struct Window *Win;
-  struct WBArg *arg = Msg->am_ArgList;
+  struct WBArg *arg = pMsg->am_ArgList;
+  Application* pApp = (Application*)pHook->h_Data;
   
-  GetAttr(WINDOW_Window, Window, (ULONG *)&Win );
-
   // NameFromLock( arg->wa_Lock, name, sizeof(name) );
   // AddPart( name, arg->wa_Name, sizeof(name) );
 
@@ -128,9 +126,6 @@ Application* createApplication(int argc, char **argv)
 {
   Object* pMainLayout;
   Application* pApp;
-
-  apphook.h_Entry = (ULONG (* )())AppMsgFunc;
-  apphook.h_SubEntry = NULL;
 
   if((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
@@ -263,6 +258,10 @@ BOOL runApplication(Application* pApp)
   {
     return FALSE;
   }
+
+  apphook.h_Entry = (ULONG (* )())AppMsgFunc;
+  apphook.h_SubEntry = NULL;
+  apphook.h_Data = pApp;
 
   // Does list contain at least one file?
   if((pFirstPath = getFirstFilePath(pApp->pFileList)))
