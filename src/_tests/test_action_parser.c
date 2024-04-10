@@ -48,10 +48,10 @@ FileNode node3 =
 
 void AddTail(struct List *pList, struct Node *pNode)
 {
-    pNode->ln_Succ                = (struct Node *)&pList->lh_Tail;
-    pNode->ln_Pred                = pList->lh_TailPred;
-    pList->lh_TailPred->ln_Succ   = pNode;
-    pList->lh_TailPred            = pNode;
+  pNode->ln_Succ                = (struct Node *)&pList->lh_Tail;
+  pNode->ln_Pred                = pList->lh_TailPred;
+  pList->lh_TailPred->ln_Succ   = pNode;
+  pList->lh_TailPred            = pNode;
 }
 
 int main(void)
