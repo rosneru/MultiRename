@@ -354,7 +354,7 @@ void updateNewNames(Application* pApp)
                   TAG_DONE);
 }
 
-void addNode(Application* pApp)
+void addFileToListBrowser(Application* pApp)
 {
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
@@ -389,7 +389,7 @@ void handleGadgets(Application* pApp, ULONG result)
     break;
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!
-    addNode(pApp);
+    addFileToListBrowser(pApp);
     break;
   }
 }
