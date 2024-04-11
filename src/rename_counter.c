@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "rename_counter.h"
 
+#ifndef LONG_MAX
+#define LONG_MAX __LONG_MAX__
+#endif
 
 void initCounter(Counter* pCounter, LONG start, LONG inc, BYTE width)
 {
@@ -9,12 +12,11 @@ void initCounter(Counter* pCounter, LONG start, LONG inc, BYTE width)
     return;
   }
 
-  pCounter->Start = start;
-  if(pCounter->Start < 0)
+  pCounter->Value = start;
+  if(pCounter->Value < 0)
   {
-    pCounter->Start = 1;
+    pCounter->Value = 0;
   }
-
 
   pCounter->Inc = inc;
   if(pCounter->Inc < 1)
@@ -39,7 +41,15 @@ void  incrementCounter(Counter* pCounter)
     return;
   }
 
-  pCounter->Value += pCounter->Inc;
+  if((LONG_MAX - pCounter->Value) > pCounter->Inc)
+  {
+    pCounter->Value += pCounter->Inc;
+  }
+  else
+  {
+    // Overflow: reset to 0
+    pCounter->Value = 0;
+  }
 }
 
 STRPTR getCounterValue(Counter* pCounter)
@@ -51,11 +61,11 @@ STRPTR getCounterValue(Counter* pCounter)
 
   if(pCounter->Value == pCounter->ValueWhenLastRequested)
   {
-    return pCounter->StrValue;
+    return pCounter->ValueAsStr;
   }
 
   pCounter->ValueWhenLastRequested = pCounter->Value;
-  sprintf(pCounter->StrValue, "%0*d", pCounter->Width, pCounter->Value);
+  sprintf(pCounter->ValueAsStr, "%0*d", pCounter->Width, pCounter->Value);
 
-  return pCounter->StrValue;
+  return pCounter->ValueAsStr;
 }

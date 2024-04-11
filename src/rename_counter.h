@@ -4,16 +4,14 @@
 #include <exec/types.h>
 
 #define COUNTER_MAX_WIDTH 10
-#define COUNTER_MAX_WIDTH_STR "10"
 
 typedef struct Counter
 {
-  LONG Start;
   LONG Inc;
   BYTE Width;
   LONG Value;
   LONG ValueWhenLastRequested;
-  char StrValue[COUNTER_MAX_WIDTH + 1];
+  char ValueAsStr[COUNTER_MAX_WIDTH + 1];
 } Counter;
 
 
