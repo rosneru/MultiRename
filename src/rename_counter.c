@@ -2,7 +2,7 @@
 #include "rename_counter.h"
 
 #ifndef LONG_MAX
-#define LONG_MAX __LONG_MAX__
+#define LONG_MAX 2147483647
 #endif
 
 void initCounter(Counter* pCounter, LONG start, LONG inc, BYTE width)
@@ -48,7 +48,7 @@ void  incrementCounter(Counter* pCounter)
   else
   {
     // Overflow: reset to 0
-    pCounter->Value = 0;
+    pCounter->Value = pCounter->Inc - (LONG_MAX - pCounter->Value) - 1;
   }
 }
 

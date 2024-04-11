@@ -6,6 +6,12 @@
 #include "../file_node.h"
 #include "../rename_counter.h"
 
+// In Linux test environment LONG has 64bit. So the 32bit Amiga-like
+// environment is simulated here for the tests..
+#ifndef LONG_MAX
+#define LONG_MAX 2147483647
+#endif
+
 /**
  * Print given list of FileNodes
  */
@@ -46,15 +52,15 @@ int main(void)
   printf("  %s\n\n", getCounterValue(&counter));
 
 
-  initCounter(&counter, __LONG_MAX__, 1, 10);
-  printf("Testing a Counter(__LONG_MAX__, 1, 10) with init value and 4 iterations..\n");
+  initCounter(&counter, LONG_MAX, 3, 10);
+  printf("Testing a Counter(LONG_MAX, 3, 10) with init value and 4 iterations..\n");
   printf("  %s\n", getCounterValue(&counter));
   incrementCounter(&counter);
   printf("  %s\n", getCounterValue(&counter));
   incrementCounter(&counter);
-  printf("  %s\n\n", getCounterValue(&counter));
+  printf("  %s\n", getCounterValue(&counter));
   incrementCounter(&counter);
-  printf("  %s\n\n", getCounterValue(&counter));
+  printf("  %s\n", getCounterValue(&counter));
   incrementCounter(&counter);
   printf("  %s\n\n", getCounterValue(&counter));
 
