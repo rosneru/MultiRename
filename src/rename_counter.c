@@ -55,9 +55,7 @@ STRPTR getCounterValue(Counter* pCounter)
   }
 
   pCounter->ValueWhenLastRequested = pCounter->Value;
-  snprintf(pCounter->StrValue,
-           pCounter->Width+1, "%0"COUNTER_MAX_WIDTH_STR"d",
-           pCounter->Value);
+  sprintf(pCounter->StrValue, "%0*d", pCounter->Width, pCounter->Value);
 
   return pCounter->StrValue;
 }
