@@ -8,6 +8,8 @@
 #include <utility/hooks.h>
 #include <workbench/workbench.h>
 
+#include <clib/compiler-specific.h>
+
 #ifdef __clang__
   #include <clib/alib_protos.h>
   #include <clib/exec_protos.h>
@@ -82,33 +84,9 @@ enum gadids
 static Object* m_ppGadgets[MAXGADGETS];
 
 
-#ifdef __SASC  
-#define ASM __asm
-#define ASMR(x) register __ ## x
-#define ASMREG(x)
-#define SAVEDS __saveds
-#else /* __SASC */
-#ifdef __GNUC__
-#define ASM
-#define ASMR(x) register
-#define ASMREG(x) __asm("" #x "")
-#define SAVEDS __saveds 
-#else /* __GNUC__ */
-#ifdef __VBCC__
-#define ASM
-#define ASMR(x) __reg("" #x "")
-#define ASMREG(x)
-#define SAVEDS __saveds
-#else /* __VBCC__ */
-#error "Compiler not supported yet in asminterface.h"
-#endif /* __VBCC__ */
-#endif /* __GNUC__ */ 
-#endif /* __SASC */
-
-
-void ASM SAVEDS AppMsgFunc(ASMR(a0) struct Hook *pHook,
-                           ASMR(a2) Object *pWindow,
-                           ASMR(a1) struct AppMessage *pMsg)
+void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
+                                    __REG__(a2, Object *pWindow),
+                                    __REG__(a1, struct AppMessage *pMsg))
 {
   struct WBArg *arg = pMsg->am_ArgList;
   Application* pApp = (Application*)pHook->h_Data;

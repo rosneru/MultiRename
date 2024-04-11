@@ -71,7 +71,8 @@
     "types.h": "c",
     "file_node.h": "c",
     "amiga-types.h": "c",
-    "rename_counter.h": "c"
+    "rename_counter.h": "c",
+    "integer_protos.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"
