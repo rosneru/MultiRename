@@ -29,6 +29,10 @@ typedef short		COUNT;
 typedef unsigned short	UCOUNT;
 typedef ULONG		CPTR;
 
+#ifndef BOOL
+typedef short	BOOL;
+#endif
+
 #ifndef TRUE
 #define TRUE		1
 #endif

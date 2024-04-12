@@ -4,6 +4,7 @@
 #include <exec/lists.h>
 #include <exec/types.h>
 #include "../file_node.h"
+#include "../rename_algorithm.h"
 #include "../rename_counter.h"
 
 // In Linux test environment LONG has 64bit. So the 32bit Amiga-like
