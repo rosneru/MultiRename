@@ -290,7 +290,13 @@ BOOL runApplication(Application* pApp)
   return FALSE;
 }
 
-static char* fakeNewNames[] = {"Abc\0", "Def", "Ghi", NULL};
+static char* fakeNewNames[] =
+{
+  "Abc", "Def", "Ghi", 
+  "Jkl", "Mno", "Pqr", 
+  "Stu", "Vwx", "Yz", 
+  NULL
+};
 
 void updateNewNames(Application* pApp)
 {
@@ -331,7 +337,7 @@ void updateNewNames(Application* pApp)
                   TAG_DONE);
 }
 
-void addFileToListBrowser(Application* pApp)
+void addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
 {
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
@@ -341,7 +347,7 @@ void addFileToListBrowser(Application* pApp)
                   TAG_DONE);
 
   appendFileNode(pApp->pFileList,
-                 "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc",
+                 pFileFullPath,
                  pApp->pNotificationsList);
 
   // Attatch changed list to ListBrowser.
@@ -366,7 +372,7 @@ void handleGadgets(Application* pApp, ULONG result)
     break;
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!
-    addFileToListBrowser(pApp);
+    addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
     break;
   }
 }
