@@ -14,4 +14,7 @@ struct List
   UBYTE        lh_Pad;
 };
 
+void NewList(struct List *pList);
+void AddTail(struct List *pList, struct Node *pNode);
+
 #endif

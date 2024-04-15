@@ -7,6 +7,7 @@ include_directories(SYSTEM "amiga-compatibility")
 
 add_executable(test_action_parser
                test_action_parser.c
+               amiga-compatibility/exec/lists.c
                ../rename_algorithm.c
                ../rename_counter.c
                ../rename_parser.c)
