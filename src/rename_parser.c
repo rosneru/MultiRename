@@ -1,3 +1,12 @@
+#include <exec/lists.h>
+#ifdef __clang__
+  #include <clib/alib_protos.h>
+  #include <clib/exec_protos.h>
+#else
+  #include <proto/alib.h>
+  #include <proto/exec.h>
+#endif
+
 #include <string.h>
 
 #include "rename_parser.h"
@@ -9,8 +18,7 @@ void initRenameParser(RenameParser* pParser, STRPTR pMask)
     return;
   }
 
-  // TODO!
-  // NEWLIST(pParser->ActionList);
+  NewList(&pParser->ActionList);
   pParser->Command = AC_NONE;
   pParser->CommandFrom = 0;
   pParser->CommandTo = 0;

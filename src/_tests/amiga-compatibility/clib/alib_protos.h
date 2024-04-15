@@ -1,0 +1,6 @@
+#ifndef AMIGA_CLIB_ALIB_PROTOS_H
+#define AMIGA_CLIB_ALIB_PROTOS_H
+
+
+
+#endif

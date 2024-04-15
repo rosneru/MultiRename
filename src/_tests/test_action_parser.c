@@ -60,6 +60,19 @@ int main(void)
   printf("sizeof(LONG) = %lu\n", sizeof(LONG));
 
   printFileList(&fileList, "Initial file list");
+
+  // test_name_2
+  if(!fillNewNames(&fileList,
+                   "Abc - [N]",
+                   "[E]",
+                   1, 1, 1))
+  {
+    printf("Error in test test_name_2. Aborting..\n");
+    return 0;
+  }
+
+  printFileList(&fileList, "test_name_2");
+
 }
 
 

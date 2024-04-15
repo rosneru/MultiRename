@@ -5,11 +5,17 @@
 #include <exec/types.h>
 #include "rename_counter.h"
 
-BOOL createNewNames(struct List* pFileNodes,
-                    STRPTR pNameMask,
-                    STRPTR pExtMask,
-                    LONG counterStart,
-                    LONG counterInc,
-                    BYTE counterWidth);
+/**
+ * Iterates the given 'list of FileNodes'. For every FileNode the field
+ * NewName is newly filled according the OldName and given parameters
+ * pNameMask, pExtMask and counter settings.
+ *
+ */
+BOOL fillNewNames(struct List* pFileNodes,
+                  STRPTR pNameMask,
+                  STRPTR pExtMask,
+                  LONG counterStart,
+                  LONG counterInc,
+                  BYTE counterWidth);
 
 #endif
