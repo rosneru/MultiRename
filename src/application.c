@@ -49,6 +49,8 @@
 /**
  * Private function declarations
  */
+void updateApplicationWindowTitle(Application* pApp);
+void notifyUserAboutSkippedFiles(Application* pApp);
 void intuiEventLoop(Application* pApp);
 Object* createLayout(void);
 
@@ -259,21 +261,7 @@ BOOL runApplication(Application* pApp)
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
     updateApplicationWindowTitle(pApp);
-
-    if(containsSkippedNotifications(pApp->pNotificationsList))
-    {
-      sprintf(pApp->ScratchBuf,
-              "Not all input files");
-
-      if(!showEasyRequest(pApp->pIntuiWindow,
-                          "Continue|Show errors",
-                          "Failed to add some of the input files"))
-      {
-        printNotifications(pApp->pNotificationsList);
-        clearNotificationsExcept(pApp->pNotificationsList,
-                                 NNT_SELECTED_PATH_INFO);
-      }
-    }
+    notifyUserAboutSkippedFiles(pApp);
 
     intuiEventLoop(pApp);
 
@@ -289,6 +277,34 @@ BOOL runApplication(Application* pApp)
 
   return FALSE;
 }
+
+void updateApplicationWindowTitle(Application* pApp)
+{
+  if(strlen(pApp->FilesPath) > 0)
+  {
+    strcpy(pApp->WindowTitle, "MultiRename in [");
+    strcat(pApp->WindowTitle, pApp->FilesPath);
+    strcat(pApp->WindowTitle, "]");
+    SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
+  }
+}
+
+void notifyUserAboutSkippedFiles(Application* pApp)
+{
+  if(containsSkippedNotifications(pApp->pNotificationsList))
+  {
+    if(!showEasyRequest(pApp->pIntuiWindow,
+                        "Continue|Show errors",
+                        "Failed to add some of the input files"))
+    {
+      printNotifications(pApp->pNotificationsList);
+      clearNotificationsExcept(pApp->pNotificationsList,
+                                NNT_SELECTED_PATH_INFO);
+    }
+  }
+}
+
+
 
 static char* fakeNewNames[] =
 {
@@ -337,8 +353,10 @@ void updateNewNames(Application* pApp)
                   TAG_DONE);
 }
 
-void addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
+BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
 {
+  BOOL result;
+
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
                   pApp->pIntuiWindow, 
@@ -346,9 +364,9 @@ void addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
 
-  appendFileNode(pApp->pFileList,
-                 pFileFullPath,
-                 pApp->pNotificationsList);
+  result = appendFileNode(pApp->pFileList,
+                          pFileFullPath,
+                          pApp->pNotificationsList);
 
   // Attatch changed list to ListBrowser.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
@@ -356,6 +374,8 @@ void addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
                   NULL,
                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
                   TAG_DONE);
+
+  return result;
 }
 
 
@@ -373,6 +393,7 @@ void handleGadgets(Application* pApp, ULONG result)
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!
     addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
+    notifyUserAboutSkippedFiles(pApp);
     break;
   }
 }
@@ -607,16 +628,4 @@ Object* createLayout(void)
   TAG_DONE);
 
   return pMainLayout;
-}
-
-
-void updateApplicationWindowTitle(Application* pApp)
-{
-  if(strlen(pApp->FilesPath) > 0)
-  {
-    strcpy(pApp->WindowTitle, "MultiRename in [");
-    strcat(pApp->WindowTitle, pApp->FilesPath);
-    strcat(pApp->WindowTitle, "]");
-    SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
-  }
 }

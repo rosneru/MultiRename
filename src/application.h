@@ -31,10 +31,4 @@ void disposeApplication(Application* pApp);
 
 BOOL runApplication(Application* pApp);
 
-
-/**
- * Set current files path as window title
- */
-void updateApplicationWindowTitle(Application* pApp);
-
 #endif
