@@ -99,6 +99,6 @@ void applyActions(STRPTR pResultBuf,
 
   if(mustIncrementCounter)
   {
-    incrementCounter(mustIncrementCounter);
+    incrementCounter(pCounter);
   }
 }
