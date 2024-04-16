@@ -24,7 +24,7 @@
 
 struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
 {
-  STRPTR pPathEnd, pNameStart;
+  STRPTR pPathEnd, pNameStart, pExtStart;
   ULONG pathLength, len;
   struct Node *pNode;
   FileNode* pFileNode;
