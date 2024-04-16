@@ -9,6 +9,7 @@ typedef enum NotificationNodeType
   NNT_NONE = 200,
   NNT_SELECTED_PATH_INFO,
   NNT_SKIPPED_WRONG_PATH,
+  NNT_SKIPPED_INFO_FILE,
   NNT_SKIPPED_PATH_TOO_LONG
 } NotificationNodeType;
 

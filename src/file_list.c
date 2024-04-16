@@ -22,13 +22,34 @@
 #include "file_list.h"
 
 
-struct Node* createFileNode(STRPTR pFileName)
+struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
 {
   STRPTR pPathEnd, pNameStart;
-  ULONG pathLength;
+  ULONG pathLength, len;
   struct Node *pNode;
   FileNode* pFileNode;
+  BOOL doSkipInfoFiles = TRUE;  // TODO: Maybe make it a user setting
+                                // in a future version?
 
+  if(doSkipInfoFiles)
+  {
+    len = strlen(pFileName);
+    if(len > 4)
+    {
+      if(pFileName[len-1] == 'o'
+      && pFileName[len-2] == 'f'
+      && pFileName[len-3] == 'n'
+      && pFileName[len-4] == 'i'
+      && pFileName[len-5] == '.')
+      {
+        // It is an .info file. Skipping it..
+        addNotification(pNotificationsList,
+                        NNT_SKIPPED_INFO_FILE,
+                        pFileName);
+        return NULL;
+      }
+    }
+  }
 
   if ((pNode = AllocListBrowserNode(2, 
                                     LBNA_NodeSize, sizeof(FileNode),
@@ -133,7 +154,7 @@ BOOL appendFileNode(struct List* pFilesList,
 
   pFirstPath = getFirstFilePath(pFilesList);
 
-  if(!(pNode = createFileNode(pFileFullPath)))
+  if(!(pNode = createFileNode(pFileFullPath, pNotificationsList)))
   {
     return FALSE;
   }
