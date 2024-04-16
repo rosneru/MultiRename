@@ -25,13 +25,13 @@ BOOL fillNewNames(struct List* pFileNodes,
                   BYTE counterWidth)
 {
   Counter nameCounter, extCounter;
-  RenameParser nameParser, extParser;
+  ActionParser nameParser, extParser;
 
   initCounter(&nameCounter, counterStart, counterInc, counterWidth);
   initCounter(&extCounter, counterStart, counterInc, counterWidth);
 
-  initRenameParser(&nameParser, pNameMask);
-  initRenameParser(&extParser, pExtMask);
+  initActionParser(&nameParser, pNameMask);
+  initActionParser(&extParser, pExtMask);
 
 
 

@@ -29,7 +29,8 @@ typedef enum
   PS_PARSE_FROM,
   PS_PARSE_TO,
   PS_FINISHED,
-  PS_ERROR
+  PS_ERROR,
+  PS_NUM_STATES,
 } ParserState;
 
 
@@ -45,8 +46,9 @@ typedef struct
   STRPTR pMask;
   ULONG MaskLen;
   ULONG MaskIndex;
-} RenameParser;
+} ActionParser;
 
-void initRenameParser(RenameParser* pParser, STRPTR pMask);
+void initActionParser(ActionParser* pParser, STRPTR pMask);
+BOOL parseActions(ActionParser* pParser);
 
 #endif
