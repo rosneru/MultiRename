@@ -15,10 +15,11 @@ typedef enum
 
 typedef struct 
 {
+  struct Node en_Node;
   ActionCommand Command;
   LONG Start;
   LONG End;
-} Action;
+} ActionNode;
 
 typedef enum
 {
