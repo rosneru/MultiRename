@@ -5,13 +5,11 @@
   #include <clib/alib_protos.h>
   #include <clib/dos_protos.h>
   #include <clib/exec_protos.h>
-  #include <clib/utility_protos.h>
   #include <clib/listbrowser_protos.h>
 #else
   #include <proto/alib.h>
   #include <proto/dos.h>
   #include <proto/exec.h>
-  #include <proto/utility.h>
   #include <proto/listbrowser.h>
 #endif
 
@@ -24,30 +22,25 @@
 
 struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
 {
-  STRPTR pPathEnd, pNameStart, pExtStart;
-  ULONG pathLength, len;
+  STRPTR pPathEnd, pNameStart, pLastDotPosition;
+  ULONG pathLen, nameLen, extLen;
   struct Node *pNode;
   FileNode* pFileNode;
-  BOOL doSkipInfoFiles = TRUE;  // TODO: Maybe make it a user setting
-                                // in a future version?
 
-  if(doSkipInfoFiles)
+  nameLen = strlen(pFileName);
+  if(nameLen > 4)
   {
-    len = strlen(pFileName);
-    if(len > 4)
+    if(pFileName[nameLen-1] == 'o'
+    && pFileName[nameLen-2] == 'f'
+    && pFileName[nameLen-3] == 'n'
+    && pFileName[nameLen-4] == 'i'
+    && pFileName[nameLen-5] == '.')
     {
-      if(pFileName[len-1] == 'o'
-      && pFileName[len-2] == 'f'
-      && pFileName[len-3] == 'n'
-      && pFileName[len-4] == 'i'
-      && pFileName[len-5] == '.')
-      {
-        // It is an .info file. Skipping it..
-        addNotification(pNotificationsList,
-                        NNT_SKIPPED_INFO_FILE,
-                        pFileName);
-        return NULL;
-      }
+      // It is an .info file. Skipping it..
+      addNotification(pNotificationsList,
+                      NNT_SKIPPED_INFO_FILE,
+                      pFileName);
+      return NULL;
     }
   }
 
@@ -65,18 +58,40 @@ struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
   {
     pFileNode = (FileNode*) pNode;
 
+    // Separate path (to pFileNode->Path) and file name (to pNameStart)
     pPathEnd = PathPart(pFileName);
     pNameStart = FilePart(pFileName);
-    pathLength = pPathEnd - pFileName + 1;
-    if(pathLength > MAXPATHLEN)
+    pathLen = pPathEnd - pFileName + 1;
+    if(pathLen > MAXPATHLEN)
     {
       // TODO: Notify truncation
-      pathLength = MAXPATHLEN;
+      pathLen = MAXPATHLEN;
     }
 
-    Strncpy(pFileNode->Path, pFileName, pathLength);
-    Strncpy(pFileNode->OldName, pNameStart, MAXNAMELEN);
-    Strncpy(pFileNode->NewName, pNameStart , MAXNAMELEN);
+    strncpy(pFileNode->Path, pFileName, pathLen);
+    pFileNode->Path[pathLen] = '\0';
+
+    // Separate name from pNameStart (to pFileNode->OldName) and
+    // extension (to pFileNode->OldExt)
+    if((pLastDotPosition = strrchr(pNameStart, '.')))
+    {
+      extLen = strlen(pLastDotPosition + 1);
+      nameLen = pLastDotPosition - pNameStart;
+      strncpy(pFileNode->OldName, pNameStart, nameLen);
+      strncpy(pFileNode->OldExt, pLastDotPosition + 1, extLen);
+      pFileNode->OldName[nameLen] = '\0';
+      pFileNode->OldExt[extLen] = '\0';
+    }
+    else
+    {
+      strcpy(pFileNode->OldName, pNameStart);
+      strcpy(pFileNode->OldExt, "");
+    }
+
+    // Duplicate OldName and OldExt to new name, NewExt fields
+    strcpy(pFileNode->NewName, pFileNode->OldName);
+    strcpy(pFileNode->NewExt, pFileNode->OldExt);
+
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 0,
                               LBNCA_Text, pFileNode->OldName,
