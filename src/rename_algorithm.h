@@ -11,7 +11,7 @@
  * pNameMask, pExtMask and counter settings.
  *
  */
-BOOL fillNewNames(struct List* pFileNodes,
+BOOL fillNewNames(struct List* pFilesList,
                   STRPTR pNameMask,
                   STRPTR pExtMask,
                   LONG counterStart,

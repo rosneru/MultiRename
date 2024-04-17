@@ -2,6 +2,7 @@
 
 #include <string.h>
 
+#include "file_node.h"
 #include "rename_parser.h"
 #include "rename_algorithm.h"
 
@@ -17,13 +18,16 @@ void applyActions(STRPTR pResultBuf,
                   Counter* pCounter);
 
 
-BOOL fillNewNames(struct List* pFileNodes,
+BOOL fillNewNames(struct List* pFilesList,
                   STRPTR pNameMask,
                   STRPTR pExtMask,
                   LONG counterStart,
                   LONG counterInc,
                   BYTE counterWidth)
 {
+  struct Node* pNode;
+  FileNode* pFileNode;
+
   Counter nameCounter, extCounter;
   ActionParser nameParser, extParser;
 
@@ -33,7 +37,21 @@ BOOL fillNewNames(struct List* pFileNodes,
   initActionParser(&nameParser, pNameMask);
   initActionParser(&extParser, pExtMask);
 
+  if(!parseActions(&nameParser))
+  {
+    return FALSE;
+  }
 
+  if(!parseActions(&extParser))
+  {
+    return FALSE;
+  }
+
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    applyActions(pFileNode->NewName, pFileNode->OldName, pNameMask, &nameCounter);
+  }
 
   return TRUE;
 }

@@ -7,10 +7,13 @@
   #include <proto/exec.h>
 #endif
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "rename_parser.h"
 
+
+void performPendingApply(ActionParser* pParser);
 
 /**********************************************************************
  * BEGIN State machine stuff
@@ -106,9 +109,44 @@ BOOL parseActions(ActionParser* pParser)
   }
 
   pParser->MaskIndex = 0;
-  return TRUE;
+  pParser->State = PS_APPLY;
+  NewList(&pParser->ActionList);
+  init_state_apply(pParser);
+  while(pParser->State != PS_FINISHED)
+  {
+    if(pParser->State == PS_ERROR)
+    {
+      break;
+    }
+
+    run_state(pParser->State, pParser);
+  }
+
+  return pParser->State == PS_FINISHED;
 }
 
+
+void performPendingApply(ActionParser* pParser)
+{
+  ActionNode* pActionNode;
+
+  if(pParser->Command != AC_APPLY)
+  {
+    return;
+  }
+
+  if(pParser->CommandTo > -1)
+  {
+    if(!(pActionNode = malloc(sizeof(ActionNode))))
+    {
+      return;
+    }
+
+    pActionNode->Start = pParser->CommandFrom;
+    pActionNode->End = pParser->CommandTo;
+    AddTail(&pParser->ActionList, (struct Node*) pActionNode);
+  }
+}
 
 
 
@@ -146,30 +184,35 @@ static ParserState do_state_parse_to(ActionParser* pParser)
 
 static void init_state_apply(ActionParser* pParser)
 {
-
+  pParser->Command = AC_APPLY;
+  pParser->CommandFrom = pParser->MaskIndex;
+  pParser->CommandTo = -1;
 }
 
 static void init_state_finished(ActionParser* pParser)
 {
-
+  performPendingApply(pParser);
 }
 
 static void init_state_parse_command(ActionParser* pParser)
 {
-
+  performPendingApply(pParser);
 }
 
 static void init_state_detect_range(ActionParser* pParser)
 {
-
+  pParser->CommandFrom = -1;
+  pParser->CommandTo = -1;
 }
 
 static void init_state_parse_from(ActionParser* pParser)
 {
-
+  pParser->NumericFrom = pParser->MaskIndex;
+  pParser->NumericTo = -1;
 }
 
 static void init_state_parse_to(ActionParser* pParser)
 {
-
+  pParser->NumericFrom = pParser->MaskIndex;
+  pParser->NumericTo = -1;
 }
