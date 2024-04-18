@@ -14,6 +14,7 @@
 
 
 void performPendingApply(ActionParser* pParser);
+BOOL isCharAllowed(char c);
 
 /**********************************************************************
  * BEGIN State machine stuff
@@ -148,39 +149,32 @@ void performPendingApply(ActionParser* pParser)
   }
 }
 
-
-
-static ParserState do_state_apply(ActionParser* pParser)
+BOOL isCharAllowed(char c)
 {
-  return PS_APPLY;
+  // This is the easy implementation. The strict one as in the Python
+  // prototype can be done later if really needed.
+
+  if((c > 31) && (c < 91))
+  {
+    return TRUE;
+  }
+
+  // Skipping 91 '[' (Not allowed because MultiRename control char)
+
+  if(c == 92)
+  {
+    return TRUE;
+  }
+
+  // Skipping 93 ']' (Not allowed because MultiRename control char)
+  
+  if((c > 93) && (c < 128))
+  {
+    return TRUE;
+  }
+
+  return FALSE;
 }
-
-static ParserState do_state_finished(ActionParser* pParser)
-{
-  return PS_FINISHED;
-}
-
-static ParserState do_state_parse_command(ActionParser* pParser)
-{
-  return PS_PARSE_COMMAND;
-}
-
-static ParserState do_state_detect_range(ActionParser* pParser)
-{
-  return PS_DETECT_RANGE;
-}
-
-static ParserState do_state_parse_from(ActionParser* pParser)
-{
-  return PS_PARSE_FROM;
-}
-
-static ParserState do_state_parse_to(ActionParser* pParser)
-{
-  return PS_PARSE_TO;
-}
-
-
 
 static void init_state_apply(ActionParser* pParser)
 {
@@ -189,15 +183,56 @@ static void init_state_apply(ActionParser* pParser)
   pParser->CommandTo = -1;
 }
 
+static ParserState do_state_apply(ActionParser* pParser)
+{
+  char c;
+
+  if(pParser->MaskIndex == pParser->MaskLen)
+  {
+    return PS_FINISHED;
+  }
+
+  c = pParser->pMask[pParser->MaskIndex];
+  if(isCharAllowed(c))
+  {
+    pParser->CommandTo = pParser->MaskIndex;
+    pParser->MaskIndex++;
+    return PS_APPLY;
+  }
+  else if(c == '[')
+  {
+    performPendingApply(pParser);
+    pParser->MaskIndex++;
+    return PS_PARSE_COMMAND;
+  }
+  else
+  {
+    return PS_ERROR;
+  }
+}
+
+
 static void init_state_finished(ActionParser* pParser)
 {
   performPendingApply(pParser);
 }
 
+static ParserState do_state_finished(ActionParser* pParser)
+{
+  return PS_FINISHED;
+}
+
+
 static void init_state_parse_command(ActionParser* pParser)
 {
   performPendingApply(pParser);
 }
+
+static ParserState do_state_parse_command(ActionParser* pParser)
+{
+  return PS_PARSE_COMMAND;
+}
+
 
 static void init_state_detect_range(ActionParser* pParser)
 {
@@ -205,14 +240,31 @@ static void init_state_detect_range(ActionParser* pParser)
   pParser->CommandTo = -1;
 }
 
+static ParserState do_state_detect_range(ActionParser* pParser)
+{
+  return PS_DETECT_RANGE;
+}
+
+
 static void init_state_parse_from(ActionParser* pParser)
 {
   pParser->NumericFrom = pParser->MaskIndex;
   pParser->NumericTo = -1;
 }
 
+static ParserState do_state_parse_from(ActionParser* pParser)
+{
+  return PS_PARSE_FROM;
+}
+
+
 static void init_state_parse_to(ActionParser* pParser)
 {
   pParser->NumericFrom = pParser->MaskIndex;
   pParser->NumericTo = -1;
+}
+
+static ParserState do_state_parse_to(ActionParser* pParser)
+{
+  return PS_PARSE_TO;
 }

@@ -50,7 +50,8 @@ BOOL fillNewNames(struct List* pFilesList,
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    applyActions(pFileNode->NewName, pFileNode->OldName, pNameMask, &nameCounter);
+    applyActions(pFileNode->NewName, &nameParser.ActionList, pFileNode->OldName, pNameMask, &nameCounter);
+    applyActions(pFileNode->NewExt, &extParser.ActionList, pFileNode->OldExt, pExtMask, &extCounter);
   }
 
   return TRUE;
