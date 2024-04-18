@@ -13,8 +13,10 @@
 #include "rename_parser.h"
 
 
-void performPendingApply(ActionParser* pParser);
+BOOL addPendingAction(ActionParser* pParser);
+BOOL addPendingAction(ActionParser* pParser);
 BOOL isCharAllowed(char c);
+BOOL isCharDigit(char c);
 
 /**********************************************************************
  * BEGIN State machine stuff
@@ -24,25 +26,30 @@ BOOL isCharAllowed(char c);
 typedef ParserState state_func_t(ActionParser* pParser);
 
 static ParserState do_state_apply(ActionParser* pParser);
-static ParserState do_state_finished(ActionParser* pParser);
 static ParserState do_state_parse_command(ActionParser* pParser);
 static ParserState do_state_detect_range(ActionParser* pParser);
 static ParserState do_state_parse_from(ActionParser* pParser);
 static ParserState do_state_parse_to(ActionParser* pParser);
+static ParserState do_state_finished(ActionParser* pParser);
+static ParserState do_state_error(ActionParser* pParser);
 
 static void init_state_apply(ActionParser* pParser);
-static void init_state_finished(ActionParser* pParser);
 static void init_state_parse_command(ActionParser* pParser);
 static void init_state_detect_range(ActionParser* pParser);
 static void init_state_parse_from(ActionParser* pParser);
 static void init_state_parse_to(ActionParser* pParser);
-
+static void init_state_finished(ActionParser* pParser);
+static void init_state_error(ActionParser* pParser);
 
 static state_func_t* const state_table[PS_NUM_STATES] = 
 {
-  do_state_apply, do_state_finished,
-  do_state_parse_command, do_state_detect_range,
-  do_state_parse_from, do_state_parse_to
+  do_state_apply,
+  do_state_parse_command,
+  do_state_detect_range,
+  do_state_parse_from,
+  do_state_parse_to,
+  do_state_finished,
+  do_state_error
 };
 
 
@@ -52,9 +59,13 @@ typedef void transition_func_t(ActionParser* pParser);
 /* An array of function pointers to each state's init function */
 static transition_func_t* const  transition_table[PS_NUM_STATES] =
 {
-  init_state_apply, init_state_finished,
-  init_state_parse_command, init_state_detect_range,
-  init_state_parse_from, init_state_parse_to
+  init_state_apply,
+  init_state_parse_command,
+  init_state_detect_range,
+  init_state_parse_from,
+  init_state_parse_to,
+  init_state_finished,
+  init_state_error
 };
 
 static ParserState run_state(ParserState cur_state, ActionParser* pParser) 
@@ -127,26 +138,20 @@ BOOL parseActions(ActionParser* pParser)
 }
 
 
-void performPendingApply(ActionParser* pParser)
+BOOL addPendingAction(ActionParser* pParser)
 {
   ActionNode* pActionNode;
-
-  if(pParser->Command != AC_APPLY)
+  if(!(pActionNode = malloc(sizeof(ActionNode))))
   {
-    return;
+    return FALSE;
   }
 
-  if(pParser->CommandTo > -1)
-  {
-    if(!(pActionNode = malloc(sizeof(ActionNode))))
-    {
-      return;
-    }
+  pActionNode->Command = pParser->Command;
+  pActionNode->Start = pParser->CommandFrom;
+  pActionNode->End = pParser->CommandTo;
+  AddTail(&pParser->ActionList, (struct Node*) pActionNode);
 
-    pActionNode->Start = pParser->CommandFrom;
-    pActionNode->End = pParser->CommandTo;
-    AddTail(&pParser->ActionList, (struct Node*) pActionNode);
-  }
+  return TRUE;
 }
 
 BOOL isCharAllowed(char c)
@@ -176,6 +181,11 @@ BOOL isCharAllowed(char c)
   return FALSE;
 }
 
+BOOL isCharDigit(char c)
+{
+  return (c > 48) && (c < 58);
+}
+
 static void init_state_apply(ActionParser* pParser)
 {
   pParser->Command = AC_APPLY;
@@ -201,7 +211,11 @@ static ParserState do_state_apply(ActionParser* pParser)
   }
   else if(c == '[')
   {
-    performPendingApply(pParser);
+    if(!addPendingAction(pParser))
+    {
+      return PS_ERROR;
+    }
+
     pParser->MaskIndex++;
     return PS_PARSE_COMMAND;
   }
@@ -212,25 +226,44 @@ static ParserState do_state_apply(ActionParser* pParser)
 }
 
 
-static void init_state_finished(ActionParser* pParser)
-{
-  performPendingApply(pParser);
-}
-
-static ParserState do_state_finished(ActionParser* pParser)
-{
-  return PS_FINISHED;
-}
-
-
 static void init_state_parse_command(ActionParser* pParser)
 {
-  performPendingApply(pParser);
+
 }
 
 static ParserState do_state_parse_command(ActionParser* pParser)
 {
-  return PS_PARSE_COMMAND;
+  char c;
+
+  if(pParser->MaskIndex == pParser->MaskLen)
+  {
+    return PS_ERROR;
+  }
+
+  c = pParser->pMask[pParser->MaskIndex];
+  pParser->MaskIndex++;
+  switch(c)
+  {
+    case 'N':
+    {
+      pParser->Command = AC_NAME;
+      return PS_DETECT_RANGE;
+    }
+    case 'E':
+    {
+      pParser->Command = AC_EXTENSION;
+      return PS_DETECT_RANGE;
+    }
+    case 'C':
+    {
+      pParser->Command = AC_COUNTER;
+      return PS_DETECT_RANGE;
+    }
+    default:
+    {
+      return PS_ERROR;
+    }
+  }
 }
 
 
@@ -242,7 +275,39 @@ static void init_state_detect_range(ActionParser* pParser)
 
 static ParserState do_state_detect_range(ActionParser* pParser)
 {
-  return PS_DETECT_RANGE;
+  char c;
+
+  if(pParser->MaskIndex == pParser->MaskLen)
+  {
+    return PS_ERROR;
+  }
+
+  c = pParser->pMask[pParser->MaskIndex];
+  if(c == ']')
+  {
+    if(!addPendingAction(pParser))
+    {
+      return PS_ERROR;
+    }
+
+    pParser->MaskIndex++;
+    return PS_APPLY;
+  }
+  else if(pParser->Command == AC_COUNTER)
+  {
+    // A 'Counter' must be finished with an ']' immediately and this
+    // hasn't been done here. So its an error.
+    return PS_ERROR;
+  }
+  else if(isCharDigit(c))
+  {
+    return PS_PARSE_FROM;
+  }
+  else
+  {
+    return PS_ERROR;
+  }
+
 }
 
 
@@ -267,4 +332,26 @@ static void init_state_parse_to(ActionParser* pParser)
 static ParserState do_state_parse_to(ActionParser* pParser)
 {
   return PS_PARSE_TO;
+}
+
+
+static void init_state_finished(ActionParser* pParser)
+{
+  addPendingAction(pParser);
+}
+
+static ParserState do_state_finished(ActionParser* pParser)
+{
+  return PS_ERROR;
+}
+
+
+static void init_state_error(ActionParser* pParser)
+{
+
+}
+
+static ParserState do_state_error(ActionParser* pParser)
+{
+  return PS_ERROR;
 }
