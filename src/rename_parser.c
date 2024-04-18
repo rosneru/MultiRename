@@ -121,7 +121,6 @@ BOOL parseActions(ActionParser* pParser)
   }
 
   pParser->MaskIndex = 0;
-  pParser->State = PS_APPLY;
   NewList(&pParser->ActionList);
   init_state_apply(pParser);
   while(pParser->State != PS_FINISHED)
@@ -188,6 +187,7 @@ BOOL isCharDigit(char c)
 
 static void init_state_apply(ActionParser* pParser)
 {
+  pParser->State = PS_APPLY;
   pParser->Command = AC_APPLY;
   pParser->CommandFrom = pParser->MaskIndex;
   pParser->CommandTo = -1;
@@ -228,7 +228,7 @@ static ParserState do_state_apply(ActionParser* pParser)
 
 static void init_state_parse_command(ActionParser* pParser)
 {
-
+  pParser->State = PS_PARSE_COMMAND;
 }
 
 static ParserState do_state_parse_command(ActionParser* pParser)
@@ -269,6 +269,7 @@ static ParserState do_state_parse_command(ActionParser* pParser)
 
 static void init_state_detect_range(ActionParser* pParser)
 {
+  pParser->State = PS_DETECT_RANGE;
   pParser->CommandFrom = -1;
   pParser->CommandTo = -1;
 }
@@ -313,6 +314,7 @@ static ParserState do_state_detect_range(ActionParser* pParser)
 
 static void init_state_parse_from(ActionParser* pParser)
 {
+  pParser->State = PS_PARSE_FROM;
   pParser->NumericFrom = pParser->MaskIndex;
   pParser->NumericTo = -1;
 }
@@ -325,6 +327,7 @@ static ParserState do_state_parse_from(ActionParser* pParser)
 
 static void init_state_parse_to(ActionParser* pParser)
 {
+  pParser->State = PS_PARSE_TO;
   pParser->NumericFrom = pParser->MaskIndex;
   pParser->NumericTo = -1;
 }
@@ -338,17 +341,18 @@ static ParserState do_state_parse_to(ActionParser* pParser)
 static void init_state_finished(ActionParser* pParser)
 {
   addPendingAction(pParser);
+  pParser->State = PS_FINISHED;
 }
 
 static ParserState do_state_finished(ActionParser* pParser)
 {
-  return PS_ERROR;
+  return PS_FINISHED;
 }
 
 
 static void init_state_error(ActionParser* pParser)
 {
-
+  pParser->State = PS_ERROR;
 }
 
 static ParserState do_state_error(ActionParser* pParser)
