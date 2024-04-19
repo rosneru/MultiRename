@@ -15,6 +15,7 @@
 void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
                   STRPTR pPart,
+                  ULONG PartLen,
                   STRPTR pMask,
                   Counter* pCounter);
 
@@ -63,7 +64,11 @@ BOOL fillNewNames(struct List* pFilesList,
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    applyActions(pFileNode->NewName, &parser.ActionList, pFileNode->OldName, pMask, &counter);
+    applyActions(pFileNode->NewName,
+                 &parser.ActionList,
+                 pFileNode->OldName,
+                 pFileNode->OldNameLen,
+                 pMask, &counter);
   }
 
 
@@ -76,6 +81,7 @@ BOOL fillNewNames(struct List* pFilesList,
 void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
                   STRPTR pPart,
+                  ULONG PartLen,
                   STRPTR pMask,
                   Counter* pCounter)
 {
@@ -118,7 +124,7 @@ void applyActions(STRPTR pResultBuf,
         }
         else
         {
-          strcat(pResultBuf, pPart);
+          strncat(pResultBuf, pPart, PartLen);
         }
         break;
       }
