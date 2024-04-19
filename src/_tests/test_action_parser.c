@@ -18,9 +18,9 @@
  */
 void printFileList(struct List* pFilesList, const char* pTitle);
 
-FileNode node1 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_1st_file_is_older_than", "md", "My_1st_file_is_older_than", "md" };
-FileNode node2 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "my_2nd_one_and_even_more_than", "txt", "my_2nd_one_and_even_more_than", "txt" };
-FileNode node3 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_3rd_attempt", "doc", "My_3rd_attempt", "doc" };
+FileNode node1 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_1st_file_is_older_than.md", 25, 27, "My_1st_file_is_older_than.md", 25, 27 };
+FileNode node2 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "my_2nd_one_and_even_more_than.txt", 29, 31, "my_2nd_one_and_even_more_than.txt", 29, 31 };
+FileNode node3 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_3rd_attempt.doc", 14, 16, "My_3rd_attempt.doc", 14, 16 };
 
 
 int main(void)
@@ -88,10 +88,7 @@ void printFileList(struct List* pFilesList, const char* pTitle)
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    printf("%-35s.%-3s|%-35s.%-3s\n", pFileNode->OldName,
-                                      pFileNode->OldExt,
-                                      pFileNode->NewName,
-                                      pFileNode->NewExt);
+    printf("%-35s|%-35s\n", pFileNode->OldName, pFileNode->NewName);
   }
 
   printf("\n\n");

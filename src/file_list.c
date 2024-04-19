@@ -23,7 +23,7 @@
 struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
 {
   STRPTR pPathEnd, pNameStart, pLastDotPosition;
-  ULONG pathLen, nameLen, extLen;
+  ULONG pathLen, nameLen;
   struct Node *pNode;
   FileNode* pFileNode;
 
@@ -71,26 +71,21 @@ struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
     strncpy(pFileNode->Path, pFileName, pathLen);
     pFileNode->Path[pathLen] = '\0';
 
-    // Separate name from pNameStart (to pFileNode->OldName) and
-    // extension (to pFileNode->OldExt)
+    strcpy(pFileNode->OldName, pNameStart);
+    strcpy(pFileNode->NewName, pNameStart);
     if((pLastDotPosition = strrchr(pNameStart, '.')))
     {
-      extLen = strlen(pLastDotPosition + 1);
-      nameLen = pLastDotPosition - pNameStart;
-      strncpy(pFileNode->OldName, pNameStart, nameLen);
-      strncpy(pFileNode->OldExt, pLastDotPosition + 1, extLen);
-      pFileNode->OldName[nameLen] = '\0';
-      pFileNode->OldExt[extLen] = '\0';
+      pFileNode->OldNameLen = pLastDotPosition - pNameStart;
+      pFileNode->OldExtStart = pFileNode->OldNameLen + 1;
     }
     else
     {
-      strcpy(pFileNode->OldName, pNameStart);
-      strcpy(pFileNode->OldExt, "");
+      pFileNode->OldNameLen = strlen(pNameStart);
+      pFileNode->OldExtStart = -1;
     }
 
-    // Duplicate OldName and OldExt to new name, NewExt fields
-    strcpy(pFileNode->NewName, pFileNode->OldName);
-    strcpy(pFileNode->NewExt, pFileNode->OldExt);
+    pFileNode->NewNameLen = pFileNode->OldNameLen;
+    pFileNode->NewExtStart = pFileNode->OldExtStart;
 
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 0,

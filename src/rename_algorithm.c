@@ -1,5 +1,6 @@
 #include <exec/types.h>
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "file_node.h"
@@ -27,33 +28,46 @@ BOOL fillNewNames(struct List* pFilesList,
 {
   struct Node* pNode;
   FileNode* pFileNode;
+  ULONG maskSize;
+  STRPTR pMask;
+  Counter counter;
+  ActionParser parser;
 
-  Counter nameCounter, extCounter;
-  ActionParser nameParser, extParser;
+  if(!pFilesList || ! pNameMask || ! pExtMask)
+  {
+    return NULL;
+  }
 
-  initCounter(&nameCounter, counterStart, counterInc, counterWidth);
-  initCounter(&extCounter, counterStart, counterInc, counterWidth);
-
-  initActionParser(&nameParser, pNameMask);
-  initActionParser(&extParser, pExtMask);
-
-  if(!parseActions(&nameParser))
+  maskSize = strlen(pNameMask) + strlen(pNameMask) + 2;
+  if(!(pMask = malloc(maskSize * sizeof(char))))
   {
     return FALSE;
   }
 
-  if(!parseActions(&extParser))
+  strcpy(pMask, pNameMask);
+  strcat(pMask, ".");
+  strcat(pMask, pExtMask);
+
+  initCounter(&counter, counterStart, counterInc, counterWidth);
+
+  initActionParser(&parser, pNameMask);
+
+  if(!parseActions(&parser))
   {
+    free(pMask);
     return FALSE;
   }
+
+
 
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    applyActions(pFileNode->NewName, &nameParser.ActionList, pFileNode->OldName, pNameMask, &nameCounter);
-    applyActions(pFileNode->NewExt, &extParser.ActionList, pFileNode->OldExt, pExtMask, &extCounter);
+    applyActions(pFileNode->NewName, &parser.ActionList, pFileNode->OldName, pMask, &counter);
   }
 
+
+  free(pMask);
   return TRUE;
 }
 
