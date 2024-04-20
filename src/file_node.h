@@ -12,10 +12,8 @@ typedef struct FileNode
   char Path[MAXPATHLEN + 1];
   char OldName[MAXNAMELEN + 1]; // Max length + \0 termination
   UBYTE OldNameLen;
-  BYTE OldExtStart;            // Start of extension in OldName
+  UBYTE OldExtLen;
   char NewName[MAXNAMELEN + 1];
-  UBYTE NewNameLen;
-  BYTE NewExtStart;
 } FileNode;
 
 

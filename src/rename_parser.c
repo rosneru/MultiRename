@@ -140,6 +140,13 @@ BOOL parseActions(ActionParser* pParser)
 BOOL addPendingAction(ActionParser* pParser)
 {
   ActionNode* pActionNode;
+
+  if((pParser->CommandFrom > -1) && (pParser->CommandTo < 0))
+  {
+    // This Apply command hasn't been properly started
+    return;
+  }
+
   if(!(pActionNode = malloc(sizeof(ActionNode))))
   {
     return FALSE;

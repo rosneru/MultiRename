@@ -76,16 +76,13 @@ struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
     if((pLastDotPosition = strrchr(pNameStart, '.')))
     {
       pFileNode->OldNameLen = pLastDotPosition - pNameStart;
-      pFileNode->OldExtStart = pFileNode->OldNameLen + 1;
+      pFileNode->OldExtLen = strlen(pFileNode->OldName + pFileNode->OldNameLen);
     }
     else
     {
       pFileNode->OldNameLen = strlen(pNameStart);
-      pFileNode->OldExtStart = -1;
+      pFileNode->OldExtLen = 0;
     }
-
-    pFileNode->NewNameLen = pFileNode->OldNameLen;
-    pFileNode->NewExtStart = pFileNode->OldExtStart;
 
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 0,

@@ -9,16 +9,34 @@
 
 /**
  * Fills the given pResultBuf with a new name which is constructed from
- * the current name pPart, the rename mask pMask, the counter and the
+ * the current name pName, the rename mask pMask, the counter and the
  * list of rename actions that have been parsed from the pMask before.
  */
 void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
-                  STRPTR pPart,
-                  ULONG PartLen,
+                  STRPTR pName,
+                  UBYTE NameLen,
                   STRPTR pMask,
                   Counter* pCounter);
 
+// TODO: Use a memory pool to avoid this
+void freeActionNodes(struct List* pActionsList)
+{
+  struct Node* pWorkNode;
+  struct Node* pNextNode;
+
+  if(!pActionsList)
+  {
+    return;
+  }
+
+  pWorkNode = pActionsList->lh_Head;
+  while((pNextNode = pWorkNode->ln_Succ))
+  {
+    free(pWorkNode);
+    pWorkNode = pNextNode;
+  }
+}
 
 BOOL fillNewNames(struct List* pFilesList,
                   STRPTR pNameMask,
@@ -51,15 +69,13 @@ BOOL fillNewNames(struct List* pFilesList,
 
   initCounter(&counter, counterStart, counterInc, counterWidth);
 
-  initActionParser(&parser, pNameMask);
+  initActionParser(&parser, pMask);
 
   if(!parseActions(&parser))
   {
     free(pMask);
     return FALSE;
   }
-
-
 
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
@@ -72,6 +88,7 @@ BOOL fillNewNames(struct List* pFilesList,
   }
 
 
+  freeActionNodes(&parser.ActionList);
   free(pMask);
   return TRUE;
 }
@@ -80,8 +97,8 @@ BOOL fillNewNames(struct List* pFilesList,
 
 void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
-                  STRPTR pPart,
-                  ULONG PartLen,
+                  STRPTR pName,
+                  UBYTE NameLen,
                   STRPTR pMask,
                   Counter* pCounter)
 {
@@ -89,8 +106,9 @@ void applyActions(STRPTR pResultBuf,
   ActionNode* pAction;
   BOOL mustIncrementCounter = FALSE;
   ULONG numChars;
+  STRPTR pExt = pName + NameLen + 1;
 
-  if(!pResultBuf || !pActionList || !pPart || !pMask || !pCounter)
+  if(!pResultBuf || !pActionList || !pName || !pMask || !pCounter)
   {
     return;
   }
@@ -115,16 +133,28 @@ void applyActions(STRPTR pResultBuf,
         break;
       }
       case AC_NAME:
+      {
+        if((pAction->Start > -1) && (pAction->End > -1))
+        {
+          numChars = pAction->End - pAction->Start + 1;
+          strncat(pResultBuf, pName + pAction->Start, numChars);
+        }
+        else
+        {
+          strncat(pResultBuf, pName, NameLen);
+        }
+        break;
+      }
       case AC_EXTENSION:
       {
         if((pAction->Start > -1) && (pAction->End > -1))
         {
           numChars = pAction->End - pAction->Start + 1;
-          strncat(pResultBuf, pPart + pAction->Start, numChars);
+          strncat(pResultBuf, pExt + pAction->Start, numChars);
         }
         else
         {
-          strncat(pResultBuf, pPart, PartLen);
+          strncat(pResultBuf, pExt, NameLen);
         }
         break;
       }
