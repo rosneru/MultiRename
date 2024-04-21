@@ -42,6 +42,7 @@
 #include <stdio.h>
 
 #include "file_list.h"
+#include "rename_algorithm.h"
 #include "notifications.h"
 #include "requester.h"
 #include "application.h"
@@ -306,19 +307,11 @@ void notifyUserAboutSkippedFiles(Application* pApp)
 
 
 
-static char* fakeNewNames[] =
-{
-  "Abc", "Def", "Ghi", 
-  "Jkl", "Mno", "Pqr", 
-  "Stu", "Vwx", "Yz", 
-  NULL
-};
-
 void updateNewNames(Application* pApp)
 {
   struct Node* pNode;
+  STRPTR pName, pExt;
   FileNode* pFileNode;
-  ULONG i = 0;
 
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
@@ -327,25 +320,20 @@ void updateNewNames(Application* pApp)
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
 
+  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pName);
+  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_EXTENSION], (ULONG*)&pExt);
+  fillNewNames(pApp->pFileList, pName, pExt, 1, 1, 1);
+
   for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    if(fakeNewNames[i] == NULL)
-    {
-      break;
-    }
-
     pFileNode = (FileNode*)pNode;
-    strcpy(pFileNode->NewName, fakeNewNames[i]);
-
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 1,
                               LBNCA_Text, pFileNode->NewName,
                             TAG_DONE);
-
-    i++;
   }
 
-  // Attatch changed list to ListBrowser.
+  // Attach changed list to ListBrowser.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
                   pApp->pIntuiWindow, 
                   NULL,
@@ -383,12 +371,11 @@ void handleGadgets(Application* pApp, ULONG result)
 {
   switch ((result & WMHI_GADGETMASK))
   {
+  case GID_STRING_NAME:
+    updateNewNames(pApp);
+    break;
   case GID_BTN_NAME:
     printFileListNewName(pApp->pFileList);
-    break;
-  case GID_BTN_NAME_PART:
-    // TODO: Remove after testing/debugging. Changes new names!
-    updateNewNames(pApp);
     break;
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!
