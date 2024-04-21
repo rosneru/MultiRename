@@ -203,7 +203,6 @@ static void init_state_apply(ActionParser* pParser)
 static ParserState do_state_apply(ActionParser* pParser)
 {
   char c;
-
   if(pParser->MaskIndex == pParser->MaskLen)
   {
     return PS_FINISHED;
@@ -241,7 +240,6 @@ static void init_state_parse_command(ActionParser* pParser)
 static ParserState do_state_parse_command(ActionParser* pParser)
 {
   char c;
-
   if(pParser->MaskIndex == pParser->MaskLen)
   {
     return PS_ERROR;
@@ -284,7 +282,6 @@ static void init_state_detect_range(ActionParser* pParser)
 static ParserState do_state_detect_range(ActionParser* pParser)
 {
   char c;
-
   if(pParser->MaskIndex == pParser->MaskLen)
   {
     return PS_ERROR;
@@ -328,7 +325,31 @@ static void init_state_parse_from(ActionParser* pParser)
 
 static ParserState do_state_parse_from(ActionParser* pParser)
 {
-  return PS_PARSE_FROM;
+  char c;
+  if(pParser->MaskIndex == pParser->MaskLen)
+  {
+    return PS_ERROR;
+  }
+
+  c = pParser->pMask[pParser->MaskIndex];
+  if(isCharDigit(c))
+  {
+    pParser->NumericTo = pParser->MaskIndex;
+    pParser->MaskIndex++;
+    return PS_PARSE_FROM;
+  }
+  else if((c == '-') && (pParser->NumericTo > -1))
+  {
+    pParser->MaskIndex++;
+    pParser->CommandFrom = strtol(pParser->pMask + pParser->NumericFrom,
+                                  NULL,
+                                  10);
+    return PS_PARSE_TO;
+  }
+  else
+  {
+    return PS_ERROR;
+  }
 }
 
 
@@ -341,7 +362,34 @@ static void init_state_parse_to(ActionParser* pParser)
 
 static ParserState do_state_parse_to(ActionParser* pParser)
 {
-  return PS_PARSE_TO;
+  char c;
+  if(pParser->MaskIndex == pParser->MaskLen)
+  {
+    return PS_ERROR;
+  }
+
+  c = pParser->pMask[pParser->MaskIndex];
+  if(isCharDigit(c))
+  {
+    pParser->NumericTo = pParser->MaskIndex;
+    pParser->MaskIndex++;
+    return PS_PARSE_TO;
+  }
+  else if((c == ']') && (pParser->NumericTo > -1))
+  {
+    pParser->MaskIndex++;
+    pParser->CommandFrom--;
+    pParser->CommandTo = strtol(pParser->pMask + pParser->NumericFrom,
+                                NULL,
+                                10);
+    pParser->CommandTo--;
+    addPendingAction(pParser);
+    return PS_APPLY;
+  }
+  else
+  {
+    return PS_ERROR;
+  }
 }
 
 
