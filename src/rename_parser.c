@@ -133,7 +133,7 @@ BOOL parseActions(ActionParser* pParser)
     run_state(pParser->State, pParser);
   }
 
-  return (pParser->State == PS_FINISHED);
+  return (BOOL)(pParser->State == PS_FINISHED);
 }
 
 
@@ -190,7 +190,7 @@ BOOL isCharAllowed(char c)
 
 BOOL isCharDigit(char c)
 {
-  return (c > 48) && (c < 58);
+  return (BOOL)((c > 48) && (c < 58));
 }
 
 static void init_state_apply(ActionParser* pParser)
