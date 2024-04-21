@@ -133,7 +133,7 @@ BOOL parseActions(ActionParser* pParser)
     run_state(pParser->State, pParser);
   }
 
-  return pParser->State == PS_FINISHED;
+  return (pParser->State == PS_FINISHED);
 }
 
 
@@ -143,8 +143,9 @@ BOOL addPendingAction(ActionParser* pParser)
 
   if((pParser->CommandFrom > -1) && (pParser->CommandTo < 0))
   {
-    // This Apply command hasn't been properly started
-    return;
+    // This is an incomplete Apply command. In this state machine design
+    // this can occur during normal operation and is no error.
+    return TRUE;
   }
 
   if(!(pActionNode = malloc(sizeof(ActionNode))))

@@ -57,7 +57,7 @@ BOOL fillNewNames(struct List* pFilesList,
     return NULL;
   }
 
-  maskSize = strlen(pNameMask) + strlen(pNameMask) + 2;
+  maskSize = strlen(pNameMask) + strlen(pExtMask) + 2;
   if(!(pMask = malloc(maskSize * sizeof(char))))
   {
     return FALSE;
@@ -73,6 +73,7 @@ BOOL fillNewNames(struct List* pFilesList,
 
   if(!parseActions(&parser))
   {
+    freeActionNodes(&parser.ActionList);
     free(pMask);
     return FALSE;
   }
@@ -86,7 +87,6 @@ BOOL fillNewNames(struct List* pFilesList,
                  pFileNode->OldNameLen,
                  pMask, &counter);
   }
-
 
   freeActionNodes(&parser.ActionList);
   free(pMask);
