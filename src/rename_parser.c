@@ -137,6 +137,26 @@ BOOL parseActions(ActionParser* pParser)
 }
 
 
+void freeActionNodes(struct List* pActionsList)
+{
+  struct Node* pWorkNode;
+  struct Node* pNextNode;
+
+  if(!pActionsList)
+  {
+    return;
+  }
+
+  pWorkNode = pActionsList->lh_Head;
+  while((pNextNode = pWorkNode->ln_Succ))
+  {
+    free(pWorkNode);
+    pWorkNode = pNextNode;
+  }
+}
+
+
+
 BOOL addPendingAction(ActionParser* pParser)
 {
   ActionNode* pActionNode;

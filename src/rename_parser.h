@@ -48,7 +48,22 @@ typedef struct
   ULONG MaskIndex;
 } ActionParser;
 
+/**
+ * Initialize the parser. Must be done before every parseActions() call.
+ */
 void initActionParser(ActionParser* pParser, STRPTR pMask);
+
+/**
+ * Parses the given pMask. It creates a number of nodes and adds it to
+ * pParser->ActionList. After done with the actions, freeActionNodes()
+ * must be called.
+ */
 BOOL parseActions(ActionParser* pParser);
+
+/**
+ * Frees the memory that was allocated for the ACtionNodes in
+ * parseActions().
+ */
+void freeActionNodes(struct List* pActionsList);
 
 #endif

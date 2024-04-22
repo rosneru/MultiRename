@@ -17,89 +17,6 @@ void applyActions(STRPTR pResultBuf,
                   STRPTR pName,
                   UBYTE NameLen,
                   STRPTR pMask,
-                  Counter* pCounter);
-
-// TODO: Use a memory pool to avoid this
-void freeActionNodes(struct List* pActionsList)
-{
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
-
-  if(!pActionsList)
-  {
-    return;
-  }
-
-  pWorkNode = pActionsList->lh_Head;
-  while((pNextNode = pWorkNode->ln_Succ))
-  {
-    free(pWorkNode);
-    pWorkNode = pNextNode;
-  }
-}
-
-BOOL fillNewNames(struct List* pFilesList,
-                  STRPTR pNameMask,
-                  STRPTR pExtMask,
-                  LONG counterStart,
-                  LONG counterInc,
-                  BYTE counterWidth)
-{
-  struct Node* pNode;
-  FileNode* pFileNode;
-  ULONG maskSize;
-  STRPTR pMask;
-  Counter counter;
-  ActionParser parser;
-
-  if(!pFilesList || ! pNameMask || ! pExtMask)
-  {
-    return FALSE;
-  }
-
-  maskSize = strlen(pNameMask) + strlen(pExtMask) + 2;
-  if(!(pMask = malloc(maskSize * sizeof(char))))
-  {
-    return FALSE;
-  }
-
-  strcpy(pMask, pNameMask);
-  strcat(pMask, ".");
-  strcat(pMask, pExtMask);
-
-  initCounter(&counter, counterStart, counterInc, counterWidth);
-
-  initActionParser(&parser, pMask);
-
-  if(!parseActions(&parser))
-  {
-    freeActionNodes(&parser.ActionList);
-    free(pMask);
-    return FALSE;
-  }
-
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
-  {
-    pFileNode = (FileNode*)pNode;
-    applyActions(pFileNode->NewName,
-                 &parser.ActionList,
-                 pFileNode->OldName,
-                 pFileNode->OldNameLen,
-                 pMask, &counter);
-  }
-
-  freeActionNodes(&parser.ActionList);
-  free(pMask);
-  return TRUE;
-}
-
-
-
-void applyActions(STRPTR pResultBuf,
-                  struct List* pActionList,
-                  STRPTR pName,
-                  UBYTE NameLen,
-                  STRPTR pMask,
                   Counter* pCounter)
 {
   struct Node* pNode;
@@ -171,3 +88,61 @@ void applyActions(STRPTR pResultBuf,
     incrementCounter(pCounter);
   }
 }
+
+
+BOOL fillNewNames(struct List* pFilesList,
+                  STRPTR pNameMask,
+                  STRPTR pExtMask,
+                  LONG counterStart,
+                  LONG counterInc,
+                  BYTE counterWidth)
+{
+  struct Node* pNode;
+  FileNode* pFileNode;
+  ULONG maskSize;
+  STRPTR pMask;
+  Counter counter;
+  ActionParser parser;
+
+  if(!pFilesList || ! pNameMask || ! pExtMask)
+  {
+    return FALSE;
+  }
+
+  maskSize = strlen(pNameMask) + strlen(pExtMask) + 2;
+  if(!(pMask = malloc(maskSize * sizeof(char))))
+  {
+    return FALSE;
+  }
+
+  // Build the resulting mask of name and extension field to be used by
+  // the parser.
+  strcpy(pMask, pNameMask);
+  strcat(pMask, ".");
+  strcat(pMask, pExtMask);
+
+  initCounter(&counter, counterStart, counterInc, counterWidth);
+  initActionParser(&parser, pMask);
+
+  if(!parseActions(&parser))
+  {
+    freeActionNodes(&parser.ActionList);
+    free(pMask);
+    return FALSE;
+  }
+
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    applyActions(pFileNode->NewName,
+                 &parser.ActionList,
+                 pFileNode->OldName,
+                 pFileNode->OldNameLen,
+                 pMask, &counter);
+  }
+
+  freeActionNodes(&parser.ActionList);
+  free(pMask);
+  return TRUE;
+}
+
