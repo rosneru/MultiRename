@@ -6,4 +6,6 @@
 void openRangeSelectRequester(Application* pApp);
 void closeRangeSelectRequester(Application* pApp);
 
+void handleRangeSelectRequesterEvents(Application* pApp);
+
 #endif

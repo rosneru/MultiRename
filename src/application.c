@@ -368,7 +368,7 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
 }
 
 
-void handleGadgets(Application* pApp, ULONG result)
+static void handleGadgets(Application* pApp, ULONG result)
 {
   switch ((result & WMHI_GADGETMASK))
   {
@@ -414,6 +414,8 @@ void intuiEventLoop(Application* pApp)
           break;
       }
     }
+
+    handleRangeSelectRequesterEvents(pApp);
   }
 }
 

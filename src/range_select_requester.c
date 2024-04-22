@@ -42,11 +42,13 @@
 #include "range_select_requester.h"
 
 
+static void handleGadgets(Application* pApp, ULONG result);
+
 enum gadids
 {
     GID_STRING = 1
   , GID_BTN_OK
-  , GID_BTN_CANCEL
+  , GID_BTN_CLOSE
   , MAXGADGETS
 };
 
@@ -104,7 +106,7 @@ void openRangeSelectRequester(Application* pApp)
           TAG_END),
         CHILD_WeightedWidth, 100,
         LAYOUT_AddChild, NewObject(NULL, "button.gadget",
-          GA_ID, GID_BTN_OK,
+          GA_ID, GID_BTN_CLOSE,
           GA_RelVerify, TRUE,
           GA_Text, "Close",
           BUTTON_TextPadding, TRUE,
@@ -146,5 +148,47 @@ void closeRangeSelectRequester(Application* pApp)
 
     SetWindowPointer(pApp->pIntuiWindow, TAG_DONE);
     EndRequest(&BlockingReq, pApp->pIntuiWindow);
+  }
+}
+
+void handleRangeSelectRequesterEvents(Application* pApp)
+{
+  if(!pRangeSelectWindowObj || !pRangeSelectIntuiWindow)
+  {
+    return;
+  }
+
+  ULONG receivedSig;
+  ULONG result;
+  ULONG code;
+
+  while ((result = DoMethod(pRangeSelectWindowObj, WM_HANDLEINPUT, &code)))
+  {
+    switch (result & WMHI_CLASSMASK)
+    {
+      case WMHI_CLOSEWINDOW:
+        closeRangeSelectRequester(pApp);
+        break;
+      case WMHI_GADGETUP:
+        handleGadgets(pApp, result);
+        break;
+    }
+  }
+}
+
+
+static void handleGadgets(Application* pApp, ULONG result)
+{
+  switch ((result & WMHI_GADGETMASK))
+  {
+  case GID_STRING:
+    //
+    break;
+  case GID_BTN_OK:
+    //
+    break;
+  case GID_BTN_CLOSE:
+    closeRangeSelectRequester(pApp);
+    break;
   }
 }
