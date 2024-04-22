@@ -21,6 +21,7 @@ typedef struct Application
   struct List* pFileList;
   Object* pWinObject;
   struct Window* pIntuiWindow;
+  ULONG SigMask;
   char FilesPath[MAXPATHLEN + 1];
   char WindowTitle[MAXPATHLEN + 32];
   char ScratchBuf[SCRATCH_BUF_SIZE];

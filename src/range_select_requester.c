@@ -42,6 +42,109 @@
 #include "range_select_requester.h"
 
 
+enum gadids
+{
+    GID_STRING = 1
+  , GID_BTN_OK
+  , GID_BTN_CANCEL
+  , MAXGADGETS
+};
+
+static Object* m_ppGadgets[MAXGADGETS];
+
+static struct Window *pRangeSelectIntuiWindow = NULL;
+static Object *pRangeSelectWindowObj = NULL;
+static Object *pMainLayout;
+
+static struct Requester BlockingReq;
+
 void openRangeSelectRequester(Application* pApp)
 {
+  ULONG sigmask;
+  
+  pRangeSelectWindowObj = NewObject(WINDOW_GetClass(), NULL,
+    WA_Activate, TRUE,
+    WA_DragBar, TRUE,
+    WA_DepthGadget, TRUE,
+    WA_SizeGadget, TRUE,
+    WA_Title, "MultiRename: Select name part",
+    WA_Left, pApp->pIntuiWindow->LeftEdge + 50,
+    WA_Top, pApp->pIntuiWindow->TopEdge + 30,
+    WA_Width, 500,
+    WA_Height, 180,
+    WA_AutoAdjust, TRUE,
+    WINDOW_GadgetHelp, TRUE,
+    WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
+    WINDOW_Layout, pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
+      LAYOUT_DeferLayout, TRUE,
+      LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
+      LAYOUT_SpaceInner, TRUE,
+      LAYOUT_SpaceOuter, TRUE,
+      LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
+        GA_ID, GID_STRING,
+        GA_RelVerify, TRUE,
+        GA_TabCycle, TRUE,
+        TAG_END),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Select the characters to be inserted",
+        TAG_END),
+      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+        TAG_DONE),
+      CHILD_WeightedHeight, 100,
+      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+        LAYOUT_EvenSize, TRUE,
+        LAYOUT_AddChild, NewObject(NULL, "button.gadget",
+          GA_ID, GID_BTN_OK,
+          GA_RelVerify, TRUE,
+          GA_Text, "Ok",
+          BUTTON_TextPadding, TRUE,
+          GA_TabCycle, TRUE,
+          TAG_END),
+        CHILD_WeightedWidth, 1,
+        LAYOUT_AddChild, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "",
+          TAG_END),
+        CHILD_WeightedWidth, 100,
+        LAYOUT_AddChild, NewObject(NULL, "button.gadget",
+          GA_ID, GID_BTN_OK,
+          GA_RelVerify, TRUE,
+          GA_Text, "Close",
+          BUTTON_TextPadding, TRUE,
+          GA_TabCycle, TRUE,
+          TAG_END),
+        CHILD_WeightedWidth, 1,
+        TAG_DONE),
+      CHILD_WeightedHeight, 0,
+      TAG_DONE),
+    TAG_DONE);
+
+  InitRequester(&BlockingReq);
+  Request(&BlockingReq, pApp->pIntuiWindow);
+  SetWindowPointer(pApp->pIntuiWindow, WA_BusyPointer, TRUE, TAG_DONE);
+
+  pRangeSelectIntuiWindow = (struct Window *)DoMethod(pRangeSelectWindowObj, WM_OPEN, NULL);
+
+  if(!pRangeSelectWindowObj)
+  {
+    closeRangeSelectRequester(pApp);
+  }
+
+  GetAttr(WINDOW_SigMask, pRangeSelectWindowObj, &sigmask);
+
+  pApp->SigMask |= sigmask;
+}
+
+void closeRangeSelectRequester(Application* pApp)
+{
+  ULONG sigmask;
+  if (pRangeSelectWindowObj)
+  {
+
+    GetAttr(WINDOW_SigMask, pRangeSelectWindowObj, &sigmask);
+    pApp->SigMask &= ~sigmask;
+    DisposeObject(pRangeSelectWindowObj);
+    pRangeSelectWindowObj  = NULL;
+    pRangeSelectIntuiWindow = NULL;
+
+    SetWindowPointer(pApp->pIntuiWindow, TAG_DONE);
+    EndRequest(&BlockingReq, pApp->pIntuiWindow);
+  }
 }

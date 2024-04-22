@@ -4,5 +4,6 @@
 #include "application.h"
 
 void openRangeSelectRequester(Application* pApp);
+void closeRangeSelectRequester(Application* pApp);
 
 #endif

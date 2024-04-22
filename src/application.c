@@ -42,6 +42,7 @@
 #include <stdio.h>
 
 #include "file_list.h"
+#include "range_select_requester.h"
 #include "rename_algorithm.h"
 #include "notifications.h"
 #include "requester.h"
@@ -377,6 +378,9 @@ void handleGadgets(Application* pApp, ULONG result)
   case GID_BTN_NAME:
     printFileListNewName(pApp->pFileList);
     break;
+  case GID_BTN_NAME_PART:
+    openRangeSelectRequester(pApp);
+    break;
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!
     addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
@@ -388,17 +392,16 @@ void handleGadgets(Application* pApp, ULONG result)
 
 void intuiEventLoop(Application* pApp)
 {
-  ULONG winSig;
   ULONG receivedSig;
   ULONG result;
   ULONG code;
   BOOL end = FALSE;
 
-  GetAttr(WINDOW_SigMask, pApp->pWinObject, &winSig);
+  GetAttr(WINDOW_SigMask, pApp->pWinObject, &pApp->SigMask);
 
   while (!end)
   {
-    receivedSig = Wait(winSig);
+    receivedSig = Wait(pApp->SigMask);
     while ((result = DoMethod(pApp->pWinObject, WM_HANDLEINPUT, &code)))
     {
       switch (result & WMHI_CLASSMASK)
