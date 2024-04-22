@@ -54,7 +54,7 @@ BOOL fillNewNames(struct List* pFilesList,
 
   if(!pFilesList || ! pNameMask || ! pExtMask)
   {
-    return NULL;
+    return FALSE;
   }
 
   maskSize = strlen(pNameMask) + strlen(pExtMask) + 2;
