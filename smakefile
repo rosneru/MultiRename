@@ -30,6 +30,9 @@ $(OBJDIR)notifications.o : src/notifications.c
 $(OBJDIR)parsed_args.o : src/parsed_args.c
 	$(CC) nolink src/parsed_args.c
 
+$(OBJDIR)range_select_requester.o : src/range_select_requester.c
+	$(CC) nolink src/range_select_requester.c
+
 $(OBJDIR)rename_algorithm.o : src/rename_algorithm.c
 	$(CC) nolink src/rename_algorithm.c
 
@@ -44,6 +47,7 @@ $(OBJDIR)requester.o : src/requester.c
 
 OBJS = $(OBJDIR)application.o  $(OBJDIR)file_list.o $(OBJDIR)main.o
 OBJS = $(OBJS) $(OBJDIR)notifications.o $(OBJDIR)parsed_args.o
+OBJS = $(OBJS) $(OBJDIR)range_select_requester.o
 OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_counter.o
 OBJS = $(OBJS) $(OBJDIR)rename_parser.o $(OBJDIR)requester.o
 
