@@ -16,7 +16,7 @@ add_executable (MultiRename_gcc
                 main.c
                 notifications.c
                 parsed_args.c
-                range_select_requester.c
+                range_select_window.c
                 rename_counter.c
                 rename_algorithm.c
                 rename_parser.c

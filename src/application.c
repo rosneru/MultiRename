@@ -42,7 +42,7 @@
 #include <stdio.h>
 
 #include "file_list.h"
-#include "range_select_requester.h"
+#include "range_select_window.h"
 #include "rename_algorithm.h"
 #include "notifications.h"
 #include "requester.h"
@@ -379,7 +379,8 @@ static void handleGadgets(Application* pApp, ULONG result)
     printFileListNewName(pApp->pFileList);
     break;
   case GID_BTN_NAME_PART:
-    openRangeSelectRequester(pApp);
+    // TODO createRangeSelector(..)
+    openRangeSelectWindow(pApp);
     break;
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!

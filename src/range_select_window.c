@@ -1,4 +1,5 @@
 #include <classes/window.h>
+#include <exec/memory.h>
 #include <gadgets/chooser.h>
 #include <gadgets/layout.h>
 #include <gadgets/listbrowser.h>
@@ -39,10 +40,10 @@
 #endif
 
 
-#include "range_select_requester.h"
+#include "range_select_window.h"
 
 
-static void handleGadgets(Application* pApp, ULONG result);
+static void handleGadgets(RangeSelectData* pThis, ULONG result);
 
 enum gadids
 {
@@ -54,24 +55,22 @@ enum gadids
 
 static Object* m_ppGadgets[MAXGADGETS];
 
-static struct Window *pRangeSelectIntuiWindow = NULL;
-static Object *pRangeSelectWindowObj = NULL;
 static Object *pMainLayout;
 
-static struct Requester BlockingReq;
-
-void openRangeSelectRequester(Application* pApp)
+RangeSelectData* createRangeSelectData()
 {
-  ULONG sigmask;
-  
-  pRangeSelectWindowObj = NewObject(WINDOW_GetClass(), NULL,
+  RangeSelectData* pRangeSelectData;
+  if(!(pRangeSelectData = AllocVec(sizeof(RangeSelectData), MEMF_CLEAR)))
+  {
+    return NULL;
+  }
+
+  pRangeSelectData->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Activate, TRUE,
     WA_DragBar, TRUE,
     WA_DepthGadget, TRUE,
     WA_SizeGadget, TRUE,
     WA_Title, "MultiRename: Select name part",
-    WA_Left, pApp->pIntuiWindow->LeftEdge + 50,
-    WA_Top, pApp->pIntuiWindow->TopEdge + 30,
     WA_Width, 500,
     WA_Height, 180,
     WA_AutoAdjust, TRUE,
@@ -117,67 +116,109 @@ void openRangeSelectRequester(Application* pApp)
       CHILD_WeightedHeight, 0,
       TAG_DONE),
     TAG_DONE);
-
-  InitRequester(&BlockingReq);
-  Request(&BlockingReq, pApp->pIntuiWindow);
-  SetWindowPointer(pApp->pIntuiWindow, WA_BusyPointer, TRUE, TAG_DONE);
-
-  pRangeSelectIntuiWindow = (struct Window *)DoMethod(pRangeSelectWindowObj, WM_OPEN, NULL);
-
-  if(!pRangeSelectWindowObj)
-  {
-    closeRangeSelectRequester(pApp);
-  }
-
-  GetAttr(WINDOW_SigMask, pRangeSelectWindowObj, &sigmask);
-
-  pApp->SigMask |= sigmask;
+  return pRangeSelectData;
 }
 
-void closeRangeSelectRequester(Application* pApp)
+BOOL openRangeSelectWindow(RangeSelectData* pRangeSelectData,
+                           struct Window* pParentIntuiWin,
+                           ULONG* pMainSigMask)
 {
   ULONG sigmask;
-  if (pRangeSelectWindowObj)
+
+  if(!pRangeSelectData || !pRangeSelectData->pWinObject || !pMainSigMask)
   {
-
-    GetAttr(WINDOW_SigMask, pRangeSelectWindowObj, &sigmask);
-    pApp->SigMask &= ~sigmask;
-    DisposeObject(pRangeSelectWindowObj);
-    pRangeSelectWindowObj  = NULL;
-    pRangeSelectIntuiWindow = NULL;
-
-    SetWindowPointer(pApp->pIntuiWindow, TAG_DONE);
-    EndRequest(&BlockingReq, pApp->pIntuiWindow);
+    return FALSE;
   }
+
+  SetAttrs(pRangeSelectData->pWinObject,
+           WA_Left, pParentIntuiWin->LeftEdge + 50,
+           WA_Top, pParentIntuiWin->TopEdge + 30,
+           TAG_DONE);
+
+  InitRequester(&pRangeSelectData->BlockingReq);
+  Request(&pRangeSelectData->BlockingReq, pParentIntuiWin);
+  SetWindowPointer(pParentIntuiWin, WA_BusyPointer, TRUE, TAG_DONE);
+
+  if(!(pRangeSelectData->pIntuiWindow = 
+        (struct Window*) DoMethod(pRangeSelectData->pWinObject, WM_OPEN, NULL)))
+  {
+    return FALSE;
+  }
+
+  pRangeSelectData->pMainSigMask = pMainSigMask;
+  pRangeSelectData->pParentIntuiWindow = pParentIntuiWin;
+
+  GetAttr(WINDOW_SigMask, pRangeSelectData->pWinObject, &sigmask);
+  *(pRangeSelectData->pMainSigMask) |= sigmask;
+
+  return TRUE;
 }
 
-void handleRangeSelectRequesterEvents(Application* pApp)
+void closeRangeSelectWindow(RangeSelectData* pRangeSelectData)
 {
-  if(!pRangeSelectWindowObj || !pRangeSelectIntuiWindow)
+  ULONG sigmask;
+
+  if(!pRangeSelectData || !pRangeSelectData->pWinObject
+  || !pRangeSelectData->pIntuiWindow || !pRangeSelectData->pParentIntuiWindow)
   {
     return;
   }
 
+  GetAttr(WINDOW_SigMask, pRangeSelectData->pWinObject, &sigmask);
+  *(pRangeSelectData->pMainSigMask) &= ~sigmask;
+
+  DoMethod(pRangeSelectData->pWinObject, WM_CLOSE, NULL);
+  pRangeSelectData->pIntuiWindow = NULL;
+
+  SetWindowPointer(pRangeSelectData->pParentIntuiWindow, TAG_DONE);
+  EndRequest(&pRangeSelectData->BlockingReq, pRangeSelectData->pParentIntuiWindow);
+
+}
+
+void freeRangeSelectData(RangeSelectData* pRangeSelectData)
+{
+  if(!pRangeSelectData)
+  {
+    return;
+  }
+
+  if(pRangeSelectData->pWinObject)
+  {
+    DisposeObject(pRangeSelectData->pWinObject);
+    pRangeSelectData->pWinObject  = NULL;
+  }
+
+  FreeVec(pRangeSelectData);
+}
+
+void handleRangeSelectWindowEvents(RangeSelectData* pRangeSelectData)
+{
   ULONG receivedSig;
   ULONG result;
   ULONG code;
 
-  while ((result = DoMethod(pRangeSelectWindowObj, WM_HANDLEINPUT, &code)))
+  if(!pRangeSelectData || !pRangeSelectData->pWinObject 
+  || !pRangeSelectData->pIntuiWindow)
+  {
+    return;
+  }
+
+  while ((result = DoMethod(pRangeSelectData->pWinObject , WM_HANDLEINPUT, &code)))
   {
     switch (result & WMHI_CLASSMASK)
     {
       case WMHI_CLOSEWINDOW:
-        closeRangeSelectRequester(pApp);
+        closeRangeSelectWindow(pRangeSelectData);
         break;
       case WMHI_GADGETUP:
-        handleGadgets(pApp, result);
+        handleGadgets(pRangeSelectData, result);
         break;
     }
   }
 }
 
 
-static void handleGadgets(Application* pApp, ULONG result)
+static void handleGadgets(RangeSelectData* pThis, ULONG result)
 {
   switch ((result & WMHI_GADGETMASK))
   {
@@ -188,7 +229,7 @@ static void handleGadgets(Application* pApp, ULONG result)
     //
     break;
   case GID_BTN_CLOSE:
-    closeRangeSelectRequester(pApp);
+    closeRangeSelectWindow(pThis);
     break;
   }
 }
