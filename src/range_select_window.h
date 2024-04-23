@@ -1,24 +1,22 @@
-#ifndef RANGE_SELECT_REQUESTER_H
-#define RANGE_SELECT_REQUESTER_H
+#ifndef RANGE_SELECT_WINDOW_H
+#define RANGE_SELECT_WINDOW_H
 
-#include "application.h"
-
-typedef struct RangeSelectData
+typedef struct RangeSelectWindow
 {
   Object* pWinObject;
   struct Window* pIntuiWindow;
   struct Window* pParentIntuiWindow;
   ULONG* pMainSigMask;
   struct Requester BlockingReq;
-} RangeSelectData;
+} RangeSelectWindow;
 
-RangeSelectData* createRangeSelectData();
-BOOL openRangeSelectWindow(RangeSelectData* pRangeSelectData,
+RangeSelectWindow* createRangeSelectWindow();
+BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
                            ULONG* pMainSigMask);
-void closeRangeSelectWindow(RangeSelectData* pRangeSelectData);
-void freeRangeSelectData(RangeSelectData* pRangeSelectData);
+void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
+void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 
-void handleRangeSelectWindowEvents(RangeSelectData* pRangeSelectData);
+void handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow);
 
 #endif

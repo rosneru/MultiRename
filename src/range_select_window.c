@@ -43,7 +43,7 @@
 #include "range_select_window.h"
 
 
-static void handleGadgets(RangeSelectData* pThis, ULONG result);
+static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
 
 enum gadids
 {
@@ -57,168 +57,195 @@ static Object* m_ppGadgets[MAXGADGETS];
 
 static Object *pMainLayout;
 
-RangeSelectData* createRangeSelectData()
+RangeSelectWindow* createRangeSelectWindow()
 {
-  RangeSelectData* pRangeSelectData;
-  if(!(pRangeSelectData = AllocVec(sizeof(RangeSelectData), MEMF_CLEAR)))
+  RangeSelectWindow* pRangeSelectWindow;
+  if(!(pRangeSelectWindow = AllocVec(sizeof(RangeSelectWindow), MEMF_CLEAR)))
   {
     return NULL;
   }
 
-  pRangeSelectData->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-    WA_Activate, TRUE,
-    WA_DragBar, TRUE,
-    WA_DepthGadget, TRUE,
-    WA_SizeGadget, TRUE,
+  pRangeSelectWindow->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Title, "MultiRename: Select name part",
+    WA_Activate, TRUE,
+    WA_CloseGadget, TRUE,
+    WA_DepthGadget, TRUE,
+    WA_DragBar, TRUE,
+    WA_SizeGadget, TRUE,
     WA_Width, 500,
     WA_Height, 180,
     WA_AutoAdjust, TRUE,
     WINDOW_GadgetHelp, TRUE,
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
     WINDOW_Layout, pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
-      LAYOUT_DeferLayout, TRUE,
+      LAYOUT_EvenSize, TRUE,
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
-      LAYOUT_SpaceInner, TRUE,
       LAYOUT_SpaceOuter, TRUE,
+      LAYOUT_BevelStyle, BVS_GROUP,
+      LAYOUT_DeferLayout, TRUE,   /* this tag instructs layout.gadget to
+                                  * defer GM_LAYOUT and GM_RENDER and ask
+                                  * the application to do them. This
+                                  * lessens the load on input.device
+                                  */
       LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
-        TAG_END),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "Select the characters to be inserted",
-        TAG_END),
-      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
-        TAG_DONE),
-      CHILD_WeightedHeight, 100,
+      TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+        LABEL_Text, "Select the characters to be inserted",
+      TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
-        LAYOUT_AddChild, NewObject(NULL, "button.gadget",
+        LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+        LAYOUT_AddChild, m_ppGadgets[GID_BTN_OK] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_OK,
           GA_RelVerify, TRUE,
-          GA_Text, "Ok",
+          GA_Text, (ULONG)"Ok",
           BUTTON_TextPadding, TRUE,
-          GA_TabCycle, TRUE,
-          TAG_END),
+        TAG_DONE),
         CHILD_WeightedWidth, 1,
-        LAYOUT_AddChild, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "",
-          TAG_END),
+        LAYOUT_AddChild, NewObject(LABEL_GetClass(), NULL,
+          LABEL_Text, "",
+        TAG_DONE),
         CHILD_WeightedWidth, 100,
-        LAYOUT_AddChild, NewObject(NULL, "button.gadget",
+        LAYOUT_AddChild, m_ppGadgets[GID_BTN_CLOSE] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_CLOSE,
           GA_RelVerify, TRUE,
-          GA_Text, "Close",
+          GA_Text, (ULONG)"Close",
           BUTTON_TextPadding, TRUE,
-          GA_TabCycle, TRUE,
-          TAG_END),
-        CHILD_WeightedWidth, 1,
         TAG_DONE),
-      CHILD_WeightedHeight, 0,
+        CHILD_WeightedWidth, 1,
       TAG_DONE),
+      CHILD_WeightedHeight, 0,
+    TAG_DONE),
     TAG_DONE);
-  return pRangeSelectData;
+  return pRangeSelectWindow;
+        // LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+        //   LAYOUT_EvenSize, TRUE,
+        //   LAYOUT_AddChild, NewObject(NULL, "button.gadget",
+        //     GA_ID, GID_BTN_OK,
+        //     GA_RelVerify, TRUE,
+        //     GA_Text, "Ok",
+        //     BUTTON_TextPadding, TRUE,
+        //     GA_TabCycle, TRUE,
+        //     TAG_END),
+        //   CHILD_WeightedWidth, 1,
+        //   LAYOUT_AddChild, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "",
+        //       TAG_END),
+        //     CHILD_WeightedWidth, 100,
+        //     LAYOUT_AddChild, NewObject(NULL, "button.gadget",
+        //         GA_ID, GID_BTN_CLOSE,
+        //         GA_RelVerify, TRUE,
+        //         GA_Text, "Close",
+        //         BUTTON_TextPadding, TRUE,
+        //         GA_TabCycle, TRUE,
+        //         TAG_END),
+        //       CHILD_WeightedWidth, 1,
+        //     TAG_DONE),
+        // CHILD_WeightedHeight, 0,
 }
 
-BOOL openRangeSelectWindow(RangeSelectData* pRangeSelectData,
+BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
                            ULONG* pMainSigMask)
 {
   ULONG sigmask;
 
-  if(!pRangeSelectData || !pRangeSelectData->pWinObject || !pMainSigMask)
+  if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject || !pMainSigMask)
   {
     return FALSE;
   }
 
-  SetAttrs(pRangeSelectData->pWinObject,
+  SetAttrs(pRangeSelectWindow->pWinObject,
            WA_Left, pParentIntuiWin->LeftEdge + 50,
            WA_Top, pParentIntuiWin->TopEdge + 30,
            TAG_DONE);
 
-  InitRequester(&pRangeSelectData->BlockingReq);
-  Request(&pRangeSelectData->BlockingReq, pParentIntuiWin);
+  InitRequester(&pRangeSelectWindow->BlockingReq);
+  Request(&pRangeSelectWindow->BlockingReq, pParentIntuiWin);
   SetWindowPointer(pParentIntuiWin, WA_BusyPointer, TRUE, TAG_DONE);
 
-  if(!(pRangeSelectData->pIntuiWindow = 
-        (struct Window*) DoMethod(pRangeSelectData->pWinObject, WM_OPEN, NULL)))
+  if(!(pRangeSelectWindow->pIntuiWindow = 
+        (struct Window*) DoMethod(pRangeSelectWindow->pWinObject, WM_OPEN, NULL)))
   {
     return FALSE;
   }
 
-  pRangeSelectData->pMainSigMask = pMainSigMask;
-  pRangeSelectData->pParentIntuiWindow = pParentIntuiWin;
+  pRangeSelectWindow->pMainSigMask = pMainSigMask;
+  pRangeSelectWindow->pParentIntuiWindow = pParentIntuiWin;
 
-  GetAttr(WINDOW_SigMask, pRangeSelectData->pWinObject, &sigmask);
-  *(pRangeSelectData->pMainSigMask) |= sigmask;
+  GetAttr(WINDOW_SigMask, pRangeSelectWindow->pWinObject, &sigmask);
+  *(pRangeSelectWindow->pMainSigMask) |= sigmask;
 
   return TRUE;
 }
 
-void closeRangeSelectWindow(RangeSelectData* pRangeSelectData)
+void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow)
 {
   ULONG sigmask;
 
-  if(!pRangeSelectData || !pRangeSelectData->pWinObject
-  || !pRangeSelectData->pIntuiWindow || !pRangeSelectData->pParentIntuiWindow)
+  if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject
+  || !pRangeSelectWindow->pIntuiWindow || !pRangeSelectWindow->pParentIntuiWindow)
   {
     return;
   }
 
-  GetAttr(WINDOW_SigMask, pRangeSelectData->pWinObject, &sigmask);
-  *(pRangeSelectData->pMainSigMask) &= ~sigmask;
+  GetAttr(WINDOW_SigMask, pRangeSelectWindow->pWinObject, &sigmask);
+  *(pRangeSelectWindow->pMainSigMask) &= ~sigmask;
 
-  DoMethod(pRangeSelectData->pWinObject, WM_CLOSE, NULL);
-  pRangeSelectData->pIntuiWindow = NULL;
+  DoMethod(pRangeSelectWindow->pWinObject, WM_CLOSE, NULL);
+  pRangeSelectWindow->pIntuiWindow = NULL;
 
-  SetWindowPointer(pRangeSelectData->pParentIntuiWindow, TAG_DONE);
-  EndRequest(&pRangeSelectData->BlockingReq, pRangeSelectData->pParentIntuiWindow);
+  SetWindowPointer(pRangeSelectWindow->pParentIntuiWindow, TAG_DONE);
+  EndRequest(&pRangeSelectWindow->BlockingReq, pRangeSelectWindow->pParentIntuiWindow);
 
 }
 
-void freeRangeSelectData(RangeSelectData* pRangeSelectData)
+void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow)
 {
-  if(!pRangeSelectData)
+  if(!pRangeSelectWindow)
   {
     return;
   }
 
-  if(pRangeSelectData->pWinObject)
+  if(pRangeSelectWindow->pWinObject)
   {
-    DisposeObject(pRangeSelectData->pWinObject);
-    pRangeSelectData->pWinObject  = NULL;
+    DisposeObject(pRangeSelectWindow->pWinObject);
+    pRangeSelectWindow->pWinObject  = NULL;
   }
 
-  FreeVec(pRangeSelectData);
+  FreeVec(pRangeSelectWindow);
 }
 
-void handleRangeSelectWindowEvents(RangeSelectData* pRangeSelectData)
+void handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
 {
   ULONG receivedSig;
   ULONG result;
   ULONG code;
 
-  if(!pRangeSelectData || !pRangeSelectData->pWinObject 
-  || !pRangeSelectData->pIntuiWindow)
+  if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject 
+  || !pRangeSelectWindow->pIntuiWindow)
   {
     return;
   }
 
-  while ((result = DoMethod(pRangeSelectData->pWinObject , WM_HANDLEINPUT, &code)))
+  while ((result = DoMethod(pRangeSelectWindow->pWinObject , WM_HANDLEINPUT, &code)))
   {
     switch (result & WMHI_CLASSMASK)
     {
       case WMHI_CLOSEWINDOW:
-        closeRangeSelectWindow(pRangeSelectData);
+        closeRangeSelectWindow(pRangeSelectWindow);
         break;
       case WMHI_GADGETUP:
-        handleGadgets(pRangeSelectData, result);
+        handleGadgets(pRangeSelectWindow, result);
         break;
     }
   }
 }
 
 
-static void handleGadgets(RangeSelectData* pThis, ULONG result)
+static void handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
 {
   switch ((result & WMHI_GADGETMASK))
   {
@@ -229,7 +256,7 @@ static void handleGadgets(RangeSelectData* pThis, ULONG result)
     //
     break;
   case GID_BTN_CLOSE:
-    closeRangeSelectWindow(pThis);
+    closeRangeSelectWindow(pRangeSelectWindow);
     break;
   }
 }

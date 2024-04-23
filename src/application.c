@@ -128,9 +128,9 @@ Application* createApplication(int argc, char **argv)
                                               WINDOW_Position, WPOS_CENTERSCREEN,
                                               WA_Activate, TRUE,
                                               WA_Title, "MultiRename",
-                                              WA_DragBar, TRUE,
                                               WA_CloseGadget, TRUE,
                                               WA_DepthGadget, TRUE,
+                                              WA_DragBar, TRUE,
                                               WA_SizeGadget, TRUE,
                                               WA_InnerWidth, 600,
                                               WA_InnerHeight, 400,
@@ -141,11 +141,19 @@ Application* createApplication(int argc, char **argv)
                                               WINDOW_AppMsgHook, &apphook,
                                               TAG_DONE)))
               {
-                return pApp;
+                if((pApp->pRangeSelectWindow = createRangeSelectWindow()))
+                {
+                  return pApp;
+                }
+                else
+                {
+                  PutStr("Failed to create the range select window.\n");
+                  disposeApplication(pApp);
+                }
               }
               else
               {
-                PutStr("Failed to create window.\n");
+                PutStr("Failed to create the application main window.\n");
                 DisposeObject(pMainLayout);
                 disposeApplication(pApp);
               }
@@ -155,21 +163,18 @@ Application* createApplication(int argc, char **argv)
               PutStr("Failed to create layout.\n");
               disposeApplication(pApp);
             }
-
           }
           else
           {
             PutStr("Failed to parse the arguments.\n");
             disposeApplication(pApp);
           }
-
         }
         else
         {
           PutStr("Failed to create the files list.\n");
           disposeApplication(pApp);
         }
-
       }
       else
       {
@@ -197,6 +202,11 @@ void disposeApplication(Application* pApp)
   if(!pApp)
   {
     return;
+  }
+
+  if(pApp->pRangeSelectWindow)
+  {
+    freeRangeSelectWindow(pApp->pRangeSelectWindow);
   }
 
   if(pApp->pWinObject)
@@ -380,7 +390,7 @@ static void handleGadgets(Application* pApp, ULONG result)
     break;
   case GID_BTN_NAME_PART:
     // TODO createRangeSelector(..)
-    openRangeSelectWindow(pApp);
+    openRangeSelectWindow(pApp->pRangeSelectWindow, pApp->pIntuiWindow, &pApp->SigMask);
     break;
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!
@@ -416,7 +426,7 @@ void intuiEventLoop(Application* pApp)
       }
     }
 
-    handleRangeSelectRequesterEvents(pApp);
+    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
   }
 }
 
