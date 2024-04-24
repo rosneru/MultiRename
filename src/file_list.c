@@ -132,6 +132,31 @@ void freeFileList(struct List* pFilesList)
   FreeVec(pFilesList);
 }
 
+FileNode* getLongestOldNameNode(struct List* pFilesList)
+{
+  struct Node* pNode;
+  FileNode* pFileNode;
+  FileNode* pMaxLengthNode = NULL;
+  ULONG maxLength = 0;
+
+  if(!pFilesList)
+  {
+    return NULL;
+  }
+
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    if(pFileNode->OldNameLen > maxLength)
+    {
+      maxLength = pFileNode->OldNameLen;
+      pMaxLengthNode = pFileNode;
+    }
+  }
+
+  return pMaxLengthNode;
+}
+
 void printFileListNewName(struct List* pFilesList)
 {
   struct Node* pNode;

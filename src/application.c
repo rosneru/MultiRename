@@ -380,6 +380,7 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
 
 static void handleGadgets(Application* pApp, ULONG result)
 {
+  FileNode* pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
   case GID_STRING_NAME:
@@ -389,8 +390,13 @@ static void handleGadgets(Application* pApp, ULONG result)
     printFileListNewName(pApp->pFileList);
     break;
   case GID_BTN_NAME_PART:
-    // TODO createRangeSelector(..)
-    openRangeSelectWindow(pApp->pRangeSelectWindow, pApp->pIntuiWindow, &pApp->SigMask);
+    if((pFileNode = getLongestOldNameNode(pApp->pFileList)))
+    {
+      openRangeSelectWindow(pApp->pRangeSelectWindow,
+                            pApp->pIntuiWindow,
+                            &pApp->SigMask,
+                            pFileNode->OldName);
+    }
     break;
   case GID_BTN_NAME_DATE:
     // TODO: Remove after testing/debugging. Changes new names!

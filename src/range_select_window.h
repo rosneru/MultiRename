@@ -13,7 +13,8 @@ typedef struct RangeSelectWindow
 RangeSelectWindow* createRangeSelectWindow();
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
-                           ULONG* pMainSigMask);
+                           ULONG* pMainSigMask,
+                           STRPTR pStringGadgetText);
 void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 

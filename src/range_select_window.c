@@ -83,10 +83,10 @@ RangeSelectWindow* createRangeSelectWindow()
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
       LAYOUT_DeferLayout, TRUE,   /* this tag instructs layout.gadget to
-                                  * defer GM_LAYOUT and GM_RENDER and ask
-                                  * the application to do them. This
-                                  * lessens the load on input.device
-                                  */
+                                   * defer GM_LAYOUT and GM_RENDER and ask
+                                   * the application to do them. This
+                                   * lessens the load on input.device
+                                   */
       LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
@@ -121,34 +121,12 @@ RangeSelectWindow* createRangeSelectWindow()
     TAG_DONE),
     TAG_DONE);
   return pRangeSelectWindow;
-        // LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
-        //   LAYOUT_EvenSize, TRUE,
-        //   LAYOUT_AddChild, NewObject(NULL, "button.gadget",
-        //     GA_ID, GID_BTN_OK,
-        //     GA_RelVerify, TRUE,
-        //     GA_Text, "Ok",
-        //     BUTTON_TextPadding, TRUE,
-        //     GA_TabCycle, TRUE,
-        //     TAG_END),
-        //   CHILD_WeightedWidth, 1,
-        //   LAYOUT_AddChild, NewObject(LABEL_GetClass(), NULL, LABEL_Text, "",
-        //       TAG_END),
-        //     CHILD_WeightedWidth, 100,
-        //     LAYOUT_AddChild, NewObject(NULL, "button.gadget",
-        //         GA_ID, GID_BTN_CLOSE,
-        //         GA_RelVerify, TRUE,
-        //         GA_Text, "Close",
-        //         BUTTON_TextPadding, TRUE,
-        //         GA_TabCycle, TRUE,
-        //         TAG_END),
-        //       CHILD_WeightedWidth, 1,
-        //     TAG_DONE),
-        // CHILD_WeightedHeight, 0,
 }
 
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
-                           ULONG* pMainSigMask)
+                           ULONG* pMainSigMask,
+                           STRPTR pStringGadgetText)
 {
   ULONG sigmask;
 
