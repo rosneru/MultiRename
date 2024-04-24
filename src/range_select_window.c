@@ -140,6 +140,11 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
            WA_Top, pParentIntuiWin->TopEdge + 30,
            TAG_DONE);
 
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING],
+                 NULL, NULL,
+                 STRINGA_TextVal, (ULONG) pStringGadgetText,
+                 TAG_DONE);
+
   InitRequester(&pRangeSelectWindow->BlockingReq);
   Request(&pRangeSelectWindow->BlockingReq, pParentIntuiWin);
   SetWindowPointer(pParentIntuiWin, WA_BusyPointer, TRUE, TAG_DONE);
