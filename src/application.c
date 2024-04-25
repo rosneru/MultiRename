@@ -486,8 +486,10 @@ void applySelectedRange(Application* pApp)
       return;
     }
 
+printf("pScratchBuf = '%s'\n", pApp->ScratchBuf);
+
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_NAME], NULL, NULL,
-                  STRINGA_BufferPos, (ULONG) bufferPos,
+                  // STRINGA_BufferPos, (ULONG) bufferPos,
                   STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
                   TAG_DONE);
   }
