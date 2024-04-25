@@ -392,6 +392,10 @@ static void handleGadgets(Application* pApp, ULONG result)
   case GID_BTN_NAME_PART:
     if((pFileNode = getLongestOldNameNode(pApp->pFileList)))
     {
+      // Mark operation for `applySelectedRange()` which will be called
+      // when the range select window is closed positively with its
+      // Apply/ok button.
+      pApp->ScratchBuf[0] = 'N';
       openRangeSelectWindow(pApp->pRangeSelectWindow,
                             pApp->pIntuiWindow,
                             &pApp->SigMask,
@@ -406,6 +410,88 @@ static void handleGadgets(Application* pApp, ULONG result)
   }
 }
 
+
+#define MAX_CMD_PART_LEN 12
+
+/**
+ * Fill given pTargetBuf by inserting a command like [N12-16] at insert
+ * position into given pSrcStr. pSrcStr is not changed, only part wise
+ * copied into pTargetBuf.
+ *
+ * The inserted command is created of the insertCmd character, which can
+ * be every char, but only 'N' and 'E' are interpret by the caller for
+ * now, and the range insertFrom and insertTo.
+ */
+int insertPart(STRPTR pTargetBuf,
+               STRPTR pSrcStr,
+               UBYTE insertPos,
+               char insertCmd,
+               UBYTE insertFrom,
+               UBYTE insertTo)
+{
+  char commandPartBuf[12];
+  int i;
+
+  if(!pTargetBuf || ! pSrcStr || (insertPos < 0)
+  || (insertFrom > MAXNAMELEN) || (insertTo > MAXNAMELEN) 
+  || (insertFrom > insertTo))
+  {
+    return -1;
+  }
+
+  if((strlen(pSrcStr) + MAX_CMD_PART_LEN) > MAXNAMELEN)
+  {
+    return -1;
+  }
+
+  // Apply the beginning until the insert position
+  strncat(pTargetBuf, pSrcStr, insertPos);
+  pTargetBuf[insertPos] = '\0';
+
+  // Fill the command buf
+  sprintf(commandPartBuf, "[%c%lu-%lu]", insertCmd, insertFrom, insertTo);
+
+  // Apply the command buf
+  strcat(pTargetBuf, commandPartBuf);
+  
+  // Apply the end, after the insert position
+  strcat(pTargetBuf, pSrcStr + insertPos);
+
+  return insertPos + strlen(commandPartBuf);
+}
+
+
+void applySelectedRange(Application* pApp)
+{
+  STRPTR pText;
+  WORD bufferPos;
+
+  if(pApp->ScratchBuf[0] == 'N')
+  {
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+                   NULL, NULL,
+                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                   TAG_DONE);
+
+    GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pText);
+    GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], (ULONG*)&bufferPos);
+                   
+    if(0 > (bufferPos = insertPart(pApp->ScratchBuf,
+                                   pText, bufferPos,
+                                   'N',
+                                   pApp->pRangeSelectWindow->RangeFrom,
+                                   pApp->pRangeSelectWindow->RangeTo)))
+    {
+      // TODO: Notify user
+      return;
+    }
+
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_NAME], NULL, NULL,
+                  STRINGA_BufferPos, (ULONG) bufferPos,
+                  STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
+                  TAG_DONE);
+  }
+}
 
 void intuiEventLoop(Application* pApp)
 {
@@ -432,7 +518,10 @@ void intuiEventLoop(Application* pApp)
       }
     }
 
-    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
+    if(TRUE == handleRangeSelectWindowEvents(pApp->pRangeSelectWindow))
+    {
+      applySelectedRange(pApp);
+    }
   }
 }
 

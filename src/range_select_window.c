@@ -43,7 +43,12 @@
 #include "range_select_window.h"
 
 
-static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
+/**
+ * Handle the gadget events for this window. Returns FALSE in normal
+ * operation and TRUE if the Ok/Apply button was pressed and the window
+ * is due to be closed with a positive result.
+ */
+static BOOL handleGadgets(RangeSelectWindow* pThis, ULONG result);
 
 enum gadids
 {
@@ -140,8 +145,7 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
            WA_Top, pParentIntuiWin->TopEdge + 30,
            TAG_DONE);
 
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING],
-                 NULL, NULL,
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING], NULL, NULL,
                  STRINGA_TextVal, (ULONG) pStringGadgetText,
                  TAG_DONE);
 
@@ -201,7 +205,7 @@ void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow)
   FreeVec(pRangeSelectWindow);
 }
 
-void handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
+BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
 {
   ULONG receivedSig;
   ULONG result;
@@ -219,6 +223,7 @@ void handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
     {
       case WMHI_CLOSEWINDOW:
         closeRangeSelectWindow(pRangeSelectWindow);
+        return FALSE;
         break;
       case WMHI_GADGETUP:
         handleGadgets(pRangeSelectWindow, result);
@@ -228,7 +233,7 @@ void handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
 }
 
 
-static void handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
+static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
 {
   switch ((result & WMHI_GADGETMASK))
   {
@@ -236,10 +241,13 @@ static void handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
     //
     break;
   case GID_BTN_OK:
-    //
+    closeRangeSelectWindow(pRangeSelectWindow);
+    return TRUE;
     break;
   case GID_BTN_CLOSE:
     closeRangeSelectWindow(pRangeSelectWindow);
     break;
   }
+
+  return FALSE;
 }
