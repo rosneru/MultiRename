@@ -91,13 +91,13 @@ RangeSelectWindow* createRangeSelectWindow()
                                    * the application to do them. This
                                    * lessens the load on input.device
                                    */
+      LAYOUT_AddImage, NewObject(LABEL_GetClass(), NULL,
+        LABEL_Text, "Select the characters to be inserted",
+      TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
-      TAG_DONE),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL,
-        LABEL_Text, "Select the characters to be inserted",
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
