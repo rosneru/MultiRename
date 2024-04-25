@@ -505,6 +505,14 @@ void intuiEventLoop(Application* pApp)
   while (!end)
   {
     receivedSig = Wait(pApp->SigMask);
+
+    // Handle the events of the range select window (if it is open)
+    if(TRUE == handleRangeSelectWindowEvents(pApp->pRangeSelectWindow))
+    {
+      applySelectedRange(pApp);
+    }
+
+    // Handle the events of this (main) window
     while ((result = DoMethod(pApp->pWinObject, WM_HANDLEINPUT, &code)))
     {
       switch (result & WMHI_CLASSMASK)
@@ -516,11 +524,6 @@ void intuiEventLoop(Application* pApp)
           handleGadgets(pApp, result);
           break;
       }
-    }
-
-    if(TRUE == handleRangeSelectWindowEvents(pApp->pRangeSelectWindow))
-    {
-      applySelectedRange(pApp);
     }
   }
 }

@@ -210,6 +210,7 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
   ULONG receivedSig;
   ULONG result;
   ULONG code;
+  BOOL isWindowClosedWithOk = FALSE;
 
   if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject 
   || !pRangeSelectWindow->pIntuiWindow)
@@ -222,14 +223,19 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
     switch (result & WMHI_CLASSMASK)
     {
       case WMHI_CLOSEWINDOW:
+      {
         closeRangeSelectWindow(pRangeSelectWindow);
-        return FALSE;
         break;
+      }
       case WMHI_GADGETUP:
-        handleGadgets(pRangeSelectWindow, result);
+      {
+        isWindowClosedWithOk = handleGadgets(pRangeSelectWindow, result);
         break;
+      }
     }
   }
+
+  return isWindowClosedWithOk;
 }
 
 
@@ -237,19 +243,29 @@ static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
 {
   switch ((result & WMHI_GADGETMASK))
   {
-  case GID_STRING:
-    //
-    break;
-  case GID_BTN_OK:
-    closeRangeSelectWindow(pRangeSelectWindow);
-    // TODO Replace the following test selected values by the proper ones
-    pRangeSelectWindow->RangeFrom = 3;
-    pRangeSelectWindow->RangeTo = 5;
-    return TRUE;
-    break;
-  case GID_BTN_CLOSE:
-    closeRangeSelectWindow(pRangeSelectWindow);
-    break;
+    case GID_STRING:
+    {
+      //
+      break;
+    }
+    case GID_BTN_OK:
+    {
+      if(pRangeSelectWindow->pIntuiWindow != NULL)
+      {
+        closeRangeSelectWindow(pRangeSelectWindow);
+        // TODO Replace the following test selected values by the proper ones
+        pRangeSelectWindow->RangeFrom = 3;
+        pRangeSelectWindow->RangeTo = 5;
+        return TRUE;
+      }
+
+      break;
+    }
+    case GID_BTN_CLOSE:
+    {
+      closeRangeSelectWindow(pRangeSelectWindow);
+      break;
+    }
   }
 
   return FALSE;
