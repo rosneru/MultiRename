@@ -78,7 +78,6 @@ RangeSelectWindow* createRangeSelectWindow()
     WA_DragBar, TRUE,
     WA_SizeGadget, TRUE,
     WA_Width, 500,
-    WA_Height, 180,
     WA_AutoAdjust, TRUE,
     WINDOW_GadgetHelp, TRUE,
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
