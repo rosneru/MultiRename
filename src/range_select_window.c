@@ -242,6 +242,9 @@ static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
     break;
   case GID_BTN_OK:
     closeRangeSelectWindow(pRangeSelectWindow);
+    // TODO Replace the following test selected values by the proper ones
+    pRangeSelectWindow->RangeFrom = 3;
+    pRangeSelectWindow->RangeTo = 5;
     return TRUE;
     break;
   case GID_BTN_CLOSE:
