@@ -468,11 +468,6 @@ void applySelectedRange(Application* pApp)
 
   if(pApp->ScratchBuf[0] == 'N')
   {
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
-                   NULL, NULL,
-                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
-                   TAG_DONE);
-
     gotTextValAttr = GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pText);
     gotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], (ULONG*)&bufferPos);
 
@@ -507,10 +502,12 @@ void applySelectedRange(Application* pApp)
 
 printf("pScratchBuf = '%s'\n", pApp->ScratchBuf);
 
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_NAME], NULL, NULL,
-                  // STRINGA_BufferPos, (ULONG) bufferPos,
-                  STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
-                  TAG_DONE);
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_NAME],
+                   pApp->pIntuiWindow,
+                   NULL,
+                   STRINGA_BufferPos, (ULONG) bufferPos,
+                   STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
+                   TAG_DONE);
   }
 }
 
