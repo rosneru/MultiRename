@@ -430,7 +430,6 @@ int insertPart(STRPTR pTargetBuf,
                UBYTE insertTo)
 {
   char commandPartBuf[12];
-  int i;
 
   if(!pTargetBuf || ! pSrcStr || (insertPos < 0)
   || (insertFrom > MAXNAMELEN) || (insertTo > MAXNAMELEN) 
@@ -449,7 +448,7 @@ int insertPart(STRPTR pTargetBuf,
   pTargetBuf[insertPos] = '\0';
 
   // Fill the command buf
-  sprintf(commandPartBuf, "[%c%lu-%lu]", insertCmd, insertFrom, insertTo);
+  sprintf(commandPartBuf, "[%c%d-%d]", insertCmd, insertFrom, insertTo);
 
   // Apply the command buf
   strcat(pTargetBuf, commandPartBuf);
@@ -465,6 +464,7 @@ void applySelectedRange(Application* pApp)
 {
   STRPTR pText;
   WORD bufferPos;
+  ULONG gotTextValAttr, gotBufferPosAttr;
 
   if(pApp->ScratchBuf[0] == 'N')
   {
@@ -473,11 +473,30 @@ void applySelectedRange(Application* pApp)
                    LISTBROWSER_Labels, (ULONG)pApp->pFileList,
                    TAG_DONE);
 
-    GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pText);
-    GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], (ULONG*)&bufferPos);
-                   
+    gotTextValAttr = GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pText);
+    gotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], (ULONG*)&bufferPos);
+
+    if(gotTextValAttr == 1)
+    {
+      printf("Successfully got TextValAttr: '%s'\n", pText);
+    }
+    else
+    {
+      printf("FAILED to get TextValAttr.\n");
+    }
+
+    if(gotBufferPosAttr == 1)
+    {
+      printf("Successfully got BufferPosAttr: '%d'\n", bufferPos);
+    }
+    else
+    {
+      printf("FAILED to get BufferPosAttr.\n");
+    }
+
     if(0 > (bufferPos = insertPart(pApp->ScratchBuf,
-                                   pText, bufferPos,
+                                   pText,
+                                   bufferPos,
                                    'N',
                                    pApp->pRangeSelectWindow->RangeFrom,
                                    pApp->pRangeSelectWindow->RangeTo)))
