@@ -443,6 +443,9 @@ int insertPart(STRPTR pTargetBuf,
     return -1;
   }
 
+  // Start with a clean target buffer
+  strcpy(pTargetBuf, "");
+
   // Apply the beginning until the insert position
   strncat(pTargetBuf, pSrcStr, insertPos);
   pTargetBuf[insertPos] = '\0';
