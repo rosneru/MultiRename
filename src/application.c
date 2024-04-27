@@ -377,36 +377,57 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
   return result;
 }
 
+ULONG myBufferPos = -1;
+ULONG myGotBufferPosAttr;
 
 static void handleGadgets(Application* pApp, ULONG result)
 {
   FileNode* pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
-  case GID_STRING_NAME:
-    updateNewNames(pApp);
-    break;
-  case GID_BTN_NAME:
-    printFileListNewName(pApp->pFileList);
-    break;
-  case GID_BTN_NAME_PART:
-    if((pFileNode = getLongestOldNameNode(pApp->pFileList)))
+    case GID_STRING_NAME:
     {
-      // Mark operation for `applySelectedRange()` which will be called
-      // when the range select window is closed positively with its
-      // Apply/ok button.
-      pApp->ScratchBuf[0] = 'N';
-      openRangeSelectWindow(pApp->pRangeSelectWindow,
-                            pApp->pIntuiWindow,
-                            &pApp->SigMask,
-                            pFileNode->OldName);
+      myGotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], &myBufferPos);
+      if(myGotBufferPosAttr == 1)
+      {
+        printf("Successfully got BufferPosAttr: '%d'\n", myBufferPos);
+      }
+      else
+      {
+        printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", myBufferPos);
+      }
+
+      updateNewNames(pApp);
+      break;
     }
-    break;
-  case GID_BTN_NAME_DATE:
-    // TODO: Remove after testing/debugging. Changes new names!
-    addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
-    notifyUserAboutSkippedFiles(pApp);
-    break;
+    case GID_BTN_NAME:
+    {
+      printFileListNewName(pApp->pFileList);
+      break;
+    }
+    case GID_BTN_NAME_PART:
+    {
+      if((pFileNode = getLongestOldNameNode(pApp->pFileList)))
+      {
+        // Mark operation for `applySelectedRange()` which will be called
+        // when the range select window is closed positively with its
+        // Apply/ok button.
+        pApp->ScratchBuf[0] = 'N';
+        openRangeSelectWindow(pApp->pRangeSelectWindow,
+                              pApp->pIntuiWindow,
+                              &pApp->SigMask,
+                              pFileNode->OldName);
+      }
+
+      break;
+    }
+    case GID_BTN_NAME_DATE:
+    {
+      // TODO: Remove after testing/debugging. Changes new names!
+      addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
+      notifyUserAboutSkippedFiles(pApp);
+      break;
+    }
   }
 }
 
@@ -466,13 +487,13 @@ int insertPart(STRPTR pTargetBuf,
 void applySelectedRange(Application* pApp)
 {
   STRPTR pText;
-  WORD bufferPos;
+  ULONG bufferPos;
   ULONG gotTextValAttr, gotBufferPosAttr;
 
   if(pApp->ScratchBuf[0] == 'N')
   {
     gotTextValAttr = GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pText);
-    gotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], (ULONG*)&bufferPos);
+    gotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], &bufferPos);
 
     if(gotTextValAttr == 1)
     {
@@ -489,7 +510,7 @@ void applySelectedRange(Application* pApp)
     }
     else
     {
-      printf("FAILED to get BufferPosAttr.\n");
+      printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", bufferPos);
     }
 
     if(0 > (bufferPos = insertPart(pApp->ScratchBuf,

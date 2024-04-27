@@ -39,6 +39,7 @@
   #include <proto/window.h>
 #endif
 
+#include <string.h>
 
 #include "range_select_window.h"
 
@@ -132,21 +133,21 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            ULONG* pMainSigMask,
                            STRPTR pStringGadgetText)
 {
-  ULONG sigmask;
+  ULONG sigMask;
+  ULONG textLen;
 
   if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject || !pMainSigMask)
   {
     return FALSE;
   }
 
+  textLen = strlen(pStringGadgetText);
+
   SetAttrs(pRangeSelectWindow->pWinObject,
            WA_Left, pParentIntuiWin->LeftEdge + 50,
            WA_Top, pParentIntuiWin->TopEdge + 30,
            TAG_DONE);
 
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING], NULL, NULL,
-                 STRINGA_TextVal, (ULONG) pStringGadgetText,
-                 TAG_DONE);
 
   InitRequester(&pRangeSelectWindow->BlockingReq);
   Request(&pRangeSelectWindow->BlockingReq, pParentIntuiWin);
@@ -158,11 +159,21 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
     return FALSE;
   }
 
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING], pRangeSelectWindow->pIntuiWindow, NULL,
+                 STRINGA_TextVal, (ULONG) pStringGadgetText,
+                 STRINGA_Mark, (strlen(pStringGadgetText)-1),
+                 TAG_DONE);
+
+  ActivateLayoutGadget((struct Gadget*)pMainLayout,
+                       pRangeSelectWindow->pIntuiWindow,
+                       NULL,
+                       (ULONG)m_ppGadgets[GID_STRING]);
+
   pRangeSelectWindow->pMainSigMask = pMainSigMask;
   pRangeSelectWindow->pParentIntuiWindow = pParentIntuiWin;
 
-  GetAttr(WINDOW_SigMask, pRangeSelectWindow->pWinObject, &sigmask);
-  *(pRangeSelectWindow->pMainSigMask) |= sigmask;
+  GetAttr(WINDOW_SigMask, pRangeSelectWindow->pWinObject, &sigMask);
+  *(pRangeSelectWindow->pMainSigMask) |= sigMask;
 
   return TRUE;
 }
