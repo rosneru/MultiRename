@@ -512,7 +512,7 @@ void applySelectedRange(Application* pApp)
     {
       printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", bufferPos);
     }
-
+printf("ranegFrom = %d, rangeTo = %d\n", pApp->pRangeSelectWindow->RangeFrom, pApp->pRangeSelectWindow->RangeTo);
     if(0 > (bufferPos = insertPart(pApp->ScratchBuf,
                                    pText,
                                    bufferPos,

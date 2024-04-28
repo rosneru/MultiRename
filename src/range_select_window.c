@@ -6,6 +6,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <intuition/sghooks.h>
 #include <utility/hooks.h>
 #include <workbench/workbench.h>
 
@@ -39,6 +40,7 @@
   #include <proto/window.h>
 #endif
 
+#include <stdio.h>
 #include <string.h>
 
 #include "range_select_window.h"
@@ -63,6 +65,32 @@ static Object* m_ppGadgets[MAXGADGETS];
 
 static Object *pMainLayout;
 
+
+// struct Hook m_EditHook;
+
+// ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
+//                                         __REG__(a2, struct SGWork * pSgWork),
+//                                         __REG__(a1, ULONG *pMsg))
+// {
+//   ULONG mark;
+//   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
+  
+//   if(GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &mark))
+//   {
+//     pRsw->RangeFrom = (mark > 16) & 0xff;
+//     pRsw->RangeTo = mark & 0xff;
+//   }
+//   else
+//   {
+//     pRsw->RangeFrom = 11;
+//     pRsw->RangeTo = 22;
+//   }
+
+//   printf("bufferPos = %d\n", pSgWork->BufferPos);
+//   return 0;
+// }
+
+
 RangeSelectWindow* createRangeSelectWindow()
 {
   RangeSelectWindow* pRangeSelectWindow;
@@ -70,6 +98,10 @@ RangeSelectWindow* createRangeSelectWindow()
   {
     return NULL;
   }
+
+  // m_EditHook.h_Entry = (ULONG (*)()) StringEditFunc;
+  // m_EditHook.h_SubEntry = NULL;
+  // m_EditHook.h_Data = pRangeSelectWindow;
 
   pRangeSelectWindow->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Title, "MultiRename: Select name part",
@@ -99,6 +131,7 @@ RangeSelectWindow* createRangeSelectWindow()
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
+        // STRINGA_EditHook, &m_EditHook,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
@@ -263,9 +296,6 @@ static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
       if(pRangeSelectWindow->pIntuiWindow != NULL)
       {
         closeRangeSelectWindow(pRangeSelectWindow);
-        // TODO Replace the following test selected values by the proper ones
-        pRangeSelectWindow->RangeFrom = 3;
-        pRangeSelectWindow->RangeTo = 5;
         return TRUE;
       }
 
