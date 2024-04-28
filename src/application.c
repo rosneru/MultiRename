@@ -6,6 +6,7 @@
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
 #include <utility/hooks.h>
+#include <workbench/startup.h>
 #include <workbench/workbench.h>
 
 #include <clib/compiler-specific.h>
@@ -48,19 +49,73 @@
 #include "requester.h"
 #include "application.h"
 
+
+/// Private function declarations
+
 /**
- * Private function declarations
+ * Try to add one single file to the ListBrowser.
+ */
+BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath);
+
+/**
+ * Re-attaches the list of FileNodes to the list browser.
+ * Set the current working path if necessary.
+ * Updates window title with the current working path.
+ * 
+ * NOTE: List must be detached off ListBrowser before this call!
+ */
+void applyNewFiles(Application* pApp);
+
+/**
+ * When range selection window was closed with Ok, the resulting mask is
+ * inserted in current cursor position.
+ */
+void applySelectedRange(Application* pApp);
+
+/**
+ * Set the current working path as application window title.
  */
 void updateApplicationWindowTitle(Application* pApp);
+
+/**
+ * Calculates the new names in the processing list / ListBrowser.
+ */
+void calculateNewNames(Application* pApp);
+
+/**
+ * Informs the user about error / skip notifications, if there are some.
+ * With the option to display the details.
+ */
 void notifyUserAboutSkippedFiles(Application* pApp);
+
+/**
+ * Fill given pTargetBuf by inserting a command like [N12-16] at insert
+ * position into given pSrcStr. pSrcStr is not changed, only part wise
+ * copied into pTargetBuf.
+ *
+ * The inserted command is created of the insertCmd character, which can
+ * be every char, but only 'N' and 'E' are interpret by the caller for
+ * now, and the range insertFrom and insertTo.
+ */
+int insertPart(STRPTR pTargetBuf,
+               STRPTR pSrcStr,
+               UBYTE insertPos,
+               char insertCmd,
+               UBYTE insertFrom,
+               UBYTE insertTo);
+
+/**
+ * The application event loop.
+ */
 void intuiEventLoop(Application* pApp);
+
+/**
+ * Layout creation of main window.
+ */
 Object* createLayout(void);
 
 
-
-/**
- * Private variables
- */
+/// Private variables
 
 struct ColumnInfo *m_pColumnInfo = NULL;
 struct Hook m_CompareHook;
@@ -86,23 +141,56 @@ enum gadids
 };
 
 static Object* m_ppGadgets[MAXGADGETS];
+struct Hook apphook;
 
+/// Hook implementations
 
 void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
                                     __REG__(a2, Object *pWindow),
                                     __REG__(a1, struct AppMessage *pMsg))
 {
-  struct WBArg *arg = pMsg->am_ArgList;
+  ULONG i;
+  STRPTR pFileName;
+  struct WBArg *pWbArg = pMsg->am_ArgList;
   Application* pApp = (Application*)pHook->h_Data;
-  
-  // NameFromLock( arg->wa_Lock, name, sizeof(name) );
-  // AddPart( name, arg->wa_Name, sizeof(name) );
 
-  printf("App message\n");
+  // Detach list from ListBrowser. Must be done before changing the list.
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, ~0,
+                  TAG_DONE);
+
+  // Add the files of the args if possible
+  for(i = 0; i < pMsg->am_NumArgs; i++)
+  {
+    pFileName = pWbArg[i].wa_Name;
+    if(NameFromLock(pWbArg[i].wa_Lock,
+                    pApp->pParsedArgs->pScratchPathBuf,
+                    MAXPATHLEN))
+    {
+      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
+      appendFileNode(pApp->pFileList,
+                     pApp->pParsedArgs->pScratchPathBuf,
+                     pApp->pNotificationsList);
+    }
+    else
+    {
+      if(IoErr() == ERROR_LINE_TOO_LONG)
+      {
+        // For the error notification only the file name not the
+        // relative path is needed.
+        addNotification(pApp->pNotificationsList,
+                        NNT_SKIPPED_PATH_TOO_LONG,
+                        pFileName);
+      }
+    }
+  }
+
+  applyNewFiles(pApp);
 }
 
-struct Hook apphook;
-
+/// Public function implementations
 
 Application* createApplication(int argc, char **argv)
 {
@@ -242,10 +330,8 @@ void disposeApplication(Application* pApp)
   FreeVec(pApp);
 }
 
-
 BOOL runApplication(Application* pApp)
 {
-  STRPTR pFirstPath;
   if(!pApp)
   {
     return FALSE;
@@ -255,25 +341,11 @@ BOOL runApplication(Application* pApp)
   apphook.h_SubEntry = NULL;
   apphook.h_Data = pApp;
 
-  // Does list contain at least one file?
-  if((pFirstPath = getFirstFilePath(pApp->pFileList)))
-  {
-    // Display the files list in ListBrowser
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
-                   NULL, NULL,
-                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
-                   TAG_DONE);
-
-    // Apply the file path for this session
-    strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
-    addNotification(pApp->pNotificationsList, NNT_SELECTED_PATH_INFO, pFirstPath);
-  }
 
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
-    updateApplicationWindowTitle(pApp);
-    notifyUserAboutSkippedFiles(pApp);
+    applyNewFiles(pApp);
 
     intuiEventLoop(pApp);
 
@@ -289,6 +361,9 @@ BOOL runApplication(Application* pApp)
 
   return FALSE;
 }
+
+
+/// Private function implementations
 
 void updateApplicationWindowTitle(Application* pApp)
 {
@@ -316,9 +391,30 @@ void notifyUserAboutSkippedFiles(Application* pApp)
   }
 }
 
+void applyNewFiles(Application* pApp)
+{
+  STRPTR pFirstPath;
 
+  // Does list contain at least one file?
+  if((pFirstPath = getFirstFilePath(pApp->pFileList)))
+  {
+    // Display the files list in ListBrowser
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+                   pApp->pIntuiWindow, NULL,
+                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                   TAG_DONE);
 
-void updateNewNames(Application* pApp)
+    // Apply the file path for this session
+    strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
+    addNotification(pApp->pNotificationsList, NNT_SELECTED_PATH_INFO, pFirstPath);
+  }
+
+  calculateNewNames(pApp);
+  updateApplicationWindowTitle(pApp);
+  notifyUserAboutSkippedFiles(pApp);
+}
+
+void calculateNewNames(Application* pApp)
 {
   struct Node* pNode;
   STRPTR pName, pExt;
@@ -397,7 +493,7 @@ static void handleGadgets(Application* pApp, ULONG result)
         printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", myBufferPos);
       }
 
-      updateNewNames(pApp);
+      calculateNewNames(pApp);
       break;
     }
     case GID_BTN_NAME:
@@ -434,15 +530,7 @@ static void handleGadgets(Application* pApp, ULONG result)
 
 #define MAX_CMD_PART_LEN 12
 
-/**
- * Fill given pTargetBuf by inserting a command like [N12-16] at insert
- * position into given pSrcStr. pSrcStr is not changed, only part wise
- * copied into pTargetBuf.
- *
- * The inserted command is created of the insertCmd character, which can
- * be every char, but only 'N' and 'E' are interpret by the caller for
- * now, and the range insertFrom and insertTo.
- */
+
 int insertPart(STRPTR pTargetBuf,
                STRPTR pSrcStr,
                UBYTE insertPos,
