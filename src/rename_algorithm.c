@@ -7,11 +7,81 @@
 #include "rename_parser.h"
 #include "rename_algorithm.h"
 
+/// Private function forward declarations
+
 /**
  * Fills the given pResultBuf with a new name which is constructed from
  * the current name pName, the rename mask pMask, the counter and the
  * list of rename actions that have been parsed from the pMask before.
  */
+void applyActions(STRPTR pResultBuf,
+                  struct List* pActionList,
+                  STRPTR pName,
+                  UBYTE NameLen,
+                  STRPTR pMask,
+                  Counter* pCounter);
+
+
+/// Public function implementations
+
+BOOL createNewNames(struct List* pFilesList,
+                  STRPTR pNameMask,
+                  STRPTR pExtMask,
+                  LONG counterStart,
+                  LONG counterInc,
+                  BYTE counterWidth)
+{
+  struct Node* pNode;
+  FileNode* pFileNode;
+  ULONG maskSize;
+  STRPTR pMask;
+  Counter counter;
+  ActionParser parser;
+
+  if(!pFilesList || ! pNameMask || ! pExtMask)
+  {
+    return FALSE;
+  }
+
+  maskSize = strlen(pNameMask) + strlen(pExtMask) + 2;
+  if(!(pMask = malloc(maskSize * sizeof(char))))
+  {
+    return FALSE;
+  }
+
+  // Build the resulting mask of name and extension field to be used by
+  // the parser.
+  strcpy(pMask, pNameMask);
+  strcat(pMask, ".");
+  strcat(pMask, pExtMask);
+
+  initCounter(&counter, counterStart, counterInc, counterWidth);
+  initActionParser(&parser, pMask);
+
+  if(!parseActions(&parser))
+  {
+    freeActionNodes(&parser.ActionList);
+    free(pMask);
+    return FALSE;
+  }
+
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    applyActions(pFileNode->NewName,
+                 &parser.ActionList,
+                 pFileNode->OldName,
+                 pFileNode->OldNameLen,
+                 pMask, &counter);
+  }
+
+  freeActionNodes(&parser.ActionList);
+  free(pMask);
+  return TRUE;
+}
+
+/// Private function implementations
+
 void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
                   STRPTR pName,
@@ -88,61 +158,3 @@ void applyActions(STRPTR pResultBuf,
     incrementCounter(pCounter);
   }
 }
-
-
-BOOL fillNewNames(struct List* pFilesList,
-                  STRPTR pNameMask,
-                  STRPTR pExtMask,
-                  LONG counterStart,
-                  LONG counterInc,
-                  BYTE counterWidth)
-{
-  struct Node* pNode;
-  FileNode* pFileNode;
-  ULONG maskSize;
-  STRPTR pMask;
-  Counter counter;
-  ActionParser parser;
-
-  if(!pFilesList || ! pNameMask || ! pExtMask)
-  {
-    return FALSE;
-  }
-
-  maskSize = strlen(pNameMask) + strlen(pExtMask) + 2;
-  if(!(pMask = malloc(maskSize * sizeof(char))))
-  {
-    return FALSE;
-  }
-
-  // Build the resulting mask of name and extension field to be used by
-  // the parser.
-  strcpy(pMask, pNameMask);
-  strcat(pMask, ".");
-  strcat(pMask, pExtMask);
-
-  initCounter(&counter, counterStart, counterInc, counterWidth);
-  initActionParser(&parser, pMask);
-
-  if(!parseActions(&parser))
-  {
-    freeActionNodes(&parser.ActionList);
-    free(pMask);
-    return FALSE;
-  }
-
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
-  {
-    pFileNode = (FileNode*)pNode;
-    applyActions(pFileNode->NewName,
-                 &parser.ActionList,
-                 pFileNode->OldName,
-                 pFileNode->OldNameLen,
-                 pMask, &counter);
-  }
-
-  freeActionNodes(&parser.ActionList);
-  free(pMask);
-  return TRUE;
-}
-

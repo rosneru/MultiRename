@@ -62,7 +62,7 @@ int main(void)
   printFileList(&fileList, "Initial file list");
 
   // test_name_2
-  if(fillNewNames(&fileList, "Abc - [N]", "[E]", 1, 1, 1))
+  if(createNewNames(&fileList, "Abc - [N]", "[E]", 1, 1, 1))
   {
     printFileList(&fileList, "test_name_2: 'Abc - [N]', '[E]'");
   }
@@ -72,7 +72,7 @@ int main(void)
   }
 
   // test_name_4
-  if(fillNewNames(&fileList, "Aa[N]Bb", "[E]", 1, 1, 1))
+  if(createNewNames(&fileList, "Aa[N]Bb", "[E]", 1, 1, 1))
   {
     printFileList(&fileList, "test_name_4: 'Abc - [N]', '[E]'");
   }
@@ -82,7 +82,7 @@ int main(void)
   }
 
   // test_name_5
-  if(fillNewNames(&fileList, "", "[E]", 1, 1, 1))
+  if(createNewNames(&fileList, "", "[E]", 1, 1, 1))
   {
     printFileList(&fileList, "test_name_5 (Create empty names): '', '[E]'");
   }
@@ -92,7 +92,7 @@ int main(void)
   }
 
   // test_name_6
-  if(fillNewNames(&fileList, "Abc - [N", "[E]", 1, 1, 1))
+  if(createNewNames(&fileList, "Abc - [N", "[E]", 1, 1, 1))
   {
     printFileList(&fileList, "test_name_6: Error because unclosed name cmd: 'Abc - [N', '[E]'");
   }
@@ -102,7 +102,7 @@ int main(void)
   }
 
   // test_name_7
-  if(fillNewNames(&fileList, "Abc - [N]]", "[E]", 1, 1, 1))
+  if(createNewNames(&fileList, "Abc - [N]]", "[E]", 1, 1, 1))
   {
     printFileList(&fileList, "test_name_7: Error because double closed name cmd: 'Abc - [N', '[E]'");
   }
@@ -112,7 +112,7 @@ int main(void)
   }
 
   // test_name_part_1
-  if(fillNewNames(&fileList, "[N4-6]", "[E]", 1, 1, 1))
+  if(createNewNames(&fileList, "[N4-6]", "[E]", 1, 1, 1))
   {
     printFileList(&fileList, "test_name_part_1: '[N4-6]', '[E]'");
   }

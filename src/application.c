@@ -80,7 +80,7 @@ void updateApplicationWindowTitle(Application* pApp);
 /**
  * Calculates the new names in the processing list / ListBrowser.
  */
-void calculateNewNames(Application* pApp);
+void updateNewNames(Application* pApp);
 
 /**
  * Informs the user about error / skip notifications, if there are some.
@@ -409,12 +409,12 @@ void applyNewFiles(Application* pApp)
     addNotification(pApp->pNotificationsList, NNT_SELECTED_PATH_INFO, pFirstPath);
   }
 
-  calculateNewNames(pApp);
+  updateNewNames(pApp);
   updateApplicationWindowTitle(pApp);
   notifyUserAboutSkippedFiles(pApp);
 }
 
-void calculateNewNames(Application* pApp)
+void updateNewNames(Application* pApp)
 {
   struct Node* pNode;
   STRPTR pName, pExt;
@@ -427,10 +427,15 @@ void calculateNewNames(Application* pApp)
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
 
+  // Read current name and extension masks
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pName);
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_EXTENSION], (ULONG*)&pExt);
-  fillNewNames(pApp->pFileList, pName, pExt, 1, 1, 1);
 
+  // Use the rename algorithm to fill the NewName fields according the
+  // masks and counter settings
+  createNewNames(pApp->pFileList, pName, pExt, 1, 1, 1);
+
+  // Set the updated NewName text for each ListBrowser node
   for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
@@ -493,7 +498,7 @@ static void handleGadgets(Application* pApp, ULONG result)
         printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", myBufferPos);
       }
 
-      calculateNewNames(pApp);
+      updateNewNames(pApp);
       break;
     }
     case GID_BTN_NAME:
