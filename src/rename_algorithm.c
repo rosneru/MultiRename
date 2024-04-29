@@ -95,7 +95,8 @@ void applyActions(STRPTR pResultBuf,
   struct Node* pNode;
   ActionNode* pAction;
   BOOL mustIncrementCounter = FALSE;
-  ULONG numChars, lastIndex;
+  ULONG numChars;
+  int lastIndex;
   STRPTR pExt = pName + NameLen + 1;
 
   if(!pResultBuf || !pActionList || !pName || !pMask || !pCounter)
@@ -163,15 +164,14 @@ void applyActions(STRPTR pResultBuf,
 
   // Remove trailing '.'
   lastIndex = strlen(pResultBuf);
-  if(lastIndex > 0)
+  if(lastIndex == 0)
   {
-    // After the next line variable *is* the lastIndex, not the length
-    // anymore
-    lastIndex--;
-    if(pResultBuf[lastIndex] == '.')
-    {
-      pResultBuf[lastIndex] = '\0';
-    }
+    return;
+  }
+  
+  while(pResultBuf[--lastIndex] == '.')
+  {
+    pResultBuf[lastIndex] = '\0';
   }
 
 }

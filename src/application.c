@@ -486,33 +486,33 @@ static void handleGadgets(Application* pApp, ULONG result)
   FileNode* pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
+    case GID_STRING_EXTENSION:
     case GID_STRING_NAME:
     {
-      myGotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], &myBufferPos);
-      if(myGotBufferPosAttr == 1)
-      {
-        printf("Successfully got BufferPosAttr: '%d'\n", myBufferPos);
-      }
-      else
-      {
-        printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", myBufferPos);
-      }
+      // myGotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], &myBufferPos);
+      // if(myGotBufferPosAttr == 1)
+      // {
+      //   printf("Successfully got BufferPosAttr: '%d'\n", myBufferPos);
+      // }
+      // else
+      // {
+      //   printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", myBufferPos);
+      // }
 
       updateNewNames(pApp);
       break;
     }
     case GID_BTN_NAME:
     {
-      printFileListNewName(pApp->pFileList);
       break;
     }
     case GID_BTN_NAME_PART:
     {
       if((pFileNode = getLongestOldNameNode(pApp->pFileList)))
       {
-        // Mark operation for `applySelectedRange()` which will be called
-        // when the range select window is closed positively with its
-        // Apply/ok button.
+        // Mark operation for `applySelectedRange()` which will be
+        // called when the range select window is closed positively with
+        // its Apply/ok button.
         pApp->ScratchBuf[0] = 'N';
         openRangeSelectWindow(pApp->pRangeSelectWindow,
                               pApp->pIntuiWindow,
