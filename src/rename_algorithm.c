@@ -161,7 +161,7 @@ void applyActions(STRPTR pResultBuf,
     incrementCounter(pCounter);
   }
 
-
+  // Remove trailing '.'
   if(extLen == 0)
   {
     lastIndex = strlen(pResultBuf);
