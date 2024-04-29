@@ -18,6 +18,7 @@ void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
                   STRPTR pName,
                   UBYTE NameLen,
+                  UBYTE extLen,
                   STRPTR pMask,
                   Counter* pCounter);
 
@@ -72,6 +73,7 @@ BOOL createNewNames(struct List* pFilesList,
                  &parser.ActionList,
                  pFileNode->OldName,
                  pFileNode->OldNameLen,
+                 pFileNode->OldExtLen,
                  pMask, &counter);
   }
 
@@ -86,13 +88,14 @@ void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
                   STRPTR pName,
                   UBYTE NameLen,
+                  UBYTE extLen,
                   STRPTR pMask,
                   Counter* pCounter)
 {
   struct Node* pNode;
   ActionNode* pAction;
   BOOL mustIncrementCounter = FALSE;
-  ULONG numChars;
+  ULONG numChars, lastIndex;
   STRPTR pExt = pName + NameLen + 1;
 
   if(!pResultBuf || !pActionList || !pName || !pMask || !pCounter)
@@ -156,5 +159,21 @@ void applyActions(STRPTR pResultBuf,
   if(mustIncrementCounter)
   {
     incrementCounter(pCounter);
+  }
+
+
+  if(extLen == 0)
+  {
+    lastIndex = strlen(pResultBuf);
+    if(lastIndex > 0)
+    {
+      // After the next line variable *is* the lastIndex, not the length
+      // anymore
+      lastIndex--;
+      if(pResultBuf[lastIndex] == '.')
+      {
+        pResultBuf[lastIndex] = '\0';
+      }
+    }
   }
 }
