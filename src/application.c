@@ -419,6 +419,8 @@ void updateNewNames(Application* pApp)
   struct Node* pNode;
   STRPTR pName, pExt;
   FileNode* pFileNode;
+  LONG counterStart, counterStep;
+  WORD counterPlacesId;
 
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
@@ -430,10 +432,18 @@ void updateNewNames(Application* pApp)
   // Read current name and extension masks
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pName);
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_EXTENSION], (ULONG*)&pExt);
-
+  GetAttr(INTEGER_Number, m_ppGadgets[GID_INTEGER_COUNTER_START], (ULONG*)&counterStart);
+  GetAttr(INTEGER_Number, m_ppGadgets[GID_INTEGER_COUNTER_STEP], (ULONG*)&counterStep);
+  // GetAttr(CHOOSER_Selected, m_ppGadgets[GID_CHOOSER_COUNTER_PLACES], (ULONG*)&counterPlacesId);
+// printf("id = %d\n", counterPlacesId);
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
-  createNewNames(pApp->pFileList, pName, pExt, 1, 1, 1);
+  createNewNames(pApp->pFileList,
+                 pName,
+                 pExt,
+                 counterStart,
+                 counterStep,
+                 2);
 
   // Set the updated NewName text for each ListBrowser node
   for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -486,6 +496,8 @@ static void handleGadgets(Application* pApp, ULONG result)
   FileNode* pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
+    case GID_INTEGER_COUNTER_START:
+    case GID_INTEGER_COUNTER_STEP:
     case GID_STRING_EXTENSION:
     case GID_STRING_NAME:
     {
