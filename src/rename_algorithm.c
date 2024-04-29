@@ -162,18 +162,16 @@ void applyActions(STRPTR pResultBuf,
   }
 
   // Remove trailing '.'
-  if(extLen == 0)
+  lastIndex = strlen(pResultBuf);
+  if(lastIndex > 0)
   {
-    lastIndex = strlen(pResultBuf);
-    if(lastIndex > 0)
+    // After the next line variable *is* the lastIndex, not the length
+    // anymore
+    lastIndex--;
+    if(pResultBuf[lastIndex] == '.')
     {
-      // After the next line variable *is* the lastIndex, not the length
-      // anymore
-      lastIndex--;
-      if(pResultBuf[lastIndex] == '.')
-      {
-        pResultBuf[lastIndex] = '\0';
-      }
+      pResultBuf[lastIndex] = '\0';
     }
   }
+
 }
