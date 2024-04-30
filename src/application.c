@@ -114,7 +114,8 @@ void intuiEventLoop(Application* pApp);
  */
 Object* createLayout(void);
 
-
+static UBYTE *ppCounterPlaces[] = { "1", "2", "3", "4", "5",
+                                    "6", "7", "8", "9", "10", NULL };
 /// Private variables
 
 struct ColumnInfo *m_pColumnInfo = NULL;
@@ -122,20 +123,20 @@ struct Hook m_CompareHook;
 
 enum gadids
 {
-    GID_STRING_NAME = 1
+    GID_STR_NAME = 1
   , GID_BTN_NAME
   , GID_BTN_NAME_PART
   , GID_BTN_NAME_DATE
   , GID_BTN_NAME_TIME
   , GID_BTN_NAME_COUNTER
-  , GID_STRING_EXTENSION
+  , GID_STR_EXTENSION
   , GID_BTN_EXTENSION
   , GID_BTN_EXTENSION_PART
   , GID_BTN_EXTENSION_COUNTER
-  , GID_INTEGER_COUNTER_START
-  , GID_INTEGER_COUNTER_STEP
-  , GID_CHOOSER_COUNTER_PLACES
-  , GID_LISTBROWSER
+  , GID_INT_COUNTER_START
+  , GID_INT_COUNTER_STEP
+  , GID_CHO_COUNTER_PLACES
+  , GID_LBR_PROCESSING_LIST
   , GID_BTN_START
   , MAXGADGETS
 };
@@ -155,7 +156,7 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
   Application* pApp = (Application*)pHook->h_Data;
 
   // Detach list from ListBrowser. Must be done before changing the list.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, ~0,
@@ -399,7 +400,7 @@ void applyNewFiles(Application* pApp)
   if((pFirstPath = getFirstFilePath(pApp->pFileList)))
   {
     // Display the files list in ListBrowser
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                    pApp->pIntuiWindow, NULL,
                    LISTBROWSER_Labels, (ULONG)pApp->pFileList,
                    TAG_DONE);
@@ -423,19 +424,19 @@ void updateNewNames(Application* pApp)
   WORD counterPlacesId;
 
   // Detach list from ListBrowser. Must be done before changing the list.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
 
   // Read current name and extension masks
-  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pName);
-  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_EXTENSION], (ULONG*)&pExt);
-  GetAttr(INTEGER_Number, m_ppGadgets[GID_INTEGER_COUNTER_START], (ULONG*)&counterStart);
-  GetAttr(INTEGER_Number, m_ppGadgets[GID_INTEGER_COUNTER_STEP], (ULONG*)&counterStep);
-  // GetAttr(CHOOSER_Selected, m_ppGadgets[GID_CHOOSER_COUNTER_PLACES], (ULONG*)&counterPlacesId);
-// printf("id = %d\n", counterPlacesId);
+  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pName);
+  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG*)&pExt);
+  GetAttr(INTEGER_Number, m_ppGadgets[GID_INT_COUNTER_START], (ULONG*)&counterStart);
+  GetAttr(INTEGER_Number, m_ppGadgets[GID_INT_COUNTER_STEP], (ULONG*)&counterStep);
+  GetAttr(CHOOSER_Selected, m_ppGadgets[GID_CHO_COUNTER_PLACES], (ULONG*)&counterPlacesId);
+printf("id = %d\n", counterPlacesId);
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
   createNewNames(pApp->pFileList,
@@ -456,7 +457,7 @@ void updateNewNames(Application* pApp)
   }
 
   // Attach changed list to ListBrowser.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
@@ -468,7 +469,7 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
   BOOL result;
 
   // Detach list from ListBrowser. Must be done before changing the list.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, ~0,
@@ -479,7 +480,7 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
                           pApp->pNotificationsList);
 
   // Attatch changed list to ListBrowser.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LISTBROWSER],
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
@@ -496,12 +497,12 @@ static void handleGadgets(Application* pApp, ULONG result)
   FileNode* pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
-    case GID_INTEGER_COUNTER_START:
-    case GID_INTEGER_COUNTER_STEP:
-    case GID_STRING_EXTENSION:
-    case GID_STRING_NAME:
+    case GID_INT_COUNTER_START:
+    case GID_INT_COUNTER_STEP:
+    case GID_STR_EXTENSION:
+    case GID_STR_NAME:
     {
-      // myGotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], &myBufferPos);
+      // myGotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STR_NAME], &myBufferPos);
       // if(myGotBufferPosAttr == 1)
       // {
       //   printf("Successfully got BufferPosAttr: '%d'\n", myBufferPos);
@@ -597,8 +598,8 @@ void applySelectedRange(Application* pApp)
 
   if(pApp->ScratchBuf[0] == 'N')
   {
-    gotTextValAttr = GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_NAME], (ULONG*)&pText);
-    gotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STRING_NAME], &bufferPos);
+    gotTextValAttr = GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText);
+    gotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STR_NAME], &bufferPos);
 
     if(gotTextValAttr == 1)
     {
@@ -631,7 +632,7 @@ printf("ranegFrom = %d, rangeTo = %d\n", pApp->pRangeSelectWindow->RangeFrom, pA
 
 printf("pScratchBuf = '%s'\n", pApp->ScratchBuf);
 
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_NAME],
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
                    pApp->pIntuiWindow,
                    NULL,
                    STRINGA_BufferPos, (ULONG) bufferPos,
@@ -681,8 +682,6 @@ static ULONG myCompare(struct Hook *pHook, Object *pObj, struct LBSortMsg *pMsg)
   return 0;
 }
 
-static UBYTE *ppCounterPlaces[] = { "1", "2", "3", "4", "5",
-                                    "6", "7", "8", "9", "10", NULL };
 
 Object* createLayout(void)
 {
@@ -715,8 +714,8 @@ Object* createLayout(void)
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_Label, (ULONG)"Name",
-    LAYOUT_AddChild, m_ppGadgets[GID_STRING_NAME] = NewObject(STRING_GetClass(), NULL,
-      GA_ID, GID_STRING_NAME,
+    LAYOUT_AddChild, m_ppGadgets[GID_STR_NAME] = NewObject(STRING_GetClass(), NULL,
+      GA_ID, GID_STR_NAME,
       GA_RelVerify, TRUE,
       STRINGA_TextVal, (ULONG)"[N]",
     TAG_DONE),
@@ -758,8 +757,8 @@ Object* createLayout(void)
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_Label, (ULONG)"Extension",
-    LAYOUT_AddChild, m_ppGadgets[GID_STRING_EXTENSION] = NewObject(STRING_GetClass(), NULL,
-      GA_ID, GID_STRING_EXTENSION,
+    LAYOUT_AddChild, m_ppGadgets[GID_STR_EXTENSION] = NewObject(STRING_GetClass(), NULL,
+      GA_ID, GID_STR_EXTENSION,
       GA_RelVerify, TRUE,
       STRINGA_TextVal, (ULONG)"[E]",
     TAG_DONE),
@@ -787,8 +786,8 @@ Object* createLayout(void)
     LAYOUT_Label, (ULONG)"Define counter",
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, m_ppGadgets[GID_INTEGER_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
-        GA_ID, GID_INTEGER_COUNTER_START,
+      LAYOUT_AddChild, m_ppGadgets[GID_INT_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
+        GA_ID, GID_INT_COUNTER_START,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
@@ -800,8 +799,8 @@ Object* createLayout(void)
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, m_ppGadgets[GID_INTEGER_COUNTER_STEP] = NewObject(INTEGER_GetClass(), NULL,
-        GA_ID, GID_INTEGER_COUNTER_STEP,
+      LAYOUT_AddChild, m_ppGadgets[GID_INT_COUNTER_STEP] = NewObject(INTEGER_GetClass(), NULL,
+        GA_ID, GID_INT_COUNTER_STEP,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         INTEGER_Number, 1,
@@ -814,8 +813,8 @@ Object* createLayout(void)
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-      LAYOUT_AddChild, m_ppGadgets[GID_CHOOSER_COUNTER_PLACES] = NewObject(CHOOSER_GetClass(), NULL,
-        GA_ID, GID_CHOOSER_COUNTER_PLACES,
+      LAYOUT_AddChild, m_ppGadgets[GID_CHO_COUNTER_PLACES] = NewObject(CHOOSER_GetClass(), NULL,
+        GA_ID, GID_CHO_COUNTER_PLACES,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         CHOOSER_LabelArray, (ULONG)ppCounterPlaces,
@@ -855,8 +854,8 @@ Object* createLayout(void)
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
       LAYOUT_Label, (ULONG)"Processing list",
-      LAYOUT_AddChild, m_ppGadgets[GID_LISTBROWSER] = NewObject(LISTBROWSER_GetClass(), NULL,
-        GA_ID, GID_LISTBROWSER,
+      LAYOUT_AddChild, m_ppGadgets[GID_LBR_PROCESSING_LIST] = NewObject(LISTBROWSER_GetClass(), NULL,
+        GA_ID, GID_LBR_PROCESSING_LIST,
         GA_RelVerify, TRUE,
         LISTBROWSER_ColumnInfo, (ULONG)m_pColumnInfo,
         LISTBROWSER_ColumnTitles, TRUE,
