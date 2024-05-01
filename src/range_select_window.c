@@ -163,18 +163,13 @@ RangeSelectWindow* createRangeSelectWindow(void)
 
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
-                           ULONG* pMainSigMask,
+                           ULONG* pParentSigMask,
                            STRPTR pStringGadgetText)
 {
-  ULONG sigMask;
-  ULONG textLen;
-
-  if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject || !pMainSigMask)
+  if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject || !pParentSigMask)
   {
     return FALSE;
   }
-
-  textLen = strlen(pStringGadgetText);
 
   SetAttrs(pRangeSelectWindow->pWinObject,
            WA_Left, pParentIntuiWin->LeftEdge + 50,
@@ -202,27 +197,28 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                        NULL,
                        (ULONG)m_ppGadgets[GID_STRING]);
 
-  pRangeSelectWindow->pMainSigMask = pMainSigMask;
+  pRangeSelectWindow->pParentSigMask = pParentSigMask;
   pRangeSelectWindow->pParentIntuiWindow = pParentIntuiWin;
 
-  GetAttr(WINDOW_SigMask, pRangeSelectWindow->pWinObject, &sigMask);
-  *(pRangeSelectWindow->pMainSigMask) |= sigMask;
+  GetAttr(WINDOW_SigMask, pRangeSelectWindow->pWinObject, &pRangeSelectWindow->SigMask);
+
+  // Attach signal mask of this range select window to parent window mask
+  *(pRangeSelectWindow->pParentSigMask) |= pRangeSelectWindow->SigMask;
 
   return TRUE;
 }
 
 void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow)
 {
-  ULONG sigmask;
-
   if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject
   || !pRangeSelectWindow->pIntuiWindow || !pRangeSelectWindow->pParentIntuiWindow)
   {
     return;
   }
 
-  GetAttr(WINDOW_SigMask, pRangeSelectWindow->pWinObject, &sigmask);
-  *(pRangeSelectWindow->pMainSigMask) &= ~sigmask;
+
+  // Detach signal mask of this range select window to parent window mask
+  *(pRangeSelectWindow->pParentSigMask) &= ~pRangeSelectWindow->SigMask;
 
   DoMethod(pRangeSelectWindow->pWinObject, WM_CLOSE, NULL);
   pRangeSelectWindow->pIntuiWindow = NULL;
@@ -284,17 +280,31 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
 
 static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
 {
+  ULONG mark;
+
   switch ((result & WMHI_GADGETMASK))
   {
     case GID_STRING:
     {
-      //
+      printf("STRING\n");
+      if(pRangeSelectWindow->pIntuiWindow != NULL)
+      {
+        if(GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &mark))
+        {
+          printf("STRINGA_Mark result: %d\n", mark);
+          pRangeSelectWindow->RangeFrom = (mark > 16) & 0xff;
+          pRangeSelectWindow->RangeTo = mark & 0xff;
+        }
+        else
+        {
+          printf("STRINGA_Mark failed.\n");
+          pRangeSelectWindow->RangeFrom = 4;
+          pRangeSelectWindow->RangeTo = 6;
+        }
       break;
     }
     case GID_BTN_OK:
     {
-      if(pRangeSelectWindow->pIntuiWindow != NULL)
-      {
         closeRangeSelectWindow(pRangeSelectWindow);
         return TRUE;
       }

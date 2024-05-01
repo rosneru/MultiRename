@@ -5,8 +5,9 @@ typedef struct RangeSelectWindow
 {
   Object* pWinObject;
   struct Window* pIntuiWindow;
+  ULONG SigMask;
   struct Window* pParentIntuiWindow;
-  ULONG* pMainSigMask;
+  ULONG* pParentSigMask;
   struct Requester BlockingReq;
   UBYTE RangeFrom;
   UBYTE RangeTo;
@@ -15,7 +16,7 @@ typedef struct RangeSelectWindow
 RangeSelectWindow* createRangeSelectWindow(void);
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
-                           ULONG* pMainSigMask,
+                           ULONG* pParentSigMask,
                            STRPTR pStringGadgetText);
 void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
