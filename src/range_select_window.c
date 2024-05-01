@@ -246,7 +246,6 @@ void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow)
 
 BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
 {
-  ULONG receivedSig;
   ULONG result;
   ULONG code;
   BOOL isWindowClosedWithOk = FALSE;
@@ -254,7 +253,7 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
   if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject 
   || !pRangeSelectWindow->pIntuiWindow)
   {
-    return TRUE;
+    return FALSE;
   }
 
   while ((result = DoMethod(pRangeSelectWindow->pWinObject , WM_HANDLEINPUT, &code)))
