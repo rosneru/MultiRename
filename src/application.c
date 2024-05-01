@@ -39,8 +39,9 @@
   #include <proto/window.h>
 #endif
 
-#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "file_list.h"
 #include "range_select_window.h"
@@ -114,12 +115,12 @@ void intuiEventLoop(Application* pApp);
  */
 Object* createLayout(void);
 
-static UBYTE *ppCounterPlaces[] = { "1", "2", "3", "4", "5",
-                                    "6", "7", "8", "9", "10", NULL };
 /// Private variables
 
 struct ColumnInfo *m_pColumnInfo = NULL;
-struct Hook m_CompareHook;
+
+static UBYTE *m_ppCounterPlaces[] = { "1", "2", "3", "4", "5",
+                                      "6", "7", "8", "9", "10", NULL };
 
 enum gadids
 {
@@ -142,7 +143,10 @@ enum gadids
 };
 
 static Object* m_ppGadgets[MAXGADGETS];
-struct Hook apphook;
+struct Hook m_CompareHook;
+struct Hook m_AppHook;
+
+
 
 /// Hook implementations
 
@@ -227,7 +231,7 @@ Application* createApplication(int argc, char **argv)
                                               WINDOW_Layout, pMainLayout,
                                               WINDOW_AppPort, pApp->pAppWindowPort,
                                               WINDOW_AppWindow, TRUE,
-                                              WINDOW_AppMsgHook, &apphook,
+                                              WINDOW_AppMsgHook, &m_AppHook,
                                               TAG_DONE)))
               {
                 if((pApp->pRangeSelectWindow = createRangeSelectWindow()))
@@ -338,9 +342,9 @@ BOOL runApplication(Application* pApp)
     return FALSE;
   }
 
-  apphook.h_Entry = (ULONG (* )())AppMsgFunc;
-  apphook.h_SubEntry = NULL;
-  apphook.h_Data = pApp;
+  m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
+  m_AppHook.h_SubEntry = NULL;
+  m_AppHook.h_Data = pApp;
 
 
   if((pApp->pIntuiWindow =
@@ -420,8 +424,7 @@ void updateNewNames(Application* pApp)
   struct Node* pNode;
   STRPTR pName, pExt;
   FileNode* pFileNode;
-  LONG counterStart, counterStep;
-  WORD counterPlacesId;
+  LONG counterStart, counterStep, counterPlacesId, counterPlacesValue;
 
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
@@ -436,7 +439,9 @@ void updateNewNames(Application* pApp)
   GetAttr(INTEGER_Number, m_ppGadgets[GID_INT_COUNTER_START], (ULONG*)&counterStart);
   GetAttr(INTEGER_Number, m_ppGadgets[GID_INT_COUNTER_STEP], (ULONG*)&counterStep);
   GetAttr(CHOOSER_Selected, m_ppGadgets[GID_CHO_COUNTER_PLACES], (ULONG*)&counterPlacesId);
-printf("id = %d\n", counterPlacesId);
+
+  counterPlacesValue = atoi(m_ppCounterPlaces[counterPlacesId]);
+
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
   createNewNames(pApp->pFileList,
@@ -444,7 +449,7 @@ printf("id = %d\n", counterPlacesId);
                  pExt,
                  counterStart,
                  counterStep,
-                 2);
+                 counterPlacesValue);
 
   // Set the updated NewName text for each ListBrowser node
   for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -499,6 +504,7 @@ static void handleGadgets(Application* pApp, ULONG result)
   {
     case GID_INT_COUNTER_START:
     case GID_INT_COUNTER_STEP:
+    case GID_CHO_COUNTER_PLACES:
     case GID_STR_EXTENSION:
     case GID_STR_NAME:
     {
@@ -817,7 +823,7 @@ Object* createLayout(void)
         GA_ID, GID_CHO_COUNTER_PLACES,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
-        CHOOSER_LabelArray, (ULONG)ppCounterPlaces,
+        CHOOSER_LabelArray, (ULONG)m_ppCounterPlaces,
         CHOOSER_Justification, CHJ_RIGHT,
         CHOOSER_Selected, 1,
         CHOOSER_AutoFit, TRUE,
