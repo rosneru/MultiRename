@@ -12,7 +12,7 @@ typedef struct RangeSelectWindow
   UBYTE RangeTo;
 } RangeSelectWindow;
 
-RangeSelectWindow* createRangeSelectWindow();
+RangeSelectWindow* createRangeSelectWindow(void);
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
                            ULONG* pMainSigMask,

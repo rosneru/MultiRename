@@ -91,7 +91,7 @@ static Object *pMainLayout;
 // }
 
 
-RangeSelectWindow* createRangeSelectWindow()
+RangeSelectWindow* createRangeSelectWindow(void)
 {
   RangeSelectWindow* pRangeSelectWindow;
   if(!(pRangeSelectWindow = AllocVec(sizeof(RangeSelectWindow), MEMF_CLEAR)))
@@ -258,7 +258,7 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
   if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject 
   || !pRangeSelectWindow->pIntuiWindow)
   {
-    return;
+    return TRUE;
   }
 
   while ((result = DoMethod(pRangeSelectWindow->pWinObject , WM_HANDLEINPUT, &code)))
