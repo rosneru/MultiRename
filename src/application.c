@@ -175,9 +175,9 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
                     MAXPATHLEN))
     {
       AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
-      appendFileNode(pApp->pFileList,
+      appendFileNode(pApp->pFiles,
                      pApp->pParsedArgs->pScratchPathBuf,
-                     pApp->pNotificationsList);
+                     pApp->pNotifications);
     }
     else
     {
@@ -185,7 +185,7 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
       {
         // For the error notification only the file name not the
         // relative path is needed.
-        addNotification(pApp->pNotificationsList,
+        addNotification(pApp->pNotifications,
                         NNT_SKIPPED_PATH_TOO_LONG,
                         pFileName);
       }
@@ -206,14 +206,14 @@ Application* createApplication(int argc, char **argv)
   {
     if((pApp->pAppWindowPort = CreateMsgPort()))
     {
-      if((pApp->pNotificationsList = createNotificationList()))
+      if((pApp->pNotifications = createNotificationList()))
       {
-        if((pApp->pFileList = createFileList()))
+        if((pApp->pFiles = createFileList()))
         {
           if((pApp->pParsedArgs = createParsedArgs(argc,
                                                   argv,
-                                                  pApp->pFileList,
-                                                  pApp->pNotificationsList)))
+                                                  pApp->pFiles,
+                                                  pApp->pNotifications)))
           {
             if((pMainLayout = createLayout()))
             {
@@ -317,14 +317,14 @@ void disposeApplication(Application* pApp)
     freeParsedArgs(pApp->pParsedArgs);
   }
 
-  if(pApp->pFileList)
+  if(pApp->pFiles)
   {
-    freeFileList(pApp->pFileList);
+    freeFileList(pApp->pFiles);
   }
 
-  if(pApp->pNotificationsList)
+  if(pApp->pNotifications)
   {
-    freeNotificationList(pApp->pNotificationsList);
+    freeNotificationList(pApp->pNotifications);
   }
 
   if(pApp->pAppWindowPort)
@@ -383,14 +383,14 @@ void updateApplicationWindowTitle(Application* pApp)
 
 void notifyUserAboutSkippedFiles(Application* pApp)
 {
-  if(containsSkippedNotifications(pApp->pNotificationsList))
+  if(containsSkippedNotifications(pApp->pNotifications))
   {
     if(!showEasyRequest(pApp->pIntuiWindow,
                         "Continue|Show errors",
                         "Failed to add some of the input files"))
     {
-      printNotifications(pApp->pNotificationsList);
-      clearNotificationsExcept(pApp->pNotificationsList,
+      printNotifications(pApp->pNotifications);
+      clearNotificationsExcept(pApp->pNotifications,
                                 NNT_SELECTED_PATH_INFO);
     }
   }
@@ -401,17 +401,17 @@ void applyNewFiles(Application* pApp)
   STRPTR pFirstPath;
 
   // Does list contain at least one file?
-  if((pFirstPath = getFirstFilePath(pApp->pFileList)))
+  if((pFirstPath = getFirstFilePath(pApp->pFiles)))
   {
     // Display the files list in ListBrowser
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                    pApp->pIntuiWindow, NULL,
-                   LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                   LISTBROWSER_Labels, (ULONG)pApp->pFiles,
                    TAG_DONE);
 
     // Apply the file path for this session
     strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
-    addNotification(pApp->pNotificationsList, NNT_SELECTED_PATH_INFO, pFirstPath);
+    addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
   }
 
   updateNewNames(pApp);
@@ -444,7 +444,7 @@ void updateNewNames(Application* pApp)
 
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
-  createNewNames(pApp->pFileList,
+  createNewNames(pApp->pFiles,
                  pName,
                  pExt,
                  counterStart,
@@ -452,7 +452,7 @@ void updateNewNames(Application* pApp)
                  counterPlacesValue);
 
   // Set the updated NewName text for each ListBrowser node
-  for(pNode = pApp->pFileList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     SetListBrowserNodeAttrs(pNode,
@@ -465,7 +465,7 @@ void updateNewNames(Application* pApp)
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                  LISTBROWSER_Labels, (ULONG)pApp->pFiles,
                   TAG_DONE);
 }
 
@@ -480,15 +480,15 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
 
-  result = appendFileNode(pApp->pFileList,
+  result = appendFileNode(pApp->pFiles,
                           pFileFullPath,
-                          pApp->pNotificationsList);
+                          pApp->pNotifications);
 
   // Attatch changed list to ListBrowser.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFileList,
+                  LISTBROWSER_Labels, (ULONG)pApp->pFiles,
                   TAG_DONE);
 
   return result;
@@ -527,7 +527,7 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_NAME_PART:
     {
-      if((pFileNode = getLongestOldNameNode(pApp->pFileList)))
+      if((pFileNode = getLongestOldNameNode(pApp->pFiles)))
       {
         // Mark operation for `applySelectedRange()` which will be
         // called when the range select window is closed positively with

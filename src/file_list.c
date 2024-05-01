@@ -20,7 +20,7 @@
 #include "file_list.h"
 
 
-struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
+struct Node* createFileNode(STRPTR pFileName, struct List* pNotifications)
 {
   STRPTR pPathEnd, pNameStart, pLastDotPosition;
   ULONG pathLen, nameLen;
@@ -37,7 +37,7 @@ struct Node* createFileNode(STRPTR pFileName, struct List* pNotificationsList)
     && pFileName[nameLen-5] == '.')
     {
       // It is an .info file. Skipping it..
-      addNotification(pNotificationsList,
+      addNotification(pNotifications,
                       NNT_SKIPPED_INFO_FILE,
                       pFileName);
       return NULL;
@@ -174,19 +174,19 @@ void printFileListNewName(struct List* pFilesList)
 
 BOOL appendFileNode(struct List* pFilesList,
                     STRPTR pFileFullPath,
-                    struct List* pNotificationsList)
+                    struct List* pNotifications)
 {
   struct Node *pNode;
   STRPTR pFirstPath;
 
-  if(!pFilesList || !pFileFullPath || !pNotificationsList)
+  if(!pFilesList || !pFileFullPath || !pNotifications)
   {
     return FALSE;
   }
 
   pFirstPath = getFirstFilePath(pFilesList);
 
-  if(!(pNode = createFileNode(pFileFullPath, pNotificationsList)))
+  if(!(pNode = createFileNode(pFileFullPath, pNotifications)))
   {
     return FALSE;
   }
@@ -194,7 +194,7 @@ BOOL appendFileNode(struct List* pFilesList,
   if(pFirstPath && (strcmp(((FileNode*)pNode)->Path, pFirstPath) != 0))
   {
     // This file has a different path as the former ones: skip it
-    addNotification(pNotificationsList,
+    addNotification(pNotifications,
                     NNT_SKIPPED_WRONG_PATH,
                     pFileFullPath);
     FreeListBrowserNode(pNode);

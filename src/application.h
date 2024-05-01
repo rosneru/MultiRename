@@ -17,9 +17,9 @@
 typedef struct Application
 {
   struct MsgPort* pAppWindowPort;
-  struct List* pNotificationsList;
+  struct List* pNotifications;
   ParsedArgs* pParsedArgs;
-  struct List* pFileList;
+  struct List* pFiles;
   Object* pWinObject;
   RangeSelectWindow* pRangeSelectWindow;
   struct Window* pIntuiWindow;

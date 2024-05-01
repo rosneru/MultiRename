@@ -21,7 +21,7 @@ typedef struct ParsedArgs
 ParsedArgs* createParsedArgs(int argc,
                              char **argv,
                              struct List* pFilesList,
-                             struct List* pNotificationsList);
+                             struct List* pNotifications);
 
 void freeParsedArgs(ParsedArgs* pParsedArgs);
 

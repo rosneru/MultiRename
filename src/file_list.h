@@ -18,7 +18,7 @@ void printFileListNewName(struct List* pFilesList);
 
 BOOL appendFileNode(struct List* pFilesList,
                     STRPTR pFileFullPath,
-                    struct List* pNotificationsList);
+                    struct List* pNotifications);
 
 STRPTR getFirstFilePath(struct List* pFilesList);
 
