@@ -75,14 +75,19 @@ ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
   
   // TODO if(*pMsg == SGH_CLICK)
-  if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  & pRsw->Marked))
+  if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &pRsw->Marked))
   {
     pRsw->Marked = 666;
   }
 
-  // TODO from sghooks.h: You should always leave the SGA_REDISPLAY flag
-  // set, since Intuition uses this processing when activating a string
-  // gadget.
+  // TODO from sghooks.h:
+  //
+  // You return 0 if you don't understand the command (SGH_KEY is
+  // required and assumed).  Return non-zero if you implement the
+  // command.
+  //
+  // You should always leave the SGA_REDISPLAY flag set, since Intuition
+  // uses this processing when activating a string gadget.
 
   // pSgWork->Actions |= SGA_REDISPLAY;
   // return (~0L);
