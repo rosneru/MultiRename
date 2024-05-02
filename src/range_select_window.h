@@ -9,6 +9,7 @@ typedef struct RangeSelectWindow
   struct Window* pParentIntuiWindow;
   ULONG* pParentSigMask;
   struct Requester BlockingReq;
+  ULONG Marked;
   UBYTE RangeFrom;
   UBYTE RangeTo;
 } RangeSelectWindow;

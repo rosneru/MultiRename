@@ -66,29 +66,28 @@ static Object* m_ppGadgets[MAXGADGETS];
 static Object *pMainLayout;
 
 
-// struct Hook m_EditHook;
+struct Hook m_EditHook;
 
-// ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
-//                                         __REG__(a2, struct SGWork * pSgWork),
-//                                         __REG__(a1, ULONG *pMsg))
-// {
-//   ULONG mark;
-//   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
+ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
+                                        __REG__(a2, struct SGWork * pSgWork),
+                                        __REG__(a1, ULONG *pMsg))
+{
+  RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
   
-//   if(GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &mark))
-//   {
-//     pRsw->RangeFrom = (mark > 16) & 0xff;
-//     pRsw->RangeTo = mark & 0xff;
-//   }
-//   else
-//   {
-//     pRsw->RangeFrom = 11;
-//     pRsw->RangeTo = 22;
-//   }
+  // TODO if(*pMsg == SGH_CLICK)
+  if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  & pRsw->Marked))
+  {
+    pRsw->Marked = 666;
+  }
 
-//   printf("bufferPos = %d\n", pSgWork->BufferPos);
-//   return 0;
-// }
+  // TODO from sghooks.h: You should always leave the SGA_REDISPLAY flag
+  // set, since Intuition uses this processing when activating a string
+  // gadget.
+
+  // pSgWork->Actions |= SGA_REDISPLAY;
+  // return (~0L);
+  return 0;
+}
 
 
 RangeSelectWindow* createRangeSelectWindow(void)
@@ -99,9 +98,9 @@ RangeSelectWindow* createRangeSelectWindow(void)
     return NULL;
   }
 
-  // m_EditHook.h_Entry = (ULONG (*)()) StringEditFunc;
-  // m_EditHook.h_SubEntry = NULL;
-  // m_EditHook.h_Data = pRangeSelectWindow;
+  m_EditHook.h_Entry = (ULONG (*)()) StringEditFunc;
+  m_EditHook.h_SubEntry = NULL;
+  m_EditHook.h_Data = pRangeSelectWindow;
 
   pRangeSelectWindow->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Title, "MultiRename: Select name part",
@@ -131,7 +130,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
-        // STRINGA_EditHook, &m_EditHook,
+        STRINGA_EditHook, &m_EditHook,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
@@ -279,35 +278,16 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
 
 static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
 {
-  ULONG mark;
-
   switch ((result & WMHI_GADGETMASK))
   {
     case GID_STRING:
     {
-      printf("STRING\n");
-      if(pRangeSelectWindow->pIntuiWindow != NULL)
-      {
-        if(GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &mark))
-        {
-          printf("STRINGA_Mark result: %d\n", mark);
-          pRangeSelectWindow->RangeFrom = (mark > 16) & 0xff;
-          pRangeSelectWindow->RangeTo = mark & 0xff;
-        }
-        else
-        {
-          printf("STRINGA_Mark failed.\n");
-          pRangeSelectWindow->RangeFrom = 4;
-          pRangeSelectWindow->RangeTo = 6;
-        }
-      break;
     }
     case GID_BTN_OK:
     {
-        closeRangeSelectWindow(pRangeSelectWindow);
-        return TRUE;
-      }
-
+      printf("Marked = %d\n", pRangeSelectWindow->Marked);
+      closeRangeSelectWindow(pRangeSelectWindow);
+      return TRUE;
       break;
     }
     case GID_BTN_CLOSE:
