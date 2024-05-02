@@ -75,7 +75,7 @@ ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
   
   // TODO if(*pMsg == SGH_CLICK)
-  if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &pRsw->Marked))
+  if(!GetAttr(STRINGA_GetBlockPos, m_ppGadgets[GID_STRING],  &pRsw->Marked))
   {
     pRsw->Marked = 666;
   }

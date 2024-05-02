@@ -508,16 +508,6 @@ static void handleGadgets(Application* pApp, ULONG result)
     case GID_STR_EXTENSION:
     case GID_STR_NAME:
     {
-      // myGotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STR_NAME], &myBufferPos);
-      // if(myGotBufferPosAttr == 1)
-      // {
-      //   printf("Successfully got BufferPosAttr: '%d'\n", myBufferPos);
-      // }
-      // else
-      // {
-      //   printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", myBufferPos);
-      // }
-
       updateNewNames(pApp);
       break;
     }
@@ -616,14 +606,6 @@ void applySelectedRange(Application* pApp)
       printf("FAILED to get TextValAttr.\n");
     }
 
-    if(gotBufferPosAttr == 1)
-    {
-      printf("Successfully got BufferPosAttr: '%d'\n", bufferPos);
-    }
-    else
-    {
-      printf("FAILED to get BufferPosAttr. (bufferPos value is: %d)\n", bufferPos);
-    }
 printf("ranegFrom = %d, rangeTo = %d\n", pApp->pRangeSelectWindow->RangeFrom, pApp->pRangeSelectWindow->RangeTo);
     if(0 > (bufferPos = insertPart(pApp->ScratchBuf,
                                    pText,
