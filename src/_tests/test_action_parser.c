@@ -74,7 +74,7 @@ int main(void)
   // test_name_4
   if(createNewNames(&fileList, "Aa[N]Bb", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_name_4: 'Abc - [N]', '[E]'");
+    printFileList(&fileList, "test_name_4: 'Aa[N]Bb', '[E]'");
   }
   else
   {
@@ -119,6 +119,16 @@ int main(void)
   else
   {
     printf("Error in test test_name_part_1.\n");
+  }
+
+  // test_counter_mixed_2
+  if(createNewNames(&fileList, "[N4-6] New[C] [N8-29]", "[E]", 1, 1, 1))
+  {
+    printFileList(&fileList, "test_counter_mixed_2: '[N4-6] New[C] [N8-29]', '[E]'");
+  }
+  else
+  {
+    printf("Error in test test_counter_mixed_2.\n");
   }
 }
 

@@ -88,14 +88,14 @@ void applyActions(STRPTR pResultBuf,
                   struct List* pActionList,
                   STRPTR pName,
                   UBYTE NameLen,
-                  UBYTE extLen,
+                  UBYTE ExtLen,
                   STRPTR pMask,
                   Counter* pCounter)
 {
   struct Node* pNode;
   ActionNode* pAction;
   BOOL mustIncrementCounter = FALSE;
-  ULONG numChars;
+  ULONG numChars, end;
   int lastIndex;
   STRPTR pExt = pName + NameLen + 1;
 
@@ -127,7 +127,13 @@ void applyActions(STRPTR pResultBuf,
       {
         if((pAction->Start > -1) && (pAction->End > -1))
         {
-          numChars = pAction->End - pAction->Start + 1;
+          end = pAction->End;
+          if(end >= NameLen)
+          {
+            end = NameLen - 1;
+          }
+
+          numChars = end - pAction->Start + 1;
           strncat(pResultBuf, pName + pAction->Start, numChars);
         }
         else
@@ -140,7 +146,13 @@ void applyActions(STRPTR pResultBuf,
       {
         if((pAction->Start > -1) && (pAction->End > -1))
         {
-          numChars = pAction->End - pAction->Start + 1;
+          end = pAction->End;
+          if(end >= ExtLen)
+          {
+            end = ExtLen - 1;
+          }
+
+          numChars = end - pAction->Start + 1;
           strncat(pResultBuf, pExt + pAction->Start, numChars);
         }
         else
