@@ -582,7 +582,7 @@ int insertPart(STRPTR pTargetBuf,
   // Apply the end, after the insert position
   strcat(pTargetBuf, pSrcStr + insertPos);
 
-  return insertPos + strlen(commandPartBuf);
+  return (int)(insertPos + strlen(commandPartBuf));
 }
 
 

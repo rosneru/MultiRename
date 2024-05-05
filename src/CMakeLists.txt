@@ -12,6 +12,7 @@ set(CMAKE_C_LINK_EXECUTABLE "${CMAKE_C_LINK_EXECUTABLE} ${EXTRALIBS_LINK_FLAGS}"
 
 add_executable (MultiRename_gcc
                 application.c
+                date_tools.c
                 file_list.c
                 main.c
                 notifications.c

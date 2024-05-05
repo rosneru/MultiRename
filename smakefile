@@ -18,6 +18,9 @@ all : $(EXE)
 $(OBJDIR)application.o : src/application.c
 	$(CC) nolink src/application.c
 
+$(OBJDIR)date_tools.o : src/date_tools.c
+	$(CC) nolink src/date_tools.c
+
 $(OBJDIR)file_list.o : src/file_list.c
 	$(CC) nolink src/file_list.c
 
@@ -45,7 +48,8 @@ $(OBJDIR)rename_parser.o : src/rename_parser.c
 $(OBJDIR)requester.o : src/requester.c
 	$(CC) nolink src/requester.c
 
-OBJS = $(OBJDIR)application.o  $(OBJDIR)file_list.o $(OBJDIR)main.o
+OBJS = $(OBJDIR)application.o  $(OBJDIR)file_list.o $(OBJDIR)date_tools.o
+OBJS = $(OBJS) $(OBJDIR)main.o
 OBJS = $(OBJS) $(OBJDIR)notifications.o $(OBJDIR)parsed_args.o
 OBJS = $(OBJS) $(OBJDIR)range_select_window.o
 OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_counter.o
