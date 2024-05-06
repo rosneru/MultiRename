@@ -66,33 +66,33 @@ static Object* m_ppGadgets[MAXGADGETS];
 static Object *pMainLayout;
 
 
-struct Hook m_EditHook;
+// struct Hook m_EditHook;
 
-ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
-                                        __REG__(a2, struct SGWork * pSgWork),
-                                        __REG__(a1, ULONG *pMsg))
-{
-  RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
+// ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
+//                                          __REG__(a2, struct SGWork * pSgWork),
+//                                          __REG__(a1, ULONG *pMsg))
+// {
+//   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
   
-  // TODO if(*pMsg == SGH_CLICK)
-  if(!GetAttr(STRINGA_GetBlockPos, m_ppGadgets[GID_STRING],  &pRsw->Marked))
-  {
-    pRsw->Marked = 666;
-  }
+//   // TODO if(*pMsg == SGH_CLICK)
+//   if(!GetAttr(STRINGA_GetBlockPos, m_ppGadgets[GID_STRING],  &pRsw->Marked))
+//   {
+//     pRsw->Marked = 666;
+//   }
 
-  // TODO from sghooks.h:
-  //
-  // You return 0 if you don't understand the command (SGH_KEY is
-  // required and assumed).  Return non-zero if you implement the
-  // command.
-  //
-  // You should always leave the SGA_REDISPLAY flag set, since Intuition
-  // uses this processing when activating a string gadget.
+//   // TODO from sghooks.h:
+//   //
+//   // You return 0 if you don't understand the command (SGH_KEY is
+//   // required and assumed).  Return non-zero if you implement the
+//   // command.
+//   //
+//   // You should always leave the SGA_REDISPLAY flag set, since Intuition
+//   // uses this processing when activating a string gadget.
 
-  // pSgWork->Actions |= SGA_REDISPLAY;
-  // return (~0L);
-  return 0;
-}
+//   // pSgWork->Actions |= SGA_REDISPLAY;
+//   // return (~0L);
+//   return 0;
+// }
 
 
 RangeSelectWindow* createRangeSelectWindow(void)
@@ -103,9 +103,9 @@ RangeSelectWindow* createRangeSelectWindow(void)
     return NULL;
   }
 
-  m_EditHook.h_Entry = (ULONG (*)()) StringEditFunc;
-  m_EditHook.h_SubEntry = NULL;
-  m_EditHook.h_Data = pRangeSelectWindow;
+  // m_EditHook.h_Entry = (ULONG (*)()) StringEditFunc;
+  // m_EditHook.h_SubEntry = NULL;
+  // m_EditHook.h_Data = pRangeSelectWindow;
 
   pRangeSelectWindow->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Title, "MultiRename: Select name part",
@@ -135,7 +135,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
-        STRINGA_EditHook, &m_EditHook,
+        // STRINGA_EditHook, &m_EditHook,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
