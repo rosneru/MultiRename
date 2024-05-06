@@ -606,7 +606,8 @@ void applySelectedRange(Application* pApp)
       printf("FAILED to get TextValAttr.\n");
     }
 
-printf("ranegFrom = %d, rangeTo = %d\n", pApp->pRangeSelectWindow->RangeFrom, pApp->pRangeSelectWindow->RangeTo);
+printf("Marked = %d\n", pApp->pRangeSelectWindow->Marked);
+// printf("ranegFrom = %d, rangeTo = %d\n", pApp->pRangeSelectWindow->RangeFrom, pApp->pRangeSelectWindow->RangeTo);
     if(0 > (bufferPos = insertPart(pApp->ScratchBuf,
                                    pText,
                                    bufferPos,

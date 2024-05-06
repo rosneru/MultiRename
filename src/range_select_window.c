@@ -75,7 +75,7 @@ static Object *pMainLayout;
 //   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
   
 //   // TODO if(*pMsg == SGH_CLICK)
-//   if(!GetAttr(STRINGA_GetBlockPos, m_ppGadgets[GID_STRING],  &pRsw->Marked))
+//   if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &pRsw->Marked))
 //   {
 //     pRsw->Marked = 666;
 //   }
@@ -136,6 +136,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         // STRINGA_EditHook, &m_EditHook,
+        ICA_TARGET, ICTARGET_IDCMP,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
@@ -272,6 +273,19 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
       case WMHI_GADGETUP:
       {
         isWindowClosedWithOk = handleGadgets(pRangeSelectWindow, result);
+        break;
+      }
+      case IDCMP_IDCMPUPDATE:
+      {
+        // Only the StringGadget sends these messages for now. No need 
+        // to
+printf("IDCMP_IDCMPUPDATE\n");
+        if(!GetAttr(STRINGA_Mark,
+                    m_ppGadgets[GID_STRING],
+                    &pRangeSelectWindow->Marked))
+        {
+          pRangeSelectWindow->Marked = 666;
+        }
         break;
       }
     }
