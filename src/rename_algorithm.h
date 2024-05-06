@@ -7,7 +7,7 @@
 
 /**
  * Iterates the given 'list of FileNodes'. For every FileNode the field
- * NewName is newly filled according the OldName and given parameters
+ * NewName is newly filled according the OriginalName and given parameters
  * pNameMask, pExtMask and counter settings.
  *
  */

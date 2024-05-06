@@ -1,0 +1,6 @@
+#ifndef AMIGA_LIBRARIES_LOCALE_H
+#define AMIGA_LIBRARIES_LOCALE_H
+
+
+
+#endif

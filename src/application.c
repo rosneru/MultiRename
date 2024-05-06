@@ -526,7 +526,7 @@ static void handleGadgets(Application* pApp, ULONG result)
         openRangeSelectWindow(pApp->pRangeSelectWindow,
                               pApp->pIntuiWindow,
                               &pApp->SigMask,
-                              pFileNode->OldName);
+                              pFileNode->OriginalName);
       }
 
       break;

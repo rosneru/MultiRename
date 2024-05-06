@@ -10,7 +10,7 @@ void freeFileList(struct List* pFilesList);
 
 /**
  * Iterates the given pFilesList and return the FileNode* that contains
- * the longest OldName.
+ * the longest OriginalName.
  */
 FileNode* getLongestOldNameNode(struct List* pFilesList);
 

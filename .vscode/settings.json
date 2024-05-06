@@ -73,7 +73,9 @@
     "amiga-types.h": "c",
     "rename_counter.h": "c",
     "integer_protos.h": "c",
-    "range_select_window.h": "c"
+    "range_select_window.h": "c",
+    "date_tools.h": "c",
+    "locale.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

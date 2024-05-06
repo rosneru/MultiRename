@@ -71,22 +71,23 @@ struct Node* createFileNode(STRPTR pFileName, struct List* pNotifications)
     strncpy(pFileNode->Path, pFileName, pathLen);
     pFileNode->Path[pathLen] = '\0';
 
-    strcpy(pFileNode->OldName, pNameStart);
+    strcpy(pFileNode->OriginalName, pNameStart);
     strcpy(pFileNode->NewName, pNameStart);
     if((pLastDotPosition = strrchr(pNameStart, '.')))
     {
-      pFileNode->OldNameLen = pLastDotPosition - pNameStart;
-      pFileNode->OldExtLen = strlen(pFileNode->OldName + pFileNode->OldNameLen);
+      pFileNode->OriginalNameLen = pLastDotPosition - pNameStart;
+      pFileNode->OriginalExtLen = strlen(pFileNode->OriginalName +
+                                         pFileNode->OriginalNameLen);
     }
     else
     {
-      pFileNode->OldNameLen = strlen(pNameStart);
-      pFileNode->OldExtLen = 0;
+      pFileNode->OriginalNameLen = strlen(pNameStart);
+      pFileNode->OriginalExtLen = 0;
     }
 
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 0,
-                              LBNCA_Text, pFileNode->OldName,
+                              LBNCA_Text, pFileNode->OriginalName,
                             LBNA_Column, 1,
                               LBNCA_Text, pFileNode->NewName,
                             TAG_DONE);
@@ -147,9 +148,9 @@ FileNode* getLongestOldNameNode(struct List* pFilesList)
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    if(pFileNode->OldNameLen > maxLength)
+    if(pFileNode->OriginalNameLen > maxLength)
     {
-      maxLength = pFileNode->OldNameLen;
+      maxLength = pFileNode->OriginalNameLen;
       pMaxLengthNode = pFileNode;
     }
   }

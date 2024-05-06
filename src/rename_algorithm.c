@@ -71,9 +71,9 @@ BOOL createNewNames(struct List* pFilesList,
     pFileNode = (FileNode*)pNode;
     applyActions(pFileNode->NewName,
                  &parser.ActionList,
-                 pFileNode->OldName,
-                 pFileNode->OldNameLen,
-                 pFileNode->OldExtLen,
+                 pFileNode->OriginalName,
+                 pFileNode->OriginalNameLen,
+                 pFileNode->OriginalExtLen,
                  pMask, &counter);
   }
 

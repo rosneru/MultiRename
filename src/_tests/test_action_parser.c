@@ -13,14 +13,32 @@
 #define LONG_MAX 2147483647
 #endif
 
+
+/// Forwards
+
 /**
- * Print given list of FileNodes
+ * Print given list of FileNodes, only the original names but with dates
+ */
+void printFileListOriginalName(struct List* pFilesList);
+
+/**
+ * Print given list of FileNodes, original and new names, but no dates
  */
 void printFileList(struct List* pFilesList, const char* pTitle);
 
-FileNode node1 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_1st_file_is_older_than.md", 25, 2, "My_1st_file_is_older_than.md" };
-FileNode node2 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "my_2nd_one_and_even_more_than.txt", 29, 3, "my_2nd_one_and_even_more_than.txt" };
-FileNode node3 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_3rd_attempt.doc", 14, 3, "My_3rd_attempt.doc" };
+/**
+ * Set the DateTimeParts field in given FileNode to given date time
+ * string. The given DateTime must have a length of 19 chars, one less
+ * than DATETIMEBUF_SIZE, which is defined in date_tools.h and be in the
+ * format "2024-05-06-12-54-23"
+ */
+void fillFileNodesDateTime(FileNode* pFileNode, const char* pDateString);
+
+
+/// Global variables
+FileNode node1 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_1st_file_is_older_than.md", 25, 2 };
+FileNode node2 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "my_2nd_one_and_even_more_than.txt", 29, 3 };
+FileNode node3 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_3rd_attempt.doc", 14, 3 };
 
 
 int main(void)
@@ -28,6 +46,10 @@ int main(void)
   int i;
   struct List fileList;
   Counter counter;
+
+  fillFileNodesDateTime(&node1, "1990-09-27-11-33-44");
+  fillFileNodesDateTime(&node2, "2017-11-23-22-38-22");
+  fillFileNodesDateTime(&node3, "1978-06-18-12-00-11");
 
   // Initialize the list
   NewList(&fileList);
@@ -59,7 +81,7 @@ int main(void)
 
   printf("sizeof(LONG) = %lu\n", sizeof(LONG));
 
-  printFileList(&fileList, "Initial file list");
+  printFileListOriginalName(&fileList);
 
   // test_name_2
   if(createNewNames(&fileList, "Abc - [N]", "[E]", 1, 1, 1))
@@ -140,13 +162,71 @@ void printFileList(struct List* pFilesList, const char* pTitle)
   struct Node* pNode;
   FileNode* pFileNode;
   printf("** %s **\n", pTitle);
-  printf("Old name                               |New name\n");
+  printf("Original name                          |New name\n");
   printf("=======================================|=======================================\n");
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    printf("%-39s|%-39s\n", pFileNode->OldName, pFileNode->NewName);
+    printf("%-39s|%-39s\n", pFileNode->OriginalName, pFileNode->NewName);
   }
 
   printf("\n\n");
+}
+
+
+void printFileListOriginalName(struct List* pFilesList)
+{
+  struct Node* pNode;
+  FileNode* pFileNode;
+  printf("** Original file list **\n");
+  printf("Name                                   |date\n");
+  printf("=======================================|=======================================\n");
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    printf("%-39s|%s-%s-%s, %s:%s:%s\n", pFileNode->OriginalName,
+                                         pFileNode->OriginalDate.pYear,
+                                         pFileNode->OriginalDate.pMonth,
+                                         pFileNode->OriginalDate.pDay,
+                                         pFileNode->OriginalDate.pHour,
+                                         pFileNode->OriginalDate.pMinute,
+                                         pFileNode->OriginalDate.pSecond);
+  }
+
+  printf("\n\n");
+}
+
+
+void fillFileNodesDateTime(FileNode* pFileNode, const char* pDateString)
+{
+  char* pBuf;
+  if(!pFileNode || !pDateString)
+  {
+    return;
+  }
+
+  if(strlen(pDateString) != (DATETIMEBUF_SIZE - 1))
+  {
+    return;
+  }
+
+  pBuf = pFileNode->OriginalDate.dateBuf;
+  strcpy(pBuf, pDateString);
+
+  // Manually overwrite the separator ('-' or ':') after each part
+  // with \0. So every part has its own string finalizer.
+  pBuf[4]  = '\0';
+  pBuf[7]  = '\0';
+  pBuf[10] = '\0';
+  pBuf[13] = '\0';
+  pBuf[16] = '\0';
+
+  // Manually adjust the start pointers of the DateTimeParts to its
+  // positions in pDateTimeBuf.
+  pFileNode->OriginalDate.pYear   = pBuf;
+  pFileNode->OriginalDate.pMonth  = pBuf + 5;
+  pFileNode->OriginalDate.pDay    = pBuf + 8;
+  pFileNode->OriginalDate.pHour   = pBuf + 11;
+  pFileNode->OriginalDate.pMinute = pBuf + 14;
+  pFileNode->OriginalDate.pSecond = pBuf + 17;
 }
