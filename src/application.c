@@ -535,6 +535,7 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_NAME:
     {
+      printFileListOriginalName(pApp->pFiles);
       break;
     }
     case GID_BTN_NAME_PART:

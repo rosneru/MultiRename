@@ -16,7 +16,10 @@ void freeFileList(struct List* pFilesList);
  */
 FileNode* getLongestOldNameNode(struct List* pFilesList);
 
+void printFileListOriginalName(struct List* pFilesList);
 void printFileListNewName(struct List* pFilesList);
+
+
 
 BOOL appendFileNode(struct List* pFilesList,
                     STRPTR pFileFullPath,

@@ -209,6 +209,31 @@ FileNode* getLongestOldNameNode(struct List* pFilesList)
   return pMaxLengthNode;
 }
 
+
+
+void printFileListOriginalName(struct List* pFilesList)
+{
+  struct Node* pNode;
+  FileNode* pFileNode;
+  printf("** Original file list **\n");
+  printf("Name                                   |date\n");
+  printf("=======================================|=======================================\n");
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    printf("%-39s|%s-%s-%s, %s:%s:%s\n", pFileNode->OriginalName,
+                                         pFileNode->OriginalDate.pYear,
+                                         pFileNode->OriginalDate.pMonth,
+                                         pFileNode->OriginalDate.pDay,
+                                         pFileNode->OriginalDate.pHour,
+                                         pFileNode->OriginalDate.pMinute,
+                                         pFileNode->OriginalDate.pSecond);
+  }
+
+  printf("\n\n");
+}
+
+
 void printFileListNewName(struct List* pFilesList)
 {
   struct Node* pNode;
