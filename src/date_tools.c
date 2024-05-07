@@ -2,6 +2,12 @@
 #include <clib/compiler-specific.h>
 #include <libraries/locale.h>
 
+#ifdef __clang__
+  #include <clib/locale_protos.h>
+#else
+  #include <proto/locale.h>
+#endif
+
 #include "date_tools.h"
 
 void __ASM__ __SAVE_DS__ FormatDateFunc(__REG__(a0, struct Hook *pHook),
