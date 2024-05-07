@@ -1,16 +1,19 @@
 #include <gadgets/chooser.h>
 #include <gadgets/listbrowser.h>
+#include <libraries/locale.h>
 
 #ifdef __clang__
   #include <clib/alib_protos.h>
   #include <clib/dos_protos.h>
   #include <clib/exec_protos.h>
   #include <clib/listbrowser_protos.h>
+  #include <clib/locale_protos.h>
 #else
   #include <proto/alib.h>
   #include <proto/dos.h>
   #include <proto/exec.h>
   #include <proto/listbrowser.h>
+  #include <proto/locale.h>
 #endif
 
 #include <string.h>
@@ -20,12 +23,41 @@
 #include "file_list.h"
 
 
-struct Node* createFileNode(STRPTR pFileName, struct List* pNotifications)
+// Thomas Richter @ RMRM DOS, 2024: It is certainly a burden to always
+// allocate temporary BCPL objects from the heap through the
+// exec.library or the os.library, and doing so can also fragment the
+// AmigaOs memory unnecessarily. However, allocation of automatic
+// objects from the stack does not ensure long-word alignment in
+// general. To work around this burden, one can use a trick and instead
+// request from the compiler a somewhat longer object with automatic
+// storage duration and align the requested object manually within the
+// memory obtained this way. The following macro performs this trick:
+
+#define D_S(type,name) char a_##name[sizeof(type)+3]; \
+                       type *name = (type *)((ULONG)(a_##name+3) & ~3UL)
+
+// It is used as follows:
+//     D_S (struct FileInfoBlock, fib);
+//
+// At this point, fib is a pointer to a properly aligned struct
+// FileInfoBlock, e.g. this is equivalent to
+//     struct FileInfoBlock _tmp;
+//     struct FileInfoBlock *fib = &tmp;
+// Except that the created pointer is properly aligned and can safely be
+// passed into the dos.library.
+
+
+
+struct Node* createFileNode(struct Locale* pLocale,
+                            BPTR pLock,
+                            STRPTR pFileName,
+                            struct List* pNotifications)
 {
   STRPTR pPathEnd, pNameStart, pLastDotPosition;
   ULONG pathLen, nameLen;
   struct Node *pNode;
   FileNode* pFileNode;
+  D_S(struct FileInfoBlock, pFib);  // See explanation of D_S macro above.
 
   nameLen = strlen(pFileName);
   if(nameLen > 4)
@@ -43,6 +75,15 @@ struct Node* createFileNode(STRPTR pFileName, struct List* pNotifications)
       return NULL;
     }
   }
+
+  if(DOSFALSE == Examine(pLock, pFib))
+  {
+    addNotification(pNotifications,
+                    NNT_SKIPPED_FAILED_EXAMINE,
+                    pFileName);
+    return NULL;
+  }
+
 
   if ((pNode = AllocListBrowserNode(2, 
                                     LBNA_NodeSize, sizeof(FileNode),
@@ -83,6 +124,16 @@ struct Node* createFileNode(STRPTR pFileName, struct List* pNotifications)
     {
       pFileNode->OriginalNameLen = strlen(pNameStart);
       pFileNode->OriginalExtLen = 0;
+    }
+
+
+    if(!fillDateTimeParts(pLocale, &pFib->fib_Date, &pFileNode->OriginalDate))
+    {
+      FreeListBrowserNode(pNode);
+      addNotification(pNotifications,
+                      NNT_SKIPPED_FAILED_DATETIMEPARTS,
+                      pFileName);
+      return NULL;
     }
 
     SetListBrowserNodeAttrs(pNode,
@@ -175,24 +226,33 @@ void printFileListNewName(struct List* pFilesList)
 
 BOOL appendFileNode(struct List* pFilesList,
                     STRPTR pFileFullPath,
+                    struct Locale* pLocale,
                     struct List* pNotifications)
 {
+  BPTR pLock;
   struct Node *pNode;
-  STRPTR pFirstPath;
+  STRPTR pWorkingPath;
 
   if(!pFilesList || !pFileFullPath || !pNotifications)
   {
     return FALSE;
   }
 
-  pFirstPath = getFirstFilePath(pFilesList);
+  if(!(pLock = Lock(pFileFullPath, SHARED_LOCK)))
+  {
+    addNotification(pNotifications,
+                    NNT_SKIPPED_FAILED_LOCK,
+                    pFileFullPath);
+    return FALSE;
+  }
 
-  if(!(pNode = createFileNode(pFileFullPath, pNotifications)))
+  if(!(pNode = createFileNode(pLocale, pLock, pFileFullPath, pNotifications)))
   {
     return FALSE;
   }
 
-  if(pFirstPath && (strcmp(((FileNode*)pNode)->Path, pFirstPath) != 0))
+  if((pWorkingPath = getFirstFilePath(pFilesList))
+  && (strcmp(((FileNode*)pNode)->Path, pWorkingPath) != 0))
   {
     // This file has a different path as the former ones: skip it
     addNotification(pNotifications,
@@ -202,8 +262,9 @@ BOOL appendFileNode(struct List* pFilesList,
     return FALSE;
   }
 
-  // This file has the same path as the former ones: add it
+  // File has the same path as the former ones: add it
   AddTail(pFilesList, pNode);
+  UnLock(pLock);
   return TRUE;
 }
 

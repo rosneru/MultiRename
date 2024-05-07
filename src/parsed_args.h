@@ -3,6 +3,7 @@
 
 
 #include <exec/lists.h>
+#include <libraries/locale.h>
 
 #include "notifications.h"
 
@@ -21,6 +22,7 @@ typedef struct ParsedArgs
 ParsedArgs* createParsedArgs(int argc,
                              char **argv,
                              struct List* pFilesList,
+                             struct Locale* pLocale,
                              struct List* pNotifications);
 
 void freeParsedArgs(ParsedArgs* pParsedArgs);

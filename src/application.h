@@ -6,6 +6,7 @@
 #include <exec/types.h>
 #include <intuition/classusr.h>
 #include <intuition/intuition.h>
+#include <libraries/locale.h>
 
 #include "file_list.h"
 #include "notifications.h"
@@ -16,6 +17,7 @@
 
 typedef struct Application
 {
+  struct Locale* pLocale;
   struct MsgPort* pAppWindowPort;
   struct List* pNotifications;
   ParsedArgs* pParsedArgs;

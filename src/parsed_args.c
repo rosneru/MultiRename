@@ -11,6 +11,7 @@
 #include <dos/dos.h>
 #include <exec/types.h>
 #include <exec/libraries.h>
+#include <libraries/locale.h>
 #include <workbench/startup.h>
 #include <workbench/workbench.h>
 
@@ -20,11 +21,13 @@
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
                          struct List* pFilesList,
+                         struct Locale* pLocale,
                          struct List* pNotifications);
 
 void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        char **argv,
                        struct List* pFilesList,
+                       struct Locale* pLocale,
                        struct List* pNotifications);
 
 static struct RDArgs* pReadArgs = NULL;
@@ -33,6 +36,7 @@ static struct RDArgs* pReadArgs = NULL;
 ParsedArgs* createParsedArgs(int argc,
                              char **argv,
                              struct List* pFilesList,
+                             struct Locale* pLocale,
                              struct List* pNotifications)
 {
   ParsedArgs* pParsedArgs;
@@ -46,13 +50,13 @@ ParsedArgs* createParsedArgs(int argc,
   if(argc == 0)
   {
     // Started from Workbench
-    readWorkbenchArgs(pParsedArgs, argv, pFilesList, pNotifications);
+    readWorkbenchArgs(pParsedArgs, argv, pFilesList, pLocale, pNotifications);
 
   }
   else
   {
     // Started from CLI
-    readCommandLineArgs(pParsedArgs, pFilesList, pNotifications);
+    readCommandLineArgs(pParsedArgs, pFilesList, pLocale, pNotifications);
   }
 
   return pParsedArgs;
@@ -75,6 +79,7 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
                          struct List* pFilesList,
+                         struct Locale* pLocale,
                          struct List* pNotifications)
 {
   BPTR lock;
@@ -103,6 +108,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
         {
           appendFileNode(pFilesList,
                          pParsedArgs->pScratchPathBuf,
+                         pLocale,
                          pNotifications);
         }
         else
@@ -141,6 +147,7 @@ char* toolTypeValue(const STRPTR* ppTooltypeArray, const char* pTooltypeName)
 void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        char **argv,
                        struct List* pFilesList,
+                       struct Locale* pLocale,
                        struct List* pNotifications)
 {
   int i;
@@ -188,6 +195,7 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
           AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
           appendFileNode(pFilesList,
                          pParsedArgs->pScratchPathBuf,
+                         pLocale,
                          pNotifications);
         }
         else

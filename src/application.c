@@ -5,6 +5,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <libraries/locale.h>
 #include <utility/hooks.h>
 #include <workbench/startup.h>
 #include <workbench/workbench.h>
@@ -22,6 +23,7 @@
   #include <clib/label_protos.h>
   #include <clib/layout_protos.h>
   #include <clib/listbrowser_protos.h>
+  #include <clib/locale_protos.h>
   #include <clib/string_protos.h>
   #include <clib/window_protos.h>
 #else
@@ -35,6 +37,7 @@
   #include <proto/label.h>
   #include <proto/layout.h>
   #include <proto/listbrowser.h>
+  #include <proto/locale.h>
   #include <proto/string.h>
   #include <proto/window.h>
 #endif
@@ -166,7 +169,7 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
 
-  // Add the files of the args if possible
+  // Iterate the files of the args and append them as FileNode if possible
   for(i = 0; i < pMsg->am_NumArgs; i++)
   {
     pFileName = pWbArg[i].wa_Name;
@@ -174,9 +177,13 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
                     pApp->pParsedArgs->pScratchPathBuf,
                     MAXPATHLEN))
     {
+      // Now scratch buf contains the name of the directory of the file
+      // So next the fileName is appended to the buf
       AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
+
       appendFileNode(pApp->pFiles,
                      pApp->pParsedArgs->pScratchPathBuf,
+                     pApp->pLocale,
                      pApp->pNotifications);
     }
     else
@@ -204,82 +211,91 @@ Application* createApplication(int argc, char **argv)
 
   if((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
-    if((pApp->pAppWindowPort = CreateMsgPort()))
+    if((pApp->pLocale = OpenLocale(NULL)))
     {
-      if((pApp->pNotifications = createNotificationList()))
+      if((pApp->pAppWindowPort = CreateMsgPort()))
       {
-        if((pApp->pFiles = createFileList()))
+        if((pApp->pNotifications = createNotificationList()))
         {
-          if((pApp->pParsedArgs = createParsedArgs(argc,
-                                                  argv,
-                                                  pApp->pFiles,
-                                                  pApp->pNotifications)))
+          if((pApp->pFiles = createFileList()))
           {
-            if((pMainLayout = createLayout()))
+            if((pApp->pParsedArgs = createParsedArgs(argc,
+                                                    argv,
+                                                    pApp->pFiles,
+                                                    pApp->pLocale,
+                                                    pApp->pNotifications)))
             {
-              if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                              WINDOW_Position, WPOS_CENTERSCREEN,
-                                              WA_Activate, TRUE,
-                                              WA_Title, "MultiRename",
-                                              WA_CloseGadget, TRUE,
-                                              WA_DepthGadget, TRUE,
-                                              WA_DragBar, TRUE,
-                                              WA_SizeGadget, TRUE,
-                                              WA_InnerWidth, 600,
-                                              WA_InnerHeight, 400,
-                                              WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
-                                              WINDOW_Layout, pMainLayout,
-                                              WINDOW_AppPort, pApp->pAppWindowPort,
-                                              WINDOW_AppWindow, TRUE,
-                                              WINDOW_AppMsgHook, &m_AppHook,
-                                              TAG_DONE)))
+              if((pMainLayout = createLayout()))
               {
-                if((pApp->pRangeSelectWindow = createRangeSelectWindow()))
+                if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
+                                                WINDOW_Position, WPOS_CENTERSCREEN,
+                                                WA_Activate, TRUE,
+                                                WA_Title, "MultiRename",
+                                                WA_CloseGadget, TRUE,
+                                                WA_DepthGadget, TRUE,
+                                                WA_DragBar, TRUE,
+                                                WA_SizeGadget, TRUE,
+                                                WA_InnerWidth, 600,
+                                                WA_InnerHeight, 400,
+                                                WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
+                                                WINDOW_Layout, pMainLayout,
+                                                WINDOW_AppPort, pApp->pAppWindowPort,
+                                                WINDOW_AppWindow, TRUE,
+                                                WINDOW_AppMsgHook, &m_AppHook,
+                                                TAG_DONE)))
                 {
-                  return pApp;
+                  if((pApp->pRangeSelectWindow = createRangeSelectWindow()))
+                  {
+                    return pApp;
+                  }
+                  else
+                  {
+                    PutStr("Failed to create the range select window.\n");
+                    disposeApplication(pApp);
+                  }
                 }
                 else
                 {
-                  PutStr("Failed to create the range select window.\n");
+                  PutStr("Failed to create the application main window.\n");
+                  DisposeObject(pMainLayout);
                   disposeApplication(pApp);
                 }
               }
               else
               {
-                PutStr("Failed to create the application main window.\n");
-                DisposeObject(pMainLayout);
+                PutStr("Failed to create layout.\n");
                 disposeApplication(pApp);
               }
             }
             else
             {
-              PutStr("Failed to create layout.\n");
+              PutStr("Failed to parse the arguments.\n");
               disposeApplication(pApp);
             }
           }
           else
           {
-            PutStr("Failed to parse the arguments.\n");
+            PutStr("Failed to create the files list.\n");
             disposeApplication(pApp);
           }
         }
         else
         {
-          PutStr("Failed to create the files list.\n");
+          PutStr("Failed to create the notifications object.\n");
           disposeApplication(pApp);
         }
+
       }
       else
       {
-        PutStr("Failed to create the notifications object.\n");
-        disposeApplication(pApp);
+          PutStr("Failed to create the message port for window drag'n drop.\n");
+          disposeApplication(pApp);
       }
-
     }
     else
     {
-        PutStr("Failed to create the message port for window drag'n drop.\n");
-        disposeApplication(pApp);
+      PutStr("Failed to open the default Locale.\n");
+      disposeApplication(pApp);
     }
   }
   else
@@ -330,6 +346,11 @@ void disposeApplication(Application* pApp)
   if(pApp->pAppWindowPort)
   {
     DeleteMsgPort(pApp->pAppWindowPort);
+  }
+
+  if(pApp->pLocale)
+  {
+    CloseLocale(pApp->pLocale);
   }
 
   FreeVec(pApp);
@@ -482,6 +503,7 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
 
   result = appendFileNode(pApp->pFiles,
                           pFileFullPath,
+                          pApp->pLocale,
                           pApp->pNotifications);
 
   // Attatch changed list to ListBrowser.

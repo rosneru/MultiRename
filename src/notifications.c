@@ -128,7 +128,8 @@ void printNotifications(struct List* pList)
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_INFO_FILE)))
   {
-    printf("Skipped %u input file(s) because of they are .info files which are not supported:\n", count);
+    printf("Skipped %u input file(s) because of they are .info files "
+           "which are not supported:\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -156,6 +157,56 @@ void printNotifications(struct List* pList)
 
     printf("\n");
   }
+
+  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_DATETIMEPARTS)))
+  {
+    printf("Skipped %u input file(s) because their date stamp couldn't "
+           "be split into parts:\n", count);
+
+    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
+      {
+        printf("  %s\n", pNode->ln_Name);
+      }
+    }
+
+    printf("\n");
+  }
+
+  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
+  {
+    printf("Skipped %u input file(s) because they couldn't be / "
+           "examined:\n", count);
+
+    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
+      {
+        printf("  %s\n", pNode->ln_Name);
+      }
+    }
+
+    printf("\n");
+  }
+
+  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
+  {
+    printf("Skipped %u input file(s) because they couldn't be / "
+           "locked:\n", count);
+
+    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
+      {
+        printf("  %s\n", pNode->ln_Name);
+      }
+    }
+
+    printf("\n");
+  }
+
+
 }
 
 BOOL containsSkippedNotifications(struct List* pList)
