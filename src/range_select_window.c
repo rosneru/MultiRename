@@ -24,6 +24,7 @@
   #include <clib/layout_protos.h>
   #include <clib/listbrowser_protos.h>
   #include <clib/string_protos.h>
+  #include <clib/utility_protos.h>
   #include <clib/window_protos.h>
 #else
   #include <proto/alib.h>
@@ -37,6 +38,7 @@
   #include <proto/layout.h>
   #include <proto/listbrowser.h>
   #include <proto/string.h>
+  #include <proto/utility.h>
   #include <proto/window.h>
 #endif
 
@@ -66,33 +68,46 @@ static Object* m_ppGadgets[MAXGADGETS];
 static Object *pMainLayout;
 
 
-// struct Hook m_EditHook;
+struct Hook m_IDCMPHook;
 
-// ULONG __ASM__ __SAVE_DS__ StringEditFunc(__REG__(a0, struct Hook *pHook),
-//                                          __REG__(a2, struct SGWork * pSgWork),
-//                                          __REG__(a1, ULONG *pMsg))
-// {
-//   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
+ULONG __ASM__ __SAVE_DS__ IDCMPFunc(__REG__(a0, struct Hook *pHook),
+                                    __REG__(a2, Object *pWinObj),
+                                    __REG__(a1, struct IntuiMessage *pMsg))
+{
+  RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
   
-//   // TODO if(*pMsg == SGH_CLICK)
-//   if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &pRsw->Marked))
-//   {
-//     pRsw->Marked = 666;
-//   }
+  switch (pMsg->Class)
+  {
+    case IDCMP_IDCMPUPDATE:
+    {
+      ULONG tagData = GetTagData(GA_ID, 0, (struct TagItem *)pMsg->IAddress);
+      switch(tagData)
+      {
+        case GID_STRING:
+        {
+          if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &pRsw->Marked))
+          {
+            if((pRsw->Marked == -1) || (pRsw->Marked == 333))
+            {
+              pRsw->Marked = 666;
+            }
+          }
+          break;
+        }
+        default:
+        {
+          if(pRsw->Marked == -1)
+          {
+            pRsw->Marked = 333;
+          }
+          break;
+        }
+      }
+    }
+  }
 
-//   // TODO from sghooks.h:
-//   //
-//   // You return 0 if you don't understand the command (SGH_KEY is
-//   // required and assumed).  Return non-zero if you implement the
-//   // command.
-//   //
-//   // You should always leave the SGA_REDISPLAY flag set, since Intuition
-//   // uses this processing when activating a string gadget.
-
-//   // pSgWork->Actions |= SGA_REDISPLAY;
-//   // return (~0L);
-//   return 0;
-// }
+  return 0;
+}
 
 
 RangeSelectWindow* createRangeSelectWindow(void)
@@ -103,9 +118,11 @@ RangeSelectWindow* createRangeSelectWindow(void)
     return NULL;
   }
 
-  // m_EditHook.h_Entry = (ULONG (*)()) StringEditFunc;
-  // m_EditHook.h_SubEntry = NULL;
-  // m_EditHook.h_Data = pRangeSelectWindow;
+  pRangeSelectWindow->Marked = -1;
+
+  m_IDCMPHook.h_Entry = (ULONG (*)()) IDCMPFunc;
+  m_IDCMPHook.h_SubEntry = NULL;
+  m_IDCMPHook.h_Data = pRangeSelectWindow;
 
   pRangeSelectWindow->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Title, "MultiRename: Select name part",
@@ -116,8 +133,12 @@ RangeSelectWindow* createRangeSelectWindow(void)
     WA_SizeGadget, TRUE,
     WA_Width, 500,
     WA_AutoAdjust, TRUE,
-    WINDOW_GadgetHelp, TRUE,
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
+    WINDOW_GadgetHelp, TRUE,
+    WINDOW_IDCMPHook, &m_IDCMPHook,
+    // WINDOW_IDCMPHookBits, (ULONG) which bits???
+    // TODO: Is this also needed? Look at:
+    // http://amigadev.elowar.com/read/ADCD_2.1/Includes_and_Autodocs_3._guide/node05C9.html
     WINDOW_Layout, pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_EvenSize, TRUE,
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
@@ -135,7 +156,6 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
-        // STRINGA_EditHook, &m_EditHook,
         ICA_TARGET, ICTARGET_IDCMP,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
