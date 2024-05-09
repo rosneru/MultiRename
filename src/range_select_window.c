@@ -136,9 +136,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
     WINDOW_GadgetHelp, TRUE,
     WINDOW_IDCMPHook, &m_IDCMPHook,
-    // WINDOW_IDCMPHookBits, (ULONG) which bits???
-    // TODO: Is this also needed? Look at:
-    // http://amigadev.elowar.com/read/ADCD_2.1/Includes_and_Autodocs_3._guide/node05C9.html
+    WINDOW_IDCMPHookBits, IDCMP_IDCMPUPDATE,
     WINDOW_Layout, pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_EvenSize, TRUE,
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
