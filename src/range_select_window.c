@@ -10,8 +10,6 @@
 #include <utility/hooks.h>
 #include <workbench/workbench.h>
 
-#include <clib/compiler-specific.h>
-
 #ifdef __clang__
   #include <clib/alib_protos.h>
   #include <clib/exec_protos.h>
@@ -68,48 +66,6 @@ static Object* m_ppGadgets[MAXGADGETS];
 static Object *pMainLayout;
 
 
-struct Hook m_IDCMPHook;
-
-ULONG __ASM__ __SAVE_DS__ IDCMPFunc(__REG__(a0, struct Hook *pHook),
-                                    __REG__(a2, Object *pWinObj),
-                                    __REG__(a1, struct IntuiMessage *pMsg))
-{
-  RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
-  
-  switch (pMsg->Class)
-  {
-    case IDCMP_IDCMPUPDATE:
-    {
-      ULONG tagData = GetTagData(GA_ID, 0, (struct TagItem *)pMsg->IAddress);
-      switch(tagData)
-      {
-        case GID_STRING:
-        {
-          if(!GetAttr(STRINGA_Mark, m_ppGadgets[GID_STRING],  &pRsw->Marked))
-          {
-            if((pRsw->Marked == -1) || (pRsw->Marked == 333))
-            {
-              pRsw->Marked = 666;
-            }
-          }
-          break;
-        }
-        default:
-        {
-          if(pRsw->Marked == -1)
-          {
-            pRsw->Marked = 333;
-          }
-          break;
-        }
-      }
-    }
-  }
-
-  return 0;
-}
-
-
 RangeSelectWindow* createRangeSelectWindow(void)
 {
   RangeSelectWindow* pRangeSelectWindow;
@@ -117,12 +73,6 @@ RangeSelectWindow* createRangeSelectWindow(void)
   {
     return NULL;
   }
-
-  pRangeSelectWindow->Marked = -1;
-
-  m_IDCMPHook.h_Entry = (ULONG (*)()) IDCMPFunc;
-  m_IDCMPHook.h_SubEntry = NULL;
-  m_IDCMPHook.h_Data = pRangeSelectWindow;
 
   pRangeSelectWindow->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Title, "MultiRename: Select name part",
@@ -135,8 +85,6 @@ RangeSelectWindow* createRangeSelectWindow(void)
     WA_AutoAdjust, TRUE,
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
     WINDOW_GadgetHelp, TRUE,
-    WINDOW_IDCMPHook, &m_IDCMPHook,
-    WINDOW_IDCMPHookBits, IDCMP_IDCMPUPDATE,
     WINDOW_Layout, pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_EvenSize, TRUE,
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
@@ -187,7 +135,8 @@ RangeSelectWindow* createRangeSelectWindow(void)
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
                            ULONG* pParentSigMask,
-                           STRPTR pStringGadgetText)
+                           STRPTR pLongestName,
+                           ULONG longestNameLen)
 {
   if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject || !pParentSigMask)
   {
@@ -211,8 +160,8 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
   }
 
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING], pRangeSelectWindow->pIntuiWindow, NULL,
-                 STRINGA_TextVal, (ULONG) pStringGadgetText,
-                 STRINGA_Mark, (strlen(pStringGadgetText)-1),
+                 STRINGA_TextVal, (ULONG) pLongestName,
+                 STRINGA_Mark, (strlen(pLongestName)-1),
                  TAG_DONE);
 
   ActivateLayoutGadget((struct Gadget*)pMainLayout,
@@ -227,6 +176,9 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
 
   // Attach signal mask of this range select window to parent window mask
   *(pRangeSelectWindow->pParentSigMask) |= pRangeSelectWindow->SigMask;
+
+  pRangeSelectWindow->RangeFrom = 1;
+  pRangeSelectWindow->RangeTo = longestNameLen;
 
   return TRUE;
 }
@@ -293,19 +245,6 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
         isWindowClosedWithOk = handleGadgets(pRangeSelectWindow, result);
         break;
       }
-      case IDCMP_IDCMPUPDATE:
-      {
-        // Only the StringGadget sends these messages for now. No need 
-        // to
-printf("IDCMP_IDCMPUPDATE\n");
-        if(!GetAttr(STRINGA_Mark,
-                    m_ppGadgets[GID_STRING],
-                    &pRangeSelectWindow->Marked))
-        {
-          pRangeSelectWindow->Marked = 666;
-        }
-        break;
-      }
     }
   }
 
@@ -322,7 +261,6 @@ static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
     }
     case GID_BTN_OK:
     {
-      printf("Marked = %d\n", pRangeSelectWindow->Marked);
       closeRangeSelectWindow(pRangeSelectWindow);
       return TRUE;
       break;

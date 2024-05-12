@@ -9,7 +9,6 @@ typedef struct RangeSelectWindow
   struct Window* pParentIntuiWindow;
   ULONG* pParentSigMask;
   struct Requester BlockingReq;
-  ULONG Marked;
   UBYTE RangeFrom;
   UBYTE RangeTo;
 } RangeSelectWindow;
@@ -18,7 +17,8 @@ RangeSelectWindow* createRangeSelectWindow(void);
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
                            ULONG* pParentSigMask,
-                           STRPTR pStringGadgetText);
+                           STRPTR pLongestName,
+                           ULONG longestNameLen);
 void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 
