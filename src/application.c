@@ -516,57 +516,40 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
   return result;
 }
 
-ULONG myBufferPos = -1;
-ULONG myGotBufferPosAttr;
 
-static void handleGadgets(Application* pApp, ULONG result)
+void appendTextToStrGadget(struct Window* pIntuiWindow,
+                           Object* pStrGadget,
+                           STRPTR pTextToAppend,
+                           STRPTR pScratchBuf,
+                           ULONG scratchBufSize)
 {
-  FileNode* pFileNode;
-  switch ((result & WMHI_GADGETMASK))
+  STRPTR pCurrentText;
+  long bufferPos;
+  ULONG remainingBufSize;
+  
+  if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pCurrentText))
   {
-    case GID_INT_COUNTER_START:
-    case GID_INT_COUNTER_STEP:
-    case GID_CHO_COUNTER_PLACES:
-    case GID_STR_EXTENSION:
-    case GID_STR_NAME:
-    {
-      updateNewNames(pApp);
-      break;
-    }
-    case GID_BTN_NAME:
-    {
-      printFileListOriginalName(pApp->pFiles);
-      break;
-    }
-    case GID_BTN_NAME_PART:
-    {
-      if((pFileNode = getLongestOldNameNode(pApp->pFiles)))
-      {
-        // Mark operation for `applySelectedRange()` which will be
-        // called when the range select window is closed positively with
-        // its Apply/ok button.
-        pApp->ScratchBuf[0] = 'N';
-        openRangeSelectWindow(pApp->pRangeSelectWindow,
-                              pApp->pIntuiWindow,
-                              &pApp->SigMask,
-                              pFileNode->OriginalName);
-      }
-
-      break;
-    }
-    case GID_BTN_NAME_DATE:
-    {
-      // TODO: Remove after testing/debugging. Changes new names!
-      addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
-      notifyUserAboutSkippedFiles(pApp);
-      break;
-    }
+    printf("Got no STRINGA_TextVal\n");
+    return;
   }
+
+  bufferPos = strlen(pCurrentText);
+  strncpy(pScratchBuf, pCurrentText, scratchBufSize);
+  pScratchBuf[scratchBufSize-1] = '\0';
+  remainingBufSize = scratchBufSize - strlen(pScratchBuf);
+  strncat(pScratchBuf, pTextToAppend, remainingBufSize);
+  pScratchBuf[scratchBufSize-1] = '\0';
+
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
+                  pIntuiWindow,
+                  NULL,
+                  STRINGA_BufferPos, (ULONG) bufferPos,
+                  STRINGA_TextVal, (ULONG) pScratchBuf,
+                  TAG_DONE);
 }
 
 
 #define MAX_CMD_PART_LEN 12
-
 
 int insertPart(STRPTR pTargetBuf,
                STRPTR pSrcStr,
@@ -612,25 +595,17 @@ int insertPart(STRPTR pTargetBuf,
 void applySelectedRange(Application* pApp)
 {
   STRPTR pText;
-  ULONG bufferPos;
-  ULONG gotTextValAttr, gotBufferPosAttr;
+  long bufferPos;
 
   if(pApp->ScratchBuf[0] == 'N')
   {
-    gotTextValAttr = GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText);
-    gotBufferPosAttr = GetAttr(STRINGA_BufferPos, m_ppGadgets[GID_STR_NAME], &bufferPos);
-
-    if(gotTextValAttr == 1)
+    if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText))
     {
-      printf("Successfully got TextValAttr: '%s'\n", pText);
-    }
-    else
-    {
-      printf("FAILED to get TextValAttr.\n");
+      printf("Got no STRINGA_TextVal\n");
+      return;
     }
 
-printf("Marked = %d\n", pApp->pRangeSelectWindow->Marked);
-// printf("ranegFrom = %d, rangeTo = %d\n", pApp->pRangeSelectWindow->RangeFrom, pApp->pRangeSelectWindow->RangeTo);
+    bufferPos = strlen(pText);
     if(0 > (bufferPos = insertPart(pApp->ScratchBuf,
                                    pText,
                                    bufferPos,
@@ -639,10 +614,9 @@ printf("Marked = %d\n", pApp->pRangeSelectWindow->Marked);
                                    pApp->pRangeSelectWindow->RangeTo)))
     {
       // TODO: Notify user
+      printf("insertPart() failed.\n");
       return;
     }
-
-printf("pScratchBuf = '%s'\n", pApp->ScratchBuf);
 
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
                    pApp->pIntuiWindow,
@@ -650,6 +624,59 @@ printf("pScratchBuf = '%s'\n", pApp->ScratchBuf);
                    STRINGA_BufferPos, (ULONG) bufferPos,
                    STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
                    TAG_DONE);
+  }
+}
+
+
+
+static void handleGadgets(Application* pApp, ULONG result)
+{
+  FileNode* pFileNode;
+  switch ((result & WMHI_GADGETMASK))
+  {
+    case GID_INT_COUNTER_START:
+    case GID_INT_COUNTER_STEP:
+    case GID_CHO_COUNTER_PLACES:
+    case GID_STR_EXTENSION:
+    case GID_STR_NAME:
+    {
+      updateNewNames(pApp);
+      break;
+    }
+    case GID_BTN_NAME:
+    {
+      appendTextToStrGadget(pApp->pIntuiWindow,
+                            m_ppGadgets[GID_STR_NAME],
+                            "[N]",
+                            pApp->ScratchBuf,
+                            SCRATCH_BUF_SIZE); 
+      updateNewNames(pApp);
+      break;
+    }
+    case GID_BTN_NAME_PART:
+    {
+      if((pFileNode = getLongestOldNameNode(pApp->pFiles)))
+      {
+        // Mark operation for `applySelectedRange()` which will be
+        // called when the range select window is closed positively with
+        // its Apply/ok button.
+        pApp->ScratchBuf[0] = 'N';
+        openRangeSelectWindow(pApp->pRangeSelectWindow,
+                              pApp->pIntuiWindow,
+                              &pApp->SigMask,
+                              pFileNode->OriginalName,
+                              pFileNode->OriginalNameLen);
+      }
+
+      break;
+    }
+    case GID_BTN_NAME_DATE:
+    {
+      // TODO: Remove after testing/debugging. Changes new names!
+      addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
+      notifyUserAboutSkippedFiles(pApp);
+      break;
+    }
   }
 }
 
