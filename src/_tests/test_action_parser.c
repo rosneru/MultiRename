@@ -152,6 +152,17 @@ int main(void)
   {
     printf("Error in test test_counter_mixed_2.\n");
   }
+
+  // test_SegmentationFault_resulting_name_too_long
+  if(createNewNames(&fileList, "[N][N][N][N][N]", "[E]", 1, 1, 1))
+  {
+    printFileList(&fileList, "test_SegmentationFault_resulting_name_too_long: '[N][N][N][N][N]', '[E]'");
+  }
+  else
+  {
+    printf("Error in test test_SegmentationFault_resulting_name_too_long.\n");
+  }
+
 }
 
 

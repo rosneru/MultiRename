@@ -7,23 +7,35 @@
 #include "rename_parser.h"
 #include "rename_algorithm.h"
 
+
 /// Private function forward declarations
 
+
 /**
- * Fills the given pResultBuf with a new name which is constructed from
- * the current name pName, the rename mask pMask, the counter and the
- * list of rename actions that have been parsed from the pMask before.
+ * Fills the given NewName field of given FileNode* with the new name
+ * that is computed from the OriginalName field, the rename mask pMask,
+ * the counter and the list of rename actions (that must have been
+ * parsed from the pMask in the former step)
  */
-void applyActions(STRPTR pResultBuf,
+void applyActions(FileNode* pFileNode,
+                  ULONG bufSize,
                   struct List* pActionList,
-                  STRPTR pName,
-                  UBYTE NameLen,
-                  UBYTE extLen,
                   STRPTR pMask,
                   Counter* pCounter);
 
+/**
+ * This own 'strcat' implementation takes care of the destination buffer
+ * size and doesn't write beyond the destination buffer borders. Instead
+ * it truncates if necessary. It tries to copy numChars from src to
+ * destination buf. Set numChars to 0 to copy the complete src string.
+ *
+ * It returns TRUE if no truncation was done and FALSE otherwise.
+ */
+BOOL appendString(STRPTR pDest, ULONG destSize, STRPTR pSrc, ULONG numChars);
+
 
 /// Public function implementations
+
 
 BOOL createNewNames(struct List* pFilesList,
                   STRPTR pNameMask,
@@ -69,12 +81,11 @@ BOOL createNewNames(struct List* pFilesList,
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    applyActions(pFileNode->NewName,
-                 &parser.ActionList,
-                 pFileNode->OriginalName,
-                 pFileNode->OriginalNameLen,
-                 pFileNode->OriginalExtLen,
-                 pMask, &counter);
+    applyActions(pFileNode,
+                 MAXNAMELEN + 1,      // buffer *is* one bigger than the
+                 &parser.ActionList,  // max name len for the trailing '\0'
+                 pMask,
+                 &counter);
   }
 
   freeActionNodes(&parser.ActionList);
@@ -82,13 +93,13 @@ BOOL createNewNames(struct List* pFilesList,
   return TRUE;
 }
 
+
 /// Private function implementations
 
-void applyActions(STRPTR pResultBuf,
+
+void applyActions(FileNode* pFileNode,
+                  ULONG bufSize,
                   struct List* pActionList,
-                  STRPTR pName,
-                  UBYTE NameLen,
-                  UBYTE ExtLen,
                   STRPTR pMask,
                   Counter* pCounter)
 {
@@ -97,14 +108,14 @@ void applyActions(STRPTR pResultBuf,
   BOOL mustIncrementCounter = FALSE;
   ULONG numChars, end;
   int lastIndex;
-  STRPTR pExt = pName + NameLen + 1;
+  STRPTR pExt = pFileNode->OriginalName + pFileNode->OriginalNameLen + 1;
 
-  if(!pResultBuf || !pActionList || !pName || !pMask || !pCounter)
+  if(!pFileNode || !pActionList || !pMask || !pCounter)
   {
     return;
   }
 
-  strcpy(pResultBuf, "");
+  strcpy(pFileNode->NewName, "");
 
   for(pNode = pActionList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
@@ -114,12 +125,12 @@ void applyActions(STRPTR pResultBuf,
       case AC_APPLY:
       {
         numChars = pAction->End - pAction->Start + 1;
-        strncat(pResultBuf, pMask + pAction->Start, numChars);
+        appendString(pFileNode->NewName, bufSize, pMask + pAction->Start, numChars);
         break;
       }
       case AC_COUNTER:
       {
-        strcat(pResultBuf, getCounterValue(pCounter));
+        appendString(pFileNode->NewName, bufSize, getCounterValue(pCounter), 0);
         mustIncrementCounter = TRUE;
         break;
       }
@@ -128,17 +139,17 @@ void applyActions(STRPTR pResultBuf,
         if((pAction->Start > -1) && (pAction->End > -1))
         {
           end = pAction->End;
-          if(end >= NameLen)
+          if(end >= pFileNode->OriginalNameLen)
           {
-            end = NameLen - 1;
+            end = pFileNode->OriginalNameLen - 1;
           }
 
           numChars = end - pAction->Start + 1;
-          strncat(pResultBuf, pName + pAction->Start, numChars);
+          appendString(pFileNode->NewName, bufSize, pFileNode->OriginalName + pAction->Start, numChars);
         }
         else
         {
-          strncat(pResultBuf, pName, NameLen);
+          appendString(pFileNode->NewName, bufSize, pFileNode->OriginalName, pFileNode->OriginalNameLen);
         }
         break;
       }
@@ -147,17 +158,17 @@ void applyActions(STRPTR pResultBuf,
         if((pAction->Start > -1) && (pAction->End > -1))
         {
           end = pAction->End;
-          if(end >= ExtLen)
+          if(end >= pFileNode->OriginalExtLen)
           {
-            end = ExtLen - 1;
+            end = pFileNode->OriginalExtLen - 1;
           }
 
           numChars = end - pAction->Start + 1;
-          strncat(pResultBuf, pExt + pAction->Start, numChars);
+          appendString(pFileNode->NewName, bufSize, pExt + pAction->Start, numChars);
         }
         else
         {
-          strncat(pResultBuf, pExt, NameLen);
+          appendString(pFileNode->NewName, bufSize, pExt, pFileNode->OriginalExtLen);
         }
         break;
       }
@@ -175,15 +186,48 @@ void applyActions(STRPTR pResultBuf,
   }
 
   // Remove trailing '.'
-  lastIndex = strlen(pResultBuf);
+  lastIndex = strlen(pFileNode->NewName);
   if(lastIndex == 0)
   {
     return;
   }
   
-  while(pResultBuf[--lastIndex] == '.')
+  while(pFileNode->NewName[--lastIndex] == '.')
   {
-    pResultBuf[lastIndex] = '\0';
+    pFileNode->NewName[lastIndex] = '\0';
   }
 
+}
+
+BOOL appendString(STRPTR pDest, ULONG destSize, STRPTR pSrc, ULONG numChars)
+{
+  ULONG remainingDestSize, srcLength, currentDestLength;
+  
+  currentDestLength = strlen(pDest);
+  if(currentDestLength >= (destSize - 1))
+  {
+    return FALSE;
+  }
+
+  remainingDestSize = destSize - currentDestLength - 1;
+
+  srcLength = strlen(pSrc);
+  if(numChars > 0)
+  {
+    /* TODO Is here a min/max needed? */
+    srcLength = numChars;
+  }
+
+  if(srcLength > remainingDestSize)
+  {
+    memcpy(pDest + currentDestLength, pSrc, remainingDestSize);
+    pDest[destSize - 1] = '\0';
+    return FALSE;
+  }
+  else
+  {
+    memcpy(pDest + currentDestLength, pSrc, srcLength);
+    pDest[currentDestLength + srcLength] = '\0';
+    return TRUE;
+  }
 }
