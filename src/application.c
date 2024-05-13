@@ -428,6 +428,7 @@ void applyNewFiles(Application* pApp)
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                    pApp->pIntuiWindow, NULL,
                    LISTBROWSER_Labels, (ULONG)pApp->pFiles,
+                   LISTBROWSER_AutoFit, TRUE,
                    TAG_DONE);
 
     // Apply the file path for this session
@@ -899,6 +900,8 @@ Object* createLayout(void)
         LISTBROWSER_ColumnInfo, (ULONG)m_pColumnInfo,
         LISTBROWSER_ColumnTitles, TRUE,
         LISTBROWSER_TitleClickable, TRUE,
+        LISTBROWSER_AutoFit, TRUE,
+        LISTBROWSER_HorizontalProp, TRUE,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
