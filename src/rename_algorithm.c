@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "string_tools.h"
 #include "file_node.h"
 #include "rename_parser.h"
 #include "rename_algorithm.h"
@@ -22,16 +23,6 @@ void applyActions(FileNode* pFileNode,
                   struct List* pActionList,
                   STRPTR pMask,
                   Counter* pCounter);
-
-/**
- * This own 'strcat' implementation takes care of the destination buffer
- * size and doesn't write beyond the destination buffer borders. Instead
- * it truncates if necessary. It tries to copy numChars from src to
- * destination buf. Set numChars to 0 to copy the complete src string.
- *
- * It returns TRUE if no truncation was done and FALSE otherwise.
- */
-BOOL appendString(STRPTR pDest, ULONG destSize, STRPTR pSrc, ULONG numChars);
 
 
 /// Public function implementations
@@ -116,6 +107,7 @@ void applyActions(FileNode* pFileNode,
   }
 
   strcpy(pFileNode->NewName, "");
+  pFileNode->IsNewNameTruncated = FALSE;
 
   for(pNode = pActionList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
@@ -125,12 +117,20 @@ void applyActions(FileNode* pFileNode,
       case AC_APPLY:
       {
         numChars = pAction->End - pAction->Start + 1;
-        appendString(pFileNode->NewName, bufSize, pMask + pAction->Start, numChars);
+        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                      bufSize,
+                                                      &pFileNode->NewNameFullLen,
+                                                      pMask + pAction->Start,
+                                                      numChars);
         break;
       }
       case AC_COUNTER:
       {
-        appendString(pFileNode->NewName, bufSize, getCounterValue(pCounter), 0);
+        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                      bufSize,
+                                                      &pFileNode->NewNameFullLen,
+                                                      getCounterValue(pCounter),
+                                                      0);
         mustIncrementCounter = TRUE;
         break;
       }
@@ -145,11 +145,19 @@ void applyActions(FileNode* pFileNode,
           }
 
           numChars = end - pAction->Start + 1;
-          appendString(pFileNode->NewName, bufSize, pFileNode->OriginalName + pAction->Start, numChars);
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalName + pAction->Start,
+                                                        numChars);
         }
         else
         {
-          appendString(pFileNode->NewName, bufSize, pFileNode->OriginalName, pFileNode->OriginalNameLen);
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalName,
+                                                        pFileNode->OriginalNameLen);
         }
         break;
       }
@@ -164,11 +172,19 @@ void applyActions(FileNode* pFileNode,
           }
 
           numChars = end - pAction->Start + 1;
-          appendString(pFileNode->NewName, bufSize, pExt + pAction->Start, numChars);
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pExt + pAction->Start,
+                                                        numChars);
         }
         else
         {
-          appendString(pFileNode->NewName, bufSize, pExt, pFileNode->OriginalExtLen);
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pExt,
+                                                        pFileNode->OriginalExtLen);
         }
         break;
       }
@@ -197,37 +213,4 @@ void applyActions(FileNode* pFileNode,
     pFileNode->NewName[lastIndex] = '\0';
   }
 
-}
-
-BOOL appendString(STRPTR pDest, ULONG destSize, STRPTR pSrc, ULONG numChars)
-{
-  ULONG remainingDestSize, srcLength, currentDestLength;
-  
-  currentDestLength = strlen(pDest);
-  if(currentDestLength >= (destSize - 1))
-  {
-    return FALSE;
-  }
-
-  remainingDestSize = destSize - currentDestLength - 1;
-
-  srcLength = strlen(pSrc);
-  if(numChars > 0)
-  {
-    /* TODO Is here a min/max needed? */
-    srcLength = numChars;
-  }
-
-  if(srcLength > remainingDestSize)
-  {
-    memcpy(pDest + currentDestLength, pSrc, remainingDestSize);
-    pDest[destSize - 1] = '\0';
-    return FALSE;
-  }
-  else
-  {
-    memcpy(pDest + currentDestLength, pSrc, srcLength);
-    pDest[currentDestLength + srcLength] = '\0';
-    return TRUE;
-  }
 }

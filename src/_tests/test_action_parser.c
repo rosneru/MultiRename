@@ -172,13 +172,26 @@ void printFileList(struct List* pFilesList, const char* pTitle)
 {
   struct Node* pNode;
   FileNode* pFileNode;
+  char truncationState;
+
   printf("** %s **\n", pTitle);
-  printf("Original name                          |New name\n");
-  printf("=======================================|=======================================\n");
+  printf("Trunc|Original name                          |New name\n");
+  printf("=====|=======================================|=======================================\n");
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    printf("%-39s|%-39s\n", pFileNode->OriginalName, pFileNode->NewName);
+    if(pFileNode->IsNewNameTruncated)
+    {
+      truncationState = '*';
+    }
+    else
+    {
+      truncationState = ' ';
+    }
+
+    printf("  %c  |%-39s|%-39s\n", truncationState,
+                                   pFileNode->OriginalName,
+                                   pFileNode->NewName);
   }
 
   printf("\n\n");
@@ -189,6 +202,7 @@ void printFileListOriginalName(struct List* pFilesList)
 {
   struct Node* pNode;
   FileNode* pFileNode;
+
   printf("** Original file list **\n");
   printf("Name                                   |date\n");
   printf("=======================================|=======================================\n");

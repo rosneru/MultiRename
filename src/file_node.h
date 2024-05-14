@@ -16,6 +16,8 @@ typedef struct FileNode
   UBYTE OriginalExtLen;
   DateTimeParts OriginalDate;
   char NewName[MAXNAMELEN + 1];
+  UBYTE NewNameFullLen;
+  BOOL IsNewNameTruncated;
 } FileNode;
 
 

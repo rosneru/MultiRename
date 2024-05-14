@@ -10,4 +10,5 @@ add_executable(test_action_parser
                amiga-compatibility/exec/lists.c
                ../rename_algorithm.c
                ../rename_counter.c
-               ../rename_parser.c)
+               ../rename_parser.c
+               ../string_tools.c)
