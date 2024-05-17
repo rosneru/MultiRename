@@ -14,7 +14,6 @@
 
 
 BOOL addPendingAction(ActionParser* pParser);
-BOOL addPendingAction(ActionParser* pParser);
 BOOL isCharAllowed(char c);
 BOOL isCharDigit(char c);
 
@@ -161,6 +160,11 @@ BOOL addPendingAction(ActionParser* pParser)
 {
   ActionNode* pActionNode;
 
+  if(pParser->Command == AC_NONE)
+  {
+    return TRUE;
+  }
+
   if((pParser->CommandFrom > -1) && (pParser->CommandTo < 0))
   {
     // This is an incomplete Apply command. In this state machine design
@@ -285,6 +289,36 @@ static ParserState do_state_parse_command(ActionParser* pParser)
       pParser->Command = AC_COUNTER;
       return PS_DETECT_RANGE;
     }
+    case 'Y':
+    {
+      pParser->Command = AC_YEAR;
+      return PS_DETECT_RANGE;
+    }
+    case 'M':
+    {
+      pParser->Command = AC_MONTH;
+      return PS_DETECT_RANGE;
+    }
+    case 'D':
+    {
+      pParser->Command = AC_DAY;
+      return PS_DETECT_RANGE;
+    }
+    case 'h':
+    {
+      pParser->Command = AC_HOUR;
+      return PS_DETECT_RANGE;
+    }
+    case 'm':
+    {
+      pParser->Command = AC_MINUTE;
+      return PS_DETECT_RANGE;
+    }
+    case 's':
+    {
+      pParser->Command = AC_SECOND;
+      return PS_DETECT_RANGE;
+    }
     default:
     {
       return PS_ERROR;
@@ -309,7 +343,16 @@ static ParserState do_state_detect_range(ActionParser* pParser)
   }
 
   c = pParser->pMask[pParser->MaskIndex];
-  if(c == ']')
+  if(c == 'Y' || c == 'M'|| c == 'D' || c == 'h' || c == 'm'|| c == 's')
+  {
+    if(!addPendingAction(pParser))
+    {
+      return PS_ERROR;
+    }
+
+    return PS_PARSE_COMMAND;
+  }
+  else if(c == ']')
   {
     if(!addPendingAction(pParser))
     {

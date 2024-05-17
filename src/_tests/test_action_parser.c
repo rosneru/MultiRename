@@ -163,6 +163,15 @@ int main(void)
     printf("Error in test test_SegmentationFault_resulting_name_too_long.\n");
   }
 
+  // test_date_1
+  if(createNewNames(&fileList, "[YMD]-[hms]", "[E]", 1, 1, 1))
+  {
+    printFileList(&fileList, "test_date_1: '[YMD]-[hms]', '[E]'");
+  }
+  else
+  {
+    printf("Error in test test_date_1.\n");
+  }
 }
 
 

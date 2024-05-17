@@ -188,6 +188,60 @@ void applyActions(FileNode* pFileNode,
         }
         break;
       }
+      case AC_YEAR:
+      {
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalDate.pYear,
+                                                        4);
+        break;
+      }
+      case AC_MONTH:
+      {
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalDate.pMonth,
+                                                        2);
+        break;
+      }
+      case AC_DAY:
+      {
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalDate.pDay,
+                                                        2);
+        break;
+      }
+      case AC_HOUR:
+      {
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalDate.pHour,
+                                                        2);
+        break;
+      }
+      case AC_MINUTE:
+      {
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalDate.pMinute,
+                                                        2);
+        break;
+      }
+      case AC_SECOND:
+      {
+          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+                                                        bufSize,
+                                                        &pFileNode->NewNameFullLen,
+                                                        pFileNode->OriginalDate.pSecond,
+                                                        2);
+        break;
+      }
       case AC_NONE:
       {
         // Nothing

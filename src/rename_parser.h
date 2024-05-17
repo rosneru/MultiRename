@@ -10,7 +10,13 @@ typedef enum
   AC_APPLY,
   AC_NAME,
   AC_EXTENSION,
-  AC_COUNTER
+  AC_COUNTER,
+  AC_YEAR,
+  AC_MONTH,
+  AC_DAY,
+  AC_HOUR,
+  AC_MINUTE,
+  AC_SECOND
 } ActionCommand;
 
 typedef struct 
