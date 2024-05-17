@@ -47,9 +47,9 @@ int main(void)
   struct List fileList;
   Counter counter;
 
-  fillFileNodesDateTime(&node1, "1990-09-27-11-33-44");
-  fillFileNodesDateTime(&node2, "2017-11-23-22-38-22");
-  fillFileNodesDateTime(&node3, "1978-06-18-12-00-11");
+  fillFileNodesDateTime(&node1, "1978-06-18-12-00-11");
+  fillFileNodesDateTime(&node2, "1986-09-27-11-33-44");
+  fillFileNodesDateTime(&node3, "2017-11-23-22-38-22");
 
   // Initialize the list
   NewList(&fileList);
@@ -90,7 +90,7 @@ int main(void)
   }
   else
   {
-    printf("Error in test test_name_2.\n");
+    printf("Error in test_name_2.\n");
   }
 
   // test_name_4
@@ -100,7 +100,7 @@ int main(void)
   }
   else
   {
-    printf("Error in test test_name_4.\n");
+    printf("Error in test_name_4.\n");
   }
 
   // test_name_5
@@ -110,7 +110,7 @@ int main(void)
   }
   else
   {
-    printf("Error in test test_name_5.\n");
+    printf("Error in test_name_5.\n");
   }
 
   // test_name_6
@@ -120,7 +120,7 @@ int main(void)
   }
   else
   {
-    printf("Expected error in test test_name_6: Error because unclosed name cmd.\n");
+    printf("Expected error in test_name_6: Error because unclosed name cmd.\n");
   }
 
   // test_name_7
@@ -130,7 +130,7 @@ int main(void)
   }
   else
   {
-    printf("Expected error in test test_name_7: Error because double closed name cmd.\n");
+    printf("Expected error in test_name_7: Error because double closed name cmd.\n");
   }
 
   // test_name_part_1
@@ -140,7 +140,7 @@ int main(void)
   }
   else
   {
-    printf("Error in test test_name_part_1.\n");
+    printf("Error in test_name_part_1.\n");
   }
 
   // test_counter_mixed_2
@@ -150,7 +150,7 @@ int main(void)
   }
   else
   {
-    printf("Error in test test_counter_mixed_2.\n");
+    printf("Error in test_counter_mixed_2.\n");
   }
 
   // test_SegmentationFault_resulting_name_too_long
@@ -160,7 +160,7 @@ int main(void)
   }
   else
   {
-    printf("Error in test test_SegmentationFault_resulting_name_too_long.\n");
+    printf("Error in test_SegmentationFault_resulting_name_too_long.\n");
   }
 
   // test_date_1
@@ -170,7 +170,37 @@ int main(void)
   }
   else
   {
-    printf("Error in test test_date_1.\n");
+    printf("Error in test_date_1.\n");
+  }
+
+  // test_date_2
+  if(createNewNames(&fileList, "[Y]-[M]-[D] - [hms]", "[E]", 1, 1, 1))
+  {
+    printFileList(&fileList, "test_date_2: '[Y]-[M]-[D] - [hms]', '[E]'");
+  }
+  else
+  {
+    printf("Error in test_date_2.\n");
+  }
+
+  // test_date_3
+  if(createNewNames(&fileList, "[YYY]", "[E]", 1, 1, 1))
+  {
+    printFileList(&fileList, "test_date_3: '[YYY]', '[E]'");
+  }
+  else
+  {
+    printf("Error in test_date_3.\n");
+  }
+
+  // test_date_4
+  if(createNewNames(&fileList, "[Y][Y][Y]", "[E]", 1, 1, 1))
+  {
+    printFileList(&fileList, "test_date_4: '[Y][Y][Y]', '[E]'");
+  }
+  else
+  {
+    printf("Error in test_date_4.\n");
   }
 }
 
