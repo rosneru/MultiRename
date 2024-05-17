@@ -47,12 +47,12 @@
 #include <string.h>
 
 #include "file_list.h"
+#include "notifications.h"
 #include "range_select_window.h"
 #include "rename_algorithm.h"
-#include "notifications.h"
 #include "requester.h"
+#include "ui_tools.h"
 #include "application.h"
-
 
 /// Private function declarations
 
@@ -93,20 +93,20 @@ void updateNewNames(Application* pApp);
 void notifyUserAboutSkippedFiles(Application* pApp);
 
 /**
- * Fill given pTargetBuf by inserting a command like [N12-16] at insert
+ * Fill given pDest by inserting a command like [N12-16] at insert
  * position into given pSrcStr. pSrcStr is not changed, only part wise
- * copied into pTargetBuf.
+ * copied into pDest.
  *
  * The inserted command is created of the insertCmd character, which can
  * be every char, but only 'N' and 'E' are interpret by the caller for
  * now, and the range insertFrom and insertTo.
  */
-int insertPart(STRPTR pTargetBuf,
-               STRPTR pSrcStr,
-               UBYTE insertPos,
-               char insertCmd,
-               UBYTE insertFrom,
-               UBYTE insertTo);
+int insertPartIntoString(STRPTR pDest,
+                         STRPTR pSrcStr,
+                         UBYTE insertPos,
+                         char insertCmd,
+                         UBYTE insertFrom,
+                         UBYTE insertTo);
 
 /**
  * The application event loop.
@@ -517,51 +517,18 @@ BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
   return result;
 }
 
-
-void appendTextToStrGadget(struct Window* pIntuiWindow,
-                           Object* pStrGadget,
-                           STRPTR pTextToAppend,
-                           STRPTR pScratchBuf,
-                           ULONG scratchBufSize)
-{
-  STRPTR pCurrentText;
-  long bufferPos;
-  ULONG remainingBufSize;
-  
-  if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pCurrentText))
-  {
-    printf("Got no STRINGA_TextVal\n");
-    return;
-  }
-
-  bufferPos = strlen(pCurrentText);
-  strncpy(pScratchBuf, pCurrentText, scratchBufSize);
-  pScratchBuf[scratchBufSize-1] = '\0';
-  remainingBufSize = scratchBufSize - strlen(pScratchBuf);
-  strncat(pScratchBuf, pTextToAppend, remainingBufSize);
-  pScratchBuf[scratchBufSize-1] = '\0';
-
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
-                  pIntuiWindow,
-                  NULL,
-                  STRINGA_BufferPos, (ULONG) bufferPos,
-                  STRINGA_TextVal, (ULONG) pScratchBuf,
-                  TAG_DONE);
-}
-
-
 #define MAX_CMD_PART_LEN 12
 
-int insertPart(STRPTR pTargetBuf,
-               STRPTR pSrcStr,
-               UBYTE insertPos,
-               char insertCmd,
-               UBYTE insertFrom,
-               UBYTE insertTo)
+int insertPartIntoString(STRPTR pDest,
+                         STRPTR pSrcStr,
+                         UBYTE insertPos,
+                         char insertCmd,
+                         UBYTE insertFrom,
+                         UBYTE insertTo)
 {
   char commandPartBuf[12];
 
-  if(!pTargetBuf || ! pSrcStr || (insertPos < 0)
+  if(!pDest || ! pSrcStr || (insertPos < 0)
   || (insertFrom > MAXNAMELEN) || (insertTo > MAXNAMELEN) 
   || (insertFrom > insertTo))
   {
@@ -574,20 +541,20 @@ int insertPart(STRPTR pTargetBuf,
   }
 
   // Start with a clean target buffer
-  strcpy(pTargetBuf, "");
+  strcpy(pDest, "");
 
   // Apply the beginning until the insert position
-  strncat(pTargetBuf, pSrcStr, insertPos);
-  pTargetBuf[insertPos] = '\0';
+  strncat(pDest, pSrcStr, insertPos);
+  pDest[insertPos] = '\0';
 
   // Fill the command buf
   sprintf(commandPartBuf, "[%c%d-%d]", insertCmd, insertFrom, insertTo);
 
   // Apply the command buf
-  strcat(pTargetBuf, commandPartBuf);
+  strcat(pDest, commandPartBuf);
   
   // Apply the end, after the insert position
-  strcat(pTargetBuf, pSrcStr + insertPos);
+  strcat(pDest, pSrcStr + insertPos);
 
   return (int)(insertPos + strlen(commandPartBuf));
 }
@@ -607,7 +574,7 @@ void applySelectedRange(Application* pApp)
     }
 
     bufferPos = strlen(pText);
-    if(0 > (bufferPos = insertPart(pApp->ScratchBuf,
+    if(0 > (bufferPos = insertPartIntoString(pApp->ScratchBuf,
                                    pText,
                                    bufferPos,
                                    'N',
@@ -615,7 +582,7 @@ void applySelectedRange(Application* pApp)
                                    pApp->pRangeSelectWindow->RangeTo)))
     {
       // TODO: Notify user
-      printf("insertPart() failed.\n");
+      printf("insertPartIntoString() failed.\n");
       return;
     }
 
