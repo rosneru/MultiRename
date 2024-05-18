@@ -79,7 +79,7 @@ void updateApplicationWindowTitle(Application* pApp);
 /**
  * Calculates the new names in the processing list / ListBrowser.
  */
-void updateNewNames(Application* pApp);
+BOOL updateNewNames(Application* pApp);
 
 /**
  * Informs the user about error / skip notifications, if there are some.
@@ -436,8 +436,9 @@ void applyNewFiles(Application* pApp)
   notifyUserAboutSkippedFiles(pApp);
 }
 
-void updateNewNames(Application* pApp)
+BOOL updateNewNames(Application* pApp)
 {
+  BOOL wasUpdatedSucessfully;
   struct Node* pNode;
   STRPTR pName, pExt;
   FileNode* pFileNode;
@@ -461,21 +462,54 @@ void updateNewNames(Application* pApp)
 
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
-  createNewNames(pApp->pFiles,
-                 pName,
-                 pExt,
-                 counterStart,
-                 counterStep,
-                 counterPlacesValue);
-
-  // Set the updated NewName text for each ListBrowser node
-  for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  if(createNewNames(pApp->pFiles,
+                    pName,
+                    pExt,
+                    counterStart,
+                    counterStep,
+                    counterPlacesValue))
   {
-    pFileNode = (FileNode*)pNode;
-    SetListBrowserNodeAttrs(pNode,
-                            LBNA_Column, 1,
-                              LBNCA_Text, pFileNode->NewName,
-                            TAG_DONE);
+    // Set the updated NewName text for each ListBrowser node
+    for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      pFileNode = (FileNode*)pNode;
+      SetListBrowserNodeAttrs(pNode,
+                              LBNA_Column, 1,
+                                LBNCA_Text, pFileNode->NewName,
+                              TAG_DONE);
+    }
+
+      // Activate Start button
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
+                    pApp->pIntuiWindow, 
+                    NULL,
+                    GA_DISABLED, FALSE,
+                    TAG_DONE);
+
+    wasUpdatedSucessfully = TRUE;
+  }
+  else
+  {
+    // createNewNames() failed.
+    // Set <Error!> for every ListBrowser nodes NewName column.
+    for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      pFileNode = (FileNode*)pNode;
+      SetListBrowserNodeAttrs(pNode,
+                              LBNA_Column, 1,
+                                LBNCA_Text, "<Error!>",
+                              TAG_DONE);
+
+    }
+
+    // Deactivate Start button
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
+                    pApp->pIntuiWindow, 
+                    NULL,
+                    GA_DISABLED, TRUE,
+                    TAG_DONE);
+
+    wasUpdatedSucessfully = FALSE;
   }
 
   // Attach changed list to ListBrowser.
@@ -484,6 +518,8 @@ void updateNewNames(Application* pApp)
                   NULL,
                   LISTBROWSER_Labels, (ULONG)pApp->pFiles,
                   TAG_DONE);
+
+  return wasUpdatedSucessfully;
 }
 
 #define MAX_CMD_PART_LEN 12
