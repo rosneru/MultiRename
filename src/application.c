@@ -57,11 +57,6 @@
 /// Private function declarations
 
 /**
- * Try to add one single file to the ListBrowser.
- */
-BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath);
-
-/**
  * Re-attaches the list of FileNodes to the list browser.
  * Set the current working path if necessary.
  * Updates window title with the current working path.
@@ -114,7 +109,7 @@ int insertPartIntoString(STRPTR pDest,
 void intuiEventLoop(Application* pApp);
 
 /**
- * Layout creation of main window.
+ * Create layout for main window.
  */
 Object* createLayout(void);
 
@@ -491,32 +486,6 @@ void updateNewNames(Application* pApp)
                   TAG_DONE);
 }
 
-BOOL addFileToListBrowser(Application* pApp, STRPTR pFileFullPath)
-{
-  BOOL result;
-
-  // Detach list from ListBrowser. Must be done before changing the list.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  LISTBROWSER_Labels, ~0,
-                  TAG_DONE);
-
-  result = appendFileNode(pApp->pFiles,
-                          pFileFullPath,
-                          pApp->pLocale,
-                          pApp->pNotifications);
-
-  // Attatch changed list to ListBrowser.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFiles,
-                  TAG_DONE);
-
-  return result;
-}
-
 #define MAX_CMD_PART_LEN 12
 
 int insertPartIntoString(STRPTR pDest,
@@ -635,16 +604,29 @@ static void handleGadgets(Application* pApp, ULONG result)
                               pFileNode->OriginalName,
                               pFileNode->OriginalNameLen);
       }
-
       break;
     }
     case GID_BTN_NAME_DATE:
     {
-      // TODO: Remove after testing/debugging. Changes new names!
-      addFileToListBrowser(pApp, "Shared:dev/projects/MultiRename/testdata/My_3rd_attempt.doc");
-      notifyUserAboutSkippedFiles(pApp);
+      appendTextToStrGadget(pApp->pIntuiWindow,
+                            m_ppGadgets[GID_STR_NAME],
+                            "[YMD]",
+                            pApp->ScratchBuf,
+                            SCRATCH_BUF_SIZE); 
+      updateNewNames(pApp);
       break;
     }
+    case GID_BTN_NAME_TIME:
+    {
+      appendTextToStrGadget(pApp->pIntuiWindow,
+                            m_ppGadgets[GID_STR_NAME],
+                            "[hms]",
+                            pApp->ScratchBuf,
+                            SCRATCH_BUF_SIZE); 
+      updateNewNames(pApp);
+      break;
+    }
+
   }
 }
 
@@ -665,6 +647,7 @@ void intuiEventLoop(Application* pApp)
     if(TRUE == handleRangeSelectWindowEvents(pApp->pRangeSelectWindow))
     {
       applySelectedRange(pApp);
+      updateNewNames(pApp);
     }
 
     // Handle the events of this (main) window
