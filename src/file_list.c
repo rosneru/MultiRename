@@ -47,7 +47,6 @@
 // passed into the dos.library.
 
 
-
 struct Node* createFileNode(struct Locale* pLocale,
                             BPTR pLock,
                             STRPTR pFileName,
@@ -85,13 +84,17 @@ struct Node* createFileNode(struct Locale* pLocale,
   }
 
 
-  if ((pNode = AllocListBrowserNode(2, 
+  if ((pNode = AllocListBrowserNode(3, 
                                     LBNA_NodeSize, sizeof(FileNode),
                                     LBNA_Column, 0,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
                                       LBNCA_MaxChars, MAXNAMELEN,
                                     LBNA_Column, 1,
+                                      LBNCA_CopyText, FALSE,
+                                      LBNCA_Editable, FALSE,
+                                      LBNCA_MaxChars, MAXNAMELEN,
+                                    LBNA_Column, 2,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
                                       LBNCA_MaxChars, MAXNAMELEN,
@@ -138,8 +141,10 @@ struct Node* createFileNode(struct Locale* pLocale,
 
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 0,
-                              LBNCA_Text, pFileNode->OriginalName,
+                              LBNCA_Text, " ",
                             LBNA_Column, 1,
+                              LBNCA_Text, pFileNode->OriginalName,
+                            LBNA_Column, 2,
                               LBNCA_Text, pFileNode->NewName,
                             TAG_DONE);
     return pNode;

@@ -12,11 +12,11 @@ typedef struct FileNode
   struct Node en_Node;
   char Path[MAXPATHLEN + 1];
   char OriginalName[MAXNAMELEN + 1]; // Max length + \0 termination
-  UBYTE OriginalNameLen;
-  UBYTE OriginalExtLen;
+  ULONG OriginalNameLen;
+  ULONG OriginalExtLen;
   DateTimeParts OriginalDate;
   char NewName[MAXNAMELEN + 1];
-  UBYTE NewNameFullLen;
+  ULONG NewNameFullLen;
   BOOL IsNewNameTruncated;
 } FileNode;
 

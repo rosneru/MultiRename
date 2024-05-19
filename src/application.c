@@ -438,11 +438,15 @@ void applyNewFiles(Application* pApp)
 
 BOOL updateNewNames(Application* pApp)
 {
-  BOOL wasUpdatedSucessfully;
+  BOOL wasUpdatedSuccessfully = TRUE;
   struct Node* pNode;
   STRPTR pName, pExt;
   FileNode* pFileNode;
   LONG counterStart, counterStep, counterPlacesId, counterPlacesValue;
+  STRPTR pTextOk = "Ok";
+  STRPTR pTextTruncated = "Trunc";
+  STRPTR pTextCommandError = "Cmd";
+  STRPTR pStateText;
 
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
@@ -473,20 +477,24 @@ BOOL updateNewNames(Application* pApp)
     for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       pFileNode = (FileNode*)pNode;
+      
+      if(pFileNode->IsNewNameTruncated)
+      {
+        pStateText = pTextTruncated;
+        wasUpdatedSuccessfully = FALSE;
+      }
+      else
+      {
+        pStateText = pTextOk;
+      }
+
       SetListBrowserNodeAttrs(pNode,
-                              LBNA_Column, 1,
+                              LBNA_Column, 0,
+                                LBNCA_Text, pStateText,
+                              LBNA_Column, 2,
                                 LBNCA_Text, pFileNode->NewName,
                               TAG_DONE);
     }
-
-      // Activate Start button
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
-                    pApp->pIntuiWindow, 
-                    NULL,
-                    GA_DISABLED, FALSE,
-                    TAG_DONE);
-
-    wasUpdatedSucessfully = TRUE;
   }
   else
   {
@@ -496,20 +504,15 @@ BOOL updateNewNames(Application* pApp)
     {
       pFileNode = (FileNode*)pNode;
       SetListBrowserNodeAttrs(pNode,
-                              LBNA_Column, 1,
+                              LBNA_Column, 0,
+                                LBNCA_Text, pTextCommandError,
+                              LBNA_Column, 2,
                                 LBNCA_Text, "<Error!>",
                               TAG_DONE);
 
     }
 
-    // Deactivate Start button
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
-                    pApp->pIntuiWindow, 
-                    NULL,
-                    GA_DISABLED, TRUE,
-                    TAG_DONE);
-
-    wasUpdatedSucessfully = FALSE;
+    wasUpdatedSuccessfully = FALSE;
   }
 
   // Attach changed list to ListBrowser.
@@ -519,7 +522,15 @@ BOOL updateNewNames(Application* pApp)
                   LISTBROWSER_Labels, (ULONG)pApp->pFiles,
                   TAG_DONE);
 
-  return wasUpdatedSucessfully;
+  // De-/activate Start button depending if all names were updated
+  // successfully
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  GA_DISABLED, !wasUpdatedSuccessfully,
+                  TAG_DONE);
+
+  return wasUpdatedSuccessfully;
 }
 
 #define MAX_CMD_PART_LEN 12
@@ -720,19 +731,24 @@ Object* createLayout(void)
   m_CompareHook.h_SubEntry = NULL;
   m_CompareHook.h_Data = NULL;
 
-  m_pColumnInfo = AllocLBColumnInfo(2,
+  m_pColumnInfo = AllocLBColumnInfo(3,
                                     LBCIA_Column, 0,
-                                    LBCIA_Flags, CIF_WEIGHTED,
-                                    LBCIA_AutoSort, TRUE,
-                                    LBCIA_SortArrow, TRUE,
-                                    LBCIA_SortDirection, LBMSORT_FORWARD,
-                                    LBCIA_Title, "Old name",
-                                    LBCIA_Weight, 50,
+                                      LBCIA_Flags, CIF_WEIGHTED,
+                                      LBCIA_Sortable, FALSE,
+                                      LBCIA_Title, "State",
+                                      LBCIA_Weight, 20,
                                     LBCIA_Column, 1,
-                                    LBCIA_Flags, CIF_WEIGHTED,
-                                    LBCIA_Sortable, FALSE,
-                                    LBCIA_Title, "New name",
-                                    LBCIA_Weight, 50,
+                                      LBCIA_Flags, CIF_WEIGHTED,
+                                      LBCIA_AutoSort, TRUE,
+                                      LBCIA_SortArrow, TRUE,
+                                      LBCIA_SortDirection, LBMSORT_FORWARD,
+                                      LBCIA_Title, "Old name",
+                                      LBCIA_Weight, 40,
+                                    LBCIA_Column, 2,
+                                      LBCIA_Flags, CIF_WEIGHTED,
+                                      LBCIA_Sortable, FALSE,
+                                      LBCIA_Title, "New name",
+                                      LBCIA_Weight, 40,
                                     TAG_DONE);
 
   pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
