@@ -201,6 +201,8 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
 
 Application* createApplication(int argc, char **argv)
 {
+  struct Screen* pScreen;
+  ULONG screenBarHeight;
   Object* pMainLayout;
   Application* pApp;
 
@@ -222,22 +224,37 @@ Application* createApplication(int argc, char **argv)
             {
               if((pMainLayout = createLayout()))
               {
+                // Calculate an alternative size of the window for when
+                // the ZOOM gadget is clicked. It should use the whole
+                // screen minus the screen title bar.
+                UWORD zoomData[] = { 0, 20, 320, 256};
+                if(pScreen = LockPubScreen(NULL))
+                {
+                  screenBarHeight = pScreen->BarHeight + pScreen->BarVBorder;
+                  zoomData[1] = screenBarHeight + 1;
+                  zoomData[2] = pScreen->Width;
+                  zoomData[3] = pScreen->Height - screenBarHeight - 1;
+                  UnlockPubScreen(NULL, pScreen);
+                }
+                
                 if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                                WINDOW_Position, WPOS_CENTERSCREEN,
-                                                WA_Activate, TRUE,
-                                                WA_Title, "MultiRename",
-                                                WA_CloseGadget, TRUE,
-                                                WA_DepthGadget, TRUE,
-                                                WA_DragBar, TRUE,
-                                                WA_SizeGadget, TRUE,
-                                                WA_InnerWidth, 600,
-                                                WA_InnerHeight, 400,
-                                                WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
-                                                WINDOW_Layout, pMainLayout,
-                                                WINDOW_AppPort, pApp->pAppWindowPort,
-                                                WINDOW_AppWindow, TRUE,
-                                                WINDOW_AppMsgHook, &m_AppHook,
-                                                TAG_DONE)))
+                                                 WINDOW_Position, WPOS_CENTERSCREEN,
+                                                 WA_Activate, TRUE,
+                                                 WA_Title, "MultiRename",
+                                                 WA_CloseGadget, TRUE,
+                                                 WA_DepthGadget, TRUE,
+                                                 WA_DragBar, TRUE,
+                                                 WA_SizeGadget, TRUE,
+                                                 WA_Width, 640,
+                                                 WA_Height, 480,
+                                                 WA_Zoom, (ULONG) zoomData,
+                                                 WA_AutoAdjust, TRUE,
+                                                 WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
+                                                 WINDOW_Layout, pMainLayout,
+                                                 WINDOW_AppPort, pApp->pAppWindowPort,
+                                                 WINDOW_AppWindow, TRUE,
+                                                 WINDOW_AppMsgHook, &m_AppHook,
+                                                 TAG_DONE)))
                 {
                   if((pApp->pRangeSelectWindow = createRangeSelectWindow()))
                   {
