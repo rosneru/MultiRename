@@ -21,6 +21,7 @@
   #include <clib/label_protos.h>
   #include <clib/layout_protos.h>
   #include <clib/listbrowser_protos.h>
+  #include <clib/slider_protos.h>
   #include <clib/string_protos.h>
   #include <clib/utility_protos.h>
   #include <clib/window_protos.h>
@@ -35,6 +36,7 @@
   #include <proto/label.h>
   #include <proto/layout.h>
   #include <proto/listbrowser.h>
+  #include <proto/slider.h>
   #include <proto/string.h>
   #include <proto/utility.h>
   #include <proto/window.h>
@@ -56,6 +58,10 @@ static BOOL handleGadgets(RangeSelectWindow* pThis, ULONG result);
 enum gadids
 {
     GID_STRING = 1
+  , GID_INT_FROM
+  , GID_INT_TO
+  , GID_SLI_FROM
+  , GID_SLI_TO
   , GID_BTN_OK
   , GID_BTN_CLOSE
   , MAXGADGETS
@@ -98,12 +104,68 @@ RangeSelectWindow* createRangeSelectWindow(void)
       LAYOUT_AddImage, NewObject(LABEL_GetClass(), NULL,
         LABEL_Text, "Select the characters to be inserted",
       TAG_DONE),
+      CHILD_WeightedHeight, 100,
       LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         ICA_TARGET, ICTARGET_IDCMP,
       TAG_DONE),
+      CHILD_WeightedHeight, 0,
+      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+        LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+        LAYOUT_LabelWidth, 50,
+        LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
+          GA_ID, GID_INT_FROM,
+          GA_RelVerify, TRUE,
+          GA_TabCycle, TRUE,
+          SLIDER_Orientation, SORIENT_HORIZ,
+          SLIDER_Min, 0,
+          SLIDER_Max, 107, // TODO: Use MAXNAMELEN
+        TAG_DONE),
+        CHILD_WeightedWidth, 100,
+        CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"From:", TAG_DONE),
+        LAYOUT_AddChild, m_ppGadgets[GID_INT_FROM] = NewObject(INTEGER_GetClass(), NULL,
+          GA_ID, GID_INT_FROM,
+          GA_ReadOnly, TRUE,
+          GA_RelVerify, TRUE,
+          GA_TabCycle, TRUE,
+          INTEGER_Arrows, FALSE,
+          INTEGER_Number, 1,
+          INTEGER_MaxChars, 3,
+          INTEGER_Minimum, 0,
+          INTEGER_Maximum, 107, // TODO: Use MAXNAMELEN
+        TAG_DONE),
+        CHILD_WeightedWidth, 0,
+      TAG_DONE),
+      CHILD_WeightedHeight, 0,
+      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
+        LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+        LAYOUT_LabelWidth, 50,
+        LAYOUT_AddChild, m_ppGadgets[GID_SLI_TO] = NewObject(SLIDER_GetClass(), NULL,
+          GA_ID, GID_SLI_TO,
+          GA_RelVerify, TRUE,
+          GA_TabCycle, TRUE,
+          SLIDER_Orientation, SORIENT_HORIZ,
+          SLIDER_Min, 0,
+          SLIDER_Max, 107, // TODO: Use MAXNAMELEN
+        TAG_DONE),
+        CHILD_WeightedWidth, 100,
+        CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
+        LAYOUT_AddChild, m_ppGadgets[GID_INT_TO] = NewObject(INTEGER_GetClass(), NULL,
+          GA_ID, GID_INT_TO,
+          GA_ReadOnly, TRUE,
+          GA_RelVerify, TRUE,
+          GA_TabCycle, TRUE,
+          INTEGER_Arrows, FALSE,
+          INTEGER_Number, 1,
+          INTEGER_MaxChars, 3,
+          INTEGER_Minimum, 0,
+          INTEGER_Maximum, 107, // TODO: Use MAXNAMELEN
+        TAG_DONE),
+        CHILD_WeightedWidth, 0,
+      TAG_DONE),
+      CHILD_WeightedHeight, 0,
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
