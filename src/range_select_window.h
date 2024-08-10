@@ -1,6 +1,15 @@
 #ifndef RANGE_SELECT_WINDOW_H
 #define RANGE_SELECT_WINDOW_H
 
+#include "file_node.h"  // MAXNAMELEN
+
+typedef enum
+{
+    RSW_STATE_CANCELLED = 1
+  , RSW_STATE_ACCEPTED
+  , RSW_STATE_IS_OPEN
+} RangeSelectWindowState;
+
 typedef struct RangeSelectWindow
 {
   Object* pWinObject;
@@ -9,8 +18,10 @@ typedef struct RangeSelectWindow
   struct Window* pParentIntuiWindow;
   ULONG* pParentSigMask;
   struct Requester BlockingReq;
-  UBYTE RangeFrom;
-  UBYTE RangeTo;
+  RangeSelectWindowState WindowState;
+  ULONG RangeFrom;
+  ULONG RangeTo;
+  unsigned char NameWithoutExtension[MAXNAMELEN + 1];
 } RangeSelectWindow;
 
 RangeSelectWindow* createRangeSelectWindow(void);
@@ -22,13 +33,6 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
 void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);
 
-/**
- * Handles the Intuition events for this window. Returns TRUE if as a
- * result of this the window was closed positively with the Ok/Apply
- * button. If the window was closed with its close gadget or the cancel
- * button or if it was not closed at all during normal operation, it
- * returns FALSE.
- */
-BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow);
+void handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow);
 
 #endif

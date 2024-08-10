@@ -708,7 +708,8 @@ void intuiEventLoop(Application* pApp)
     receivedSig = Wait(pApp->SigMask);
 
     // Handle the events of the range select window (if it is open)
-    if(TRUE == handleRangeSelectWindowEvents(pApp->pRangeSelectWindow))
+    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
+    if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
     {
       applySelectedRange(pApp);
       updateNewNames(pApp);

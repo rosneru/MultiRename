@@ -49,11 +49,9 @@
 
 
 /**
- * Handle the gadget events for this window. Returns FALSE in normal
- * operation and TRUE if the Ok/Apply button was pressed and the window
- * is due to be closed with a positive result.
+ * Handle the gadget events for this window. R
  */
-static BOOL handleGadgets(RangeSelectWindow* pThis, ULONG result);
+static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
 
 enum gadids
 {
@@ -86,7 +84,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
     WA_CloseGadget, TRUE,
     WA_DepthGadget, TRUE,
     WA_DragBar, TRUE,
-    WA_SizeGadget, TRUE,
+    WA_SizeGadget, FALSE,
     WA_Width, 500,
     WA_AutoAdjust, TRUE,
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
@@ -116,12 +114,13 @@ RangeSelectWindow* createRangeSelectWindow(void)
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
         LAYOUT_LabelWidth, 50,
         LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
-          GA_ID, GID_INT_FROM,
+          GA_ID, GID_SLI_FROM,
           GA_RelVerify, TRUE,
           GA_TabCycle, TRUE,
           SLIDER_Orientation, SORIENT_HORIZ,
-          SLIDER_Min, 0,
-          SLIDER_Max, 107, // TODO: Use MAXNAMELEN
+          SLIDER_Min, 1,
+          SLIDER_Max, MAXNAMELEN,
+          SLIDER_Level, 1,
         TAG_DONE),
         CHILD_WeightedWidth, 100,
         CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"From:", TAG_DONE),
@@ -133,8 +132,6 @@ RangeSelectWindow* createRangeSelectWindow(void)
           INTEGER_Arrows, FALSE,
           INTEGER_Number, 1,
           INTEGER_MaxChars, 3,
-          INTEGER_Minimum, 0,
-          INTEGER_Maximum, 107, // TODO: Use MAXNAMELEN
         TAG_DONE),
         CHILD_WeightedWidth, 0,
       TAG_DONE),
@@ -147,8 +144,8 @@ RangeSelectWindow* createRangeSelectWindow(void)
           GA_RelVerify, TRUE,
           GA_TabCycle, TRUE,
           SLIDER_Orientation, SORIENT_HORIZ,
-          SLIDER_Min, 0,
-          SLIDER_Max, 107, // TODO: Use MAXNAMELEN
+          SLIDER_Min, 1,
+          SLIDER_Max, MAXNAMELEN,
         TAG_DONE),
         CHILD_WeightedWidth, 100,
         CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
@@ -160,8 +157,6 @@ RangeSelectWindow* createRangeSelectWindow(void)
           INTEGER_Arrows, FALSE,
           INTEGER_Number, 1,
           INTEGER_MaxChars, 3,
-          INTEGER_Minimum, 0,
-          INTEGER_Maximum, 107, // TODO: Use MAXNAMELEN
         TAG_DONE),
         CHILD_WeightedWidth, 0,
       TAG_DONE),
@@ -205,6 +200,13 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
     return FALSE;
   }
 
+  if(pRangeSelectWindow->WindowState == RSW_STATE_IS_OPEN)
+  {
+    // Only allow one Range select window at a time
+    return FALSE;
+  }
+
+
   SetAttrs(pRangeSelectWindow->pWinObject,
            WA_Left, pParentIntuiWin->LeftEdge + 50,
            WA_Top, pParentIntuiWin->TopEdge + 30,
@@ -221,9 +223,23 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
     return FALSE;
   }
 
+  // STRINGA_Mark, (strlen(pLongestName)-1),
+  strncpy(pRangeSelectWindow->NameWithoutExtension, pLongestName, longestNameLen);
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING], pRangeSelectWindow->pIntuiWindow, NULL,
-                 STRINGA_TextVal, (ULONG) pLongestName,
-                 STRINGA_Mark, (strlen(pLongestName)-1),
+                 STRINGA_TextVal, (ULONG) pRangeSelectWindow->NameWithoutExtension,
+                 TAG_DONE);
+
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_FROM], pRangeSelectWindow->pIntuiWindow, NULL,
+                 SLIDER_Max, (ULONG)longestNameLen,
+                 TAG_DONE);
+
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_TO], pRangeSelectWindow->pIntuiWindow, NULL,
+                 SLIDER_Max, (ULONG)longestNameLen,
+                 SLIDER_Level, (ULONG)longestNameLen,
+                 TAG_DONE);
+
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_INT_TO], pRangeSelectWindow->pIntuiWindow, NULL,
+                 INTEGER_Number, (ULONG) longestNameLen,
                  TAG_DONE);
 
   ActivateLayoutGadget((struct Gadget*)pMainLayout,
@@ -242,6 +258,7 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
   pRangeSelectWindow->RangeFrom = 1;
   pRangeSelectWindow->RangeTo = longestNameLen;
 
+  pRangeSelectWindow->WindowState = RSW_STATE_IS_OPEN;
   return TRUE;
 }
 
@@ -281,11 +298,10 @@ void freeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow)
   FreeVec(pRangeSelectWindow);
 }
 
-BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
+void handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
 {
   ULONG result;
   ULONG code;
-  BOOL isWindowClosedWithOk = FALSE;
 
   if(!pRangeSelectWindow || !pRangeSelectWindow->pWinObject 
   || !pRangeSelectWindow->pIntuiWindow)
@@ -300,39 +316,57 @@ BOOL handleRangeSelectWindowEvents(RangeSelectWindow* pRangeSelectWindow)
       case WMHI_CLOSEWINDOW:
       {
         closeRangeSelectWindow(pRangeSelectWindow);
+        pRangeSelectWindow->WindowState = RSW_STATE_CANCELLED;
         break;
       }
       case WMHI_GADGETUP:
       {
-        isWindowClosedWithOk = handleGadgets(pRangeSelectWindow, result);
+        handleGadgets(pRangeSelectWindow, result);
         break;
       }
     }
   }
-
-  return isWindowClosedWithOk;
 }
 
 
-static BOOL handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
+static void handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
 {
+  ULONG sliderFromLevel;
+  ULONG sliderToLevel;
   switch ((result & WMHI_GADGETMASK))
   {
-    case GID_STRING:
+    case GID_SLI_FROM:
     {
+      GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_FROM], &sliderFromLevel);
+      GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_TO], &sliderToLevel);
+
+      if(sliderFromLevel > sliderToLevel)
+      {
+        sliderFromLevel = sliderToLevel;
+        SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_FROM], pRangeSelectWindow->pIntuiWindow, NULL,
+                      SLIDER_Level, (ULONG) sliderFromLevel,
+                      TAG_DONE);
+
+        return;
+      }
+
+      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_INT_FROM], pRangeSelectWindow->pIntuiWindow, NULL,
+                     INTEGER_Number, (ULONG) sliderFromLevel,
+                     TAG_DONE);
+
+      break;
     }
     case GID_BTN_OK:
     {
       closeRangeSelectWindow(pRangeSelectWindow);
-      return TRUE;
+      pRangeSelectWindow->WindowState = RSW_STATE_ACCEPTED;
       break;
     }
     case GID_BTN_CLOSE:
     {
       closeRangeSelectWindow(pRangeSelectWindow);
+      pRangeSelectWindow->WindowState = RSW_STATE_CANCELLED;
       break;
     }
   }
-
-  return FALSE;
 }
