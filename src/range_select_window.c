@@ -15,6 +15,7 @@
   #include <clib/exec_protos.h>
   #include <clib/dos_protos.h>
   #include <clib/intuition_protos.h>
+  #include <clib/bevel_protos.h>
   #include <clib/button_protos.h>
   #include <clib/chooser_protos.h>
   #include <clib/integer_protos.h>
@@ -30,6 +31,7 @@
   #include <proto/dos.h>
   #include <proto/exec.h>
   #include <proto/intuition.h>
+  #include <proto/bevel.h>
   #include <proto/button.h>
   #include <proto/chooser.h>
   #include <proto/integer.h>
@@ -55,7 +57,8 @@ static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
 
 enum gadids
 {
-    GID_STRING = 1
+    GID_STRING_INPUT = 1
+  , GID_STRING_RESULT
   , GID_SLI_FROM
   , GID_SLI_TO
   , GID_BTN_OK
@@ -98,17 +101,17 @@ RangeSelectWindow* createRangeSelectWindow(void)
       LAYOUT_EvenSize, TRUE,
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
       LAYOUT_SpaceOuter, TRUE,
-      LAYOUT_AddImage, NewObject(LABEL_GetClass(), NULL,
-        LABEL_Text, "Select the characters to be inserted",
-      TAG_DONE),
-      LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
-        GA_ID, GID_STRING,
+      LAYOUT_AddChild, m_ppGadgets[GID_STRING_INPUT] = NewObject(STRING_GetClass(), NULL,
+        GA_ID, GID_STRING_INPUT,
         GA_ReadOnly, TRUE,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         ICA_TARGET, ICTARGET_IDCMP,
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Longest name:", TAG_DONE),
+      LAYOUT_AddImage, NewObject(LABEL_GetClass(), NULL,
+        LABEL_Text, "Select the characters to be inserted",
+      TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
         GA_ID, GID_SLI_FROM,
         GA_RelVerify, TRUE,
@@ -134,6 +137,17 @@ RangeSelectWindow* createRangeSelectWindow(void)
         SLIDER_LevelDomain, "222",
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
+      LAYOUT_AddChild, m_ppGadgets[GID_STRING_RESULT] = NewObject(STRING_GetClass(), NULL,
+        GA_ID, GID_STRING_RESULT,
+        GA_ReadOnly, TRUE,
+        GA_RelVerify, TRUE,
+        GA_TabCycle, TRUE,
+        ICA_TARGET, ICTARGET_IDCMP,
+      TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Result:", TAG_DONE),
+      // LAYOUT_AddImage, NewObject(BEVEL_GetClass(), NULL,
+      //   BEVEL_Style, BVS_SBAR_VERT,
+      // TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -197,7 +211,7 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
 
   // STRINGA_Mark, (strlen(pLongestName)-1),
   strncpy(pRangeSelectWindow->NameWithoutExtension, pLongestName, longestNameLen);
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING], pRangeSelectWindow->pIntuiWindow, NULL,
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_INPUT], pRangeSelectWindow->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pRangeSelectWindow->NameWithoutExtension,
                  TAG_DONE);
 
