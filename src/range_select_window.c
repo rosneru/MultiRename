@@ -56,12 +56,10 @@ static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
 enum gadids
 {
     GID_STRING = 1
-  , GID_INT_FROM
-  , GID_INT_TO
   , GID_SLI_FROM
   , GID_SLI_TO
   , GID_BTN_OK
-  , GID_BTN_CLOSE
+  , GID_BTN_CANCEL
   , MAXGADGETS
 };
 
@@ -90,19 +88,19 @@ RangeSelectWindow* createRangeSelectWindow(void)
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
     WINDOW_GadgetHelp, TRUE,
     WINDOW_Layout, pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
-      LAYOUT_EvenSize, TRUE,
-      LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
-      LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
       LAYOUT_DeferLayout, TRUE,   /* this tag instructs layout.gadget to
                                    * defer GM_LAYOUT and GM_RENDER and ask
                                    * the application to do them. This
                                    * lessens the load on input.device
                                    */
+      LAYOUT_LabelWidth, 50,
+      LAYOUT_EvenSize, TRUE,
+      LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
+      LAYOUT_SpaceOuter, TRUE,
       LAYOUT_AddImage, NewObject(LABEL_GetClass(), NULL,
         LABEL_Text, "Select the characters to be inserted",
       TAG_DONE),
-      CHILD_WeightedHeight, 100,
       LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
         GA_ID, GID_STRING,
         GA_RelVerify, TRUE,
@@ -110,56 +108,30 @@ RangeSelectWindow* createRangeSelectWindow(void)
         ICA_TARGET, ICTARGET_IDCMP,
       TAG_DONE),
       CHILD_WeightedHeight, 0,
-      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
-        LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-        LAYOUT_LabelWidth, 50,
-        LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
-          GA_ID, GID_SLI_FROM,
-          GA_RelVerify, TRUE,
-          GA_TabCycle, TRUE,
-          SLIDER_Orientation, SORIENT_HORIZ,
-          SLIDER_Min, 1,
-          SLIDER_Max, MAXNAMELEN,
-          SLIDER_Level, 1,
-        TAG_DONE),
-        CHILD_WeightedWidth, 100,
-        CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"From:", TAG_DONE),
-        LAYOUT_AddChild, m_ppGadgets[GID_INT_FROM] = NewObject(INTEGER_GetClass(), NULL,
-          GA_ID, GID_INT_FROM,
-          GA_ReadOnly, TRUE,
-          GA_RelVerify, TRUE,
-          GA_TabCycle, TRUE,
-          INTEGER_Arrows, FALSE,
-          INTEGER_Number, 1,
-          INTEGER_MaxChars, 3,
-        TAG_DONE),
-        CHILD_WeightedWidth, 0,
+      LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
+        GA_ID, GID_SLI_FROM,
+        GA_RelVerify, TRUE,
+        GA_TabCycle, TRUE,
+        SLIDER_Orientation, SORIENT_HORIZ,
+        SLIDER_Min, 1,
+        SLIDER_Max, MAXNAMELEN,
+        SLIDER_Level, 1,
+        SLIDER_LevelFormat, "%2ld",
+        SLIDER_LevelMaxLen, 3,
+        SLIDER_LevelDomain, "222",
       TAG_DONE),
+      CHILD_WeightedWidth, 100,
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"From:", TAG_DONE),
       CHILD_WeightedHeight, 0,
-      LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
-        LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
-        LAYOUT_LabelWidth, 50,
-        LAYOUT_AddChild, m_ppGadgets[GID_SLI_TO] = NewObject(SLIDER_GetClass(), NULL,
-          GA_ID, GID_SLI_TO,
-          GA_RelVerify, TRUE,
-          GA_TabCycle, TRUE,
-          SLIDER_Orientation, SORIENT_HORIZ,
-          SLIDER_Min, 1,
-          SLIDER_Max, MAXNAMELEN,
-        TAG_DONE),
-        CHILD_WeightedWidth, 100,
-        CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
-        LAYOUT_AddChild, m_ppGadgets[GID_INT_TO] = NewObject(INTEGER_GetClass(), NULL,
-          GA_ID, GID_INT_TO,
-          GA_ReadOnly, TRUE,
-          GA_RelVerify, TRUE,
-          GA_TabCycle, TRUE,
-          INTEGER_Arrows, FALSE,
-          INTEGER_Number, 1,
-          INTEGER_MaxChars, 3,
-        TAG_DONE),
-        CHILD_WeightedWidth, 0,
+      LAYOUT_AddChild, m_ppGadgets[GID_SLI_TO] = NewObject(SLIDER_GetClass(), NULL,
+        GA_ID, GID_SLI_TO,
+        GA_RelVerify, TRUE,
+        GA_TabCycle, TRUE,
+        SLIDER_Orientation, SORIENT_HORIZ,
+        SLIDER_Min, 1,
+        SLIDER_Max, MAXNAMELEN,
       TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
       CHILD_WeightedHeight, 0,
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
@@ -175,10 +147,10 @@ RangeSelectWindow* createRangeSelectWindow(void)
           LABEL_Text, "",
         TAG_DONE),
         CHILD_WeightedWidth, 100,
-        LAYOUT_AddChild, m_ppGadgets[GID_BTN_CLOSE] = NewObject(BUTTON_GetClass(), NULL,
-          GA_ID, GID_BTN_CLOSE,
+        LAYOUT_AddChild, m_ppGadgets[GID_BTN_CANCEL] = NewObject(BUTTON_GetClass(), NULL,
+          GA_ID, GID_BTN_CANCEL,
           GA_RelVerify, TRUE,
-          GA_Text, (ULONG)"Close",
+          GA_Text, (ULONG)"Cancel",
           BUTTON_TextPadding, TRUE,
         TAG_DONE),
         CHILD_WeightedWidth, 1,
@@ -236,10 +208,6 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_TO], pRangeSelectWindow->pIntuiWindow, NULL,
                  SLIDER_Max, (ULONG)longestNameLen,
                  SLIDER_Level, (ULONG)longestNameLen,
-                 TAG_DONE);
-
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_INT_TO], pRangeSelectWindow->pIntuiWindow, NULL,
-                 INTEGER_Number, (ULONG) longestNameLen,
                  TAG_DONE);
 
   ActivateLayoutGadget((struct Gadget*)pMainLayout,
@@ -350,10 +318,6 @@ static void handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
         return;
       }
 
-      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_INT_FROM], pRangeSelectWindow->pIntuiWindow, NULL,
-                     INTEGER_Number, (ULONG) sliderFromLevel,
-                     TAG_DONE);
-
       break;
     }
     case GID_BTN_OK:
@@ -362,7 +326,7 @@ static void handleGadgets(RangeSelectWindow* pRangeSelectWindow, ULONG result)
       pRangeSelectWindow->WindowState = RSW_STATE_ACCEPTED;
       break;
     }
-    case GID_BTN_CLOSE:
+    case GID_BTN_CANCEL:
     {
       closeRangeSelectWindow(pRangeSelectWindow);
       pRangeSelectWindow->WindowState = RSW_STATE_CANCELLED;
