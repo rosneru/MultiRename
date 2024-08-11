@@ -103,11 +103,12 @@ RangeSelectWindow* createRangeSelectWindow(void)
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_STRING] = NewObject(STRING_GetClass(), NULL,
         GA_ID, GID_STRING,
+        GA_ReadOnly, TRUE,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
         ICA_TARGET, ICTARGET_IDCMP,
       TAG_DONE),
-      CHILD_WeightedHeight, 0,
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Longest name:", TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
         GA_ID, GID_SLI_FROM,
         GA_RelVerify, TRUE,
@@ -120,9 +121,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         SLIDER_LevelMaxLen, 3,
         SLIDER_LevelDomain, "222",
       TAG_DONE),
-      CHILD_WeightedWidth, 100,
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"From:", TAG_DONE),
-      CHILD_WeightedHeight, 0,
       LAYOUT_AddChild, m_ppGadgets[GID_SLI_TO] = NewObject(SLIDER_GetClass(), NULL,
         GA_ID, GID_SLI_TO,
         GA_RelVerify, TRUE,
@@ -130,9 +129,11 @@ RangeSelectWindow* createRangeSelectWindow(void)
         SLIDER_Orientation, SORIENT_HORIZ,
         SLIDER_Min, 1,
         SLIDER_Max, MAXNAMELEN,
+        SLIDER_LevelFormat, "%2ld",
+        SLIDER_LevelMaxLen, 3,
+        SLIDER_LevelDomain, "222",
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
-      CHILD_WeightedHeight, 0,
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_EvenSize, TRUE,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -155,7 +156,6 @@ RangeSelectWindow* createRangeSelectWindow(void)
         TAG_DONE),
         CHILD_WeightedWidth, 1,
       TAG_DONE),
-      CHILD_WeightedHeight, 0,
     TAG_DONE),
     TAG_DONE);
   return pRangeSelectWindow;
@@ -209,11 +209,6 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                  SLIDER_Max, (ULONG)longestNameLen,
                  SLIDER_Level, (ULONG)longestNameLen,
                  TAG_DONE);
-
-  ActivateLayoutGadget((struct Gadget*)pMainLayout,
-                       pRangeSelectWindow->pIntuiWindow,
-                       NULL,
-                       (ULONG)m_ppGadgets[GID_STRING]);
 
   pRangeSelectWindow->pParentSigMask = pParentSigMask;
   pRangeSelectWindow->pParentIntuiWindow = pParentIntuiWin;
