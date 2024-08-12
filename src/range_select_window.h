@@ -21,7 +21,7 @@ typedef struct RangeSelectWindow
   RangeSelectWindowState WindowState;
   ULONG RangeFrom;
   ULONG RangeTo;
-  unsigned char NameWithoutExtension[MAXNAMELEN + 1];
+  unsigned char NameBuf[MAXNAMELEN + 1];
 } RangeSelectWindow;
 
 RangeSelectWindow* createRangeSelectWindow(void);
