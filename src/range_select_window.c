@@ -90,6 +90,11 @@ void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
   ULONG toLevel;
   RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
 
+  if(!pRsw->pRangeMask)
+  {
+    return;
+  }
+
   GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_FROM], &fromLevel);
   GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_TO], &toLevel);
 
