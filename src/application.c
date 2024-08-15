@@ -141,7 +141,6 @@ enum gadids
 };
 
 static Object* m_ppGadgets[MAXGADGETS];
-struct Hook m_CompareHook;
 struct Hook m_AppHook;
 
 
@@ -236,7 +235,11 @@ Application* createApplication(int argc, char **argv)
                   zoomData[3] = pScreen->Height - screenBarHeight - 1;
                   UnlockPubScreen(NULL, pScreen);
                 }
-                
+
+                m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
+                m_AppHook.h_SubEntry = NULL;
+                m_AppHook.h_Data = pApp;
+
                 if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
                                                  WINDOW_Position, WPOS_CENTERSCREEN,
                                                  WA_Activate, TRUE,
@@ -374,11 +377,6 @@ BOOL runApplication(Application* pApp)
   {
     return FALSE;
   }
-
-  m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
-  m_AppHook.h_SubEntry = NULL;
-  m_AppHook.h_Data = pApp;
-
 
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
@@ -743,11 +741,6 @@ Object* createLayout(void)
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL, 
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
-
-  // Initialize CompareHook for sorting the "Old name" column
-  m_CompareHook.h_Entry = (ULONG (*)()) myCompare;
-  m_CompareHook.h_SubEntry = NULL;
-  m_CompareHook.h_Data = NULL;
 
   m_pColumnInfo = AllocLBColumnInfo(3,
                                     LBCIA_Column, 0,
