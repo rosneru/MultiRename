@@ -69,7 +69,7 @@ void applyNewFiles(Application* pApp);
  * When range selection window was closed with Ok, the resulting mask is
  * inserted in current cursor position.
  */
-void applySelectedRange(Application* pApp);
+void applySelectedRange(Application* pApp, STRPTR inputText);
 
 /**
  * Set the current working path as application window title.
@@ -86,22 +86,6 @@ BOOL updateNewNames(Application* pApp);
  * With the option to display the details.
  */
 void notifyUserAboutSkippedFiles(Application* pApp);
-
-/**
- * Fill given pDest by inserting a command like [N12-16] at insert
- * position into given pSrcStr. pSrcStr is not changed, only part wise
- * copied into pDest.
- *
- * The inserted command is created of the insertCmd character, which can
- * be every char, but only 'N' and 'E' are interpret by the caller for
- * now, and the range insertFrom and insertTo.
- */
-int insertPartIntoString(STRPTR pDest,
-                         STRPTR pSrcStr,
-                         UBYTE insertPos,
-                         char insertCmd,
-                         UBYTE insertFrom,
-                         UBYTE insertTo);
 
 /**
  * The application event loop.
@@ -548,72 +532,20 @@ BOOL updateNewNames(Application* pApp)
   return wasUpdatedSuccessfully;
 }
 
-#define MAX_CMD_PART_LEN 12
-
-int insertPartIntoString(STRPTR pDest,
-                         STRPTR pSrcStr,
-                         UBYTE insertPos,
-                         char insertCmd,
-                         UBYTE insertFrom,
-                         UBYTE insertTo)
+void applySelectedRange(Application* pApp, STRPTR pInputText)
 {
-  char commandPartBuf[12];
-
-  if(!pDest || ! pSrcStr || (insertPos < 0)
-  || (insertFrom > MAXNAMELEN) || (insertTo > MAXNAMELEN) 
-  || (insertFrom > insertTo))
-  {
-    return -1;
-  }
-
-  if((strlen(pSrcStr) + MAX_CMD_PART_LEN) > MAXNAMELEN)
-  {
-    return -1;
-  }
-
-  // Start with a clean target buffer
-  strcpy(pDest, "");
-
-  // Apply the beginning until the insert position
-  strncat(pDest, pSrcStr, insertPos);
-  pDest[insertPos] = '\0';
-
-  // Fill the command buf
-  sprintf(commandPartBuf, "[%c%d-%d]", insertCmd, insertFrom, insertTo);
-
-  // Apply the command buf
-  strcat(pDest, commandPartBuf);
-  
-  // Apply the end, after the insert position
-  strcat(pDest, pSrcStr + insertPos);
-
-  return (int)(insertPos + strlen(commandPartBuf));
-}
-
-
-void applySelectedRange(Application* pApp)
-{
-  STRPTR pText;
   long bufferPos;
 
-  if(pApp->ScratchBuf[0] == 'N')
+  if(pApp->RangeMask.RequestedRangeType == RRT_NAME)
   {
-    if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText))
-    {
-      printf("Got no STRINGA_TextVal\n");
-      return;
-    }
-
-    bufferPos = strlen(pText);
-    if(0 > (bufferPos = insertPartIntoString(pApp->ScratchBuf,
-                                   pText,
-                                   bufferPos,
-                                   'N',
-                                   pApp->pRangeSelectWindow->RangeFrom,
-                                   pApp->pRangeSelectWindow->RangeTo)))
+    bufferPos = strlen(pInputText);
+    if(0 > (bufferPos = insertRangedPart(&pApp->RangeMask,
+                                             pApp->ScratchBuf,
+                                             pInputText,
+                                             bufferPos)))
     {
       // TODO: Notify user
-      printf("insertPartIntoString() failed.\n");
+      printf("insertRangedPart() failed.\n");
       return;
     }
 
@@ -656,13 +588,11 @@ static void handleGadgets(Application* pApp, ULONG result)
     {
       if((pFileNode = getLongestOldNameNode(pApp->pFiles)))
       {
-        // Mark operation for `applySelectedRange()` which will be
-        // called when the range select window is closed positively with
-        // its Apply/ok button.
-        pApp->ScratchBuf[0] = 'N';
+        pApp->RangeMask.RequestedRangeType = RRT_NAME;
         openRangeSelectWindow(pApp->pRangeSelectWindow,
                               pApp->pIntuiWindow,
                               &pApp->SigMask,
+                              &pApp->RangeMask,
                               pFileNode->OriginalName,
                               pFileNode->OriginalNameLen);
       }
@@ -694,6 +624,7 @@ static void handleGadgets(Application* pApp, ULONG result)
 
 void intuiEventLoop(Application* pApp)
 {
+  STRPTR pText;
   ULONG receivedSig;
   ULONG result;
   ULONG code;
@@ -709,8 +640,15 @@ void intuiEventLoop(Application* pApp)
     handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
     if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
     {
-      applySelectedRange(pApp);
-      updateNewNames(pApp);
+      if(GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText))
+      {
+        applySelectedRange(pApp, pText);
+        updateNewNames(pApp);
+      }
+      else
+      {
+        printf("Got no STRINGA_TextVal\n");
+      }
     }
 
     // Handle the events of this (main) window

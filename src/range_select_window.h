@@ -2,6 +2,7 @@
 #define RANGE_SELECT_WINDOW_H
 
 #include "file_node.h"  // MAXNAMELEN
+#include "range_mask.h"
 
 typedef enum
 {
@@ -19,8 +20,7 @@ typedef struct RangeSelectWindow
   ULONG* pParentSigMask;
   struct Requester BlockingReq;
   RangeSelectWindowState WindowState;
-  ULONG RangeFrom;
-  ULONG RangeTo;
+  RangeMask* pRangeMask;
   unsigned char NameBuf[MAXNAMELEN + 1];
 } RangeSelectWindow;
 
@@ -28,6 +28,7 @@ RangeSelectWindow* createRangeSelectWindow(void);
 BOOL openRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow,
                            struct Window* pParentIntuiWin,
                            ULONG* pParentSigMask,
+                           RangeMask* pRangeMask,
                            STRPTR pLongestName,
                            ULONG longestNameLen);
 void closeRangeSelectWindow(RangeSelectWindow* pRangeSelectWindow);

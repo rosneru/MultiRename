@@ -17,6 +17,7 @@ add_executable (MultiRename_gcc
                 main.c
                 notifications.c
                 parsed_args.c
+                range_mask.c
                 range_select_window.c
                 rename_counter.c
                 rename_algorithm.c

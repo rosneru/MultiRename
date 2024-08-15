@@ -65,7 +65,8 @@ static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
 enum gadids
 {
     GID_STRING_INPUT = 1
-  , GID_STRING_RESULT
+  , GID_STRING_RESULT_NAME
+  , GID_STRING_RESULT_MASK
   , GID_SLI_FROM
   , GID_SLI_TO
   , GID_BTN_OK
@@ -168,13 +169,20 @@ RangeSelectWindow* createRangeSelectWindow(void)
         SLIDER_DispHook, &m_SlidersHook,
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
-      LAYOUT_AddChild, m_ppGadgets[GID_STRING_RESULT] = NewObject(STRING_GetClass(), NULL,
-        GA_ID, GID_STRING_RESULT,
+      LAYOUT_AddChild, m_ppGadgets[GID_STRING_RESULT_NAME] = NewObject(STRING_GetClass(), NULL,
+        GA_ID, GID_STRING_RESULT_NAME,
         GA_ReadOnly, TRUE,
         GA_RelVerify, TRUE,
         GA_TabCycle, TRUE,
       TAG_DONE),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Result:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Selection result:", TAG_DONE),
+      LAYOUT_AddChild, m_ppGadgets[GID_STRING_RESULT_MASK] = NewObject(STRING_GetClass(), NULL,
+        GA_ID, GID_STRING_RESULT_MASK,
+        GA_ReadOnly, TRUE,
+        GA_RelVerify, TRUE,
+        GA_TabCycle, TRUE,
+      TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Result mask:", TAG_DONE),
       // LAYOUT_AddImage, NewObject(BEVEL_GetClass(), NULL,
       //   BEVEL_Style, BVS_SBAR_VERT,
       // TAG_DONE),
@@ -208,17 +216,18 @@ RangeSelectWindow* createRangeSelectWindow(void)
 BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
                            struct Window* pParentIntuiWin,
                            ULONG* pParentSigMask,
+                           RangeMask* pRangeMask,
                            STRPTR pLongestName,
                            ULONG longestNameLen)
 {
-  if(!pRsw || !pRsw->pWinObject || !pParentSigMask)
+  if(!pRsw || !pRsw->pWinObject || !pParentSigMask || !pRangeMask)
   {
     return FALSE;
   }
 
   if(pRsw->WindowState == RSW_STATE_IS_OPEN)
   {
-    // Only allow one Range select window at a time
+    // Only allow one range select window at a time
     return FALSE;
   }
 
@@ -239,6 +248,7 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
     return FALSE;
   }
 
+
   // Create a copy of the input string 'pLongestName' with no extension
   strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
 
@@ -258,6 +268,7 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
                  SLIDER_Level, (ULONG)longestNameLen,
                  TAG_DONE);
 
+  pRsw->pRangeMask = pRangeMask;
   pRsw->pParentSigMask = pParentSigMask;
   pRsw->pParentIntuiWindow = pParentIntuiWin;
 
@@ -318,8 +329,8 @@ static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel
     return;
   }
 
-  pRsw->RangeFrom = fromLevel;
-  pRsw->RangeTo = toLevel;
+  pRsw->pRangeMask->RangeFrom = fromLevel;
+  pRsw->pRangeMask->RangeTo = toLevel;
 
   resultLength = toLevel - fromLevel + 1;
   if(resultLength > MAXNAMELEN)
@@ -331,7 +342,7 @@ static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel
   strncpy(pRsw->NameBuf, pInputText + fromLevel - 1, resultLength);
   pRsw->NameBuf[resultLength] = '\0';
 
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_RESULT], pRsw->pIntuiWindow, NULL,
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_RESULT_NAME], pRsw->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pRsw->NameBuf,
                  TAG_DONE);
 }
