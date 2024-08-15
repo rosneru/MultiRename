@@ -540,9 +540,9 @@ void applySelectedRange(Application* pApp, STRPTR pInputText)
   {
     bufferPos = strlen(pInputText);
     if(0 > (bufferPos = insertRangedPart(&pApp->RangeMask,
-                                             pApp->ScratchBuf,
-                                             pInputText,
-                                             bufferPos)))
+                                         pApp->ScratchBuf,
+                                         pInputText,
+                                         bufferPos)))
     {
       // TODO: Notify user
       printf("insertRangedPart() failed.\n");

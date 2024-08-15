@@ -327,6 +327,7 @@ void freeRangeSelectWindow(RangeSelectWindow* pRsw)
 
 static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel)
 {
+  char commandPartBuf[MAX_CMD_PART_LEN + 1];
   STRPTR pInputText;
   ULONG resultLength;
   if(pRsw == NULL)
@@ -349,6 +350,12 @@ static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel
 
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_RESULT_NAME], pRsw->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pRsw->NameBuf,
+                 TAG_DONE);
+
+  createCommandMask(pRsw->pRangeMask, commandPartBuf);
+
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_RESULT_MASK], pRsw->pIntuiWindow, NULL,
+                 STRINGA_TextVal, (ULONG) commandPartBuf,
                  TAG_DONE);
 }
 
