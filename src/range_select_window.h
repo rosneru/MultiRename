@@ -21,7 +21,7 @@ typedef struct RangeSelectWindow
   struct Requester BlockingReq;
   RangeSelectWindowState WindowState;
   RangeMask* pRangeMask;
-  unsigned char NameBuf[MAXNAMELEN + 1];
+  unsigned char NameBuf[MAX_NAME_LEN + 1];
 } RangeSelectWindow;
 
 RangeSelectWindow* createRangeSelectWindow(void);

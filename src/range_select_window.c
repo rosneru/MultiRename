@@ -154,7 +154,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_TabCycle, TRUE,
         SLIDER_Orientation, SORIENT_HORIZ,
         SLIDER_Min, 1,
-        SLIDER_Max, MAXNAMELEN,
+        SLIDER_Max, MAX_NAME_LEN,
         SLIDER_Level, 1,
         SLIDER_LevelFormat, "%2ld",
         SLIDER_LevelMaxLen, 3,
@@ -167,7 +167,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_TabCycle, TRUE,
         SLIDER_Orientation, SORIENT_HORIZ,
         SLIDER_Min, 1,
-        SLIDER_Max, MAXNAMELEN,
+        SLIDER_Max, MAX_NAME_LEN,
         SLIDER_LevelFormat, "%2ld",
         SLIDER_LevelMaxLen, 3,
         SLIDER_LevelDomain, "222",
@@ -327,7 +327,7 @@ void freeRangeSelectWindow(RangeSelectWindow* pRsw)
 
 static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel)
 {
-  char commandPartBuf[MAX_CMD_PART_LEN + 1];
+  char commandPartBuf[MAX_RANGE_STRING_LEN + 1];
   STRPTR pInputText;
   ULONG resultLength;
   if(pRsw == NULL)
@@ -339,9 +339,9 @@ static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel
   pRsw->pRangeMask->RangeTo = toLevel;
 
   resultLength = toLevel - fromLevel + 1;
-  if(resultLength > MAXNAMELEN)
+  if(resultLength > MAX_NAME_LEN)
   {
-    resultLength = MAXNAMELEN;
+    resultLength = MAX_NAME_LEN;
   }
 
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_INPUT], (ULONG)&pInputText);
@@ -352,7 +352,7 @@ static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel
                  STRINGA_TextVal, (ULONG) pRsw->NameBuf,
                  TAG_DONE);
 
-  createCommandMask(pRsw->pRangeMask, commandPartBuf);
+  createRangeMaskString(pRsw->pRangeMask, commandPartBuf);
 
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_RESULT_MASK], pRsw->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) commandPartBuf,

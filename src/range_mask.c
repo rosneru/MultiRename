@@ -5,9 +5,13 @@
 #include "range_mask.h"
 
 
-void createCommandMask(RangeMask* pRangeMask, char* pDestinationCmdBuf)
+BOOL createRangeMaskString(RangeMask* pRangeMask, char* pResultStrBuf)
 {
   char insertCmd;
+  if(!pRangeMask || !pResultStrBuf)
+  {
+    return FALSE;
+  }
 
   switch(pRangeMask->RequestedRangeType)
   {
@@ -18,48 +22,51 @@ void createCommandMask(RangeMask* pRangeMask, char* pDestinationCmdBuf)
       insertCmd = 'E';
       break;
     default:
-      return -1;
+      return FALSE;
   }
 
-  sprintf(pDestinationCmdBuf, "[%c%d-%d]", insertCmd,
-                                           pRangeMask->RangeFrom,
-                                           pRangeMask->RangeTo);
+  sprintf(pResultStrBuf, "[%c%d-%d]", insertCmd,
+                                      pRangeMask->RangeFrom,
+                                      pRangeMask->RangeTo);
+
+  return TRUE;
 }
 
-int insertRangedPart(RangeMask* pRangeMask,
-                     STRPTR pDest,
-                     STRPTR pSrcStr,
-                     UBYTE insertPos)
+int insertRangeMaskString(RangeMask* pRangeMask,
+                          STRPTR pDestBuf,
+                          ULONG resultBufSize,
+                          const STRPTR pSrcStr,
+                          UBYTE insertPos)
 {
-  char commandPartBuf[MAX_CMD_PART_LEN + 1];
+  char commandPartBuf[MAX_RANGE_STRING_LEN + 1];
 
-  if(!pRangeMask || !pDest || ! pSrcStr || (insertPos < 0)
-  || (pRangeMask->RangeFrom > MAXNAMELEN) || (pRangeMask->RangeTo > MAXNAMELEN) 
+  if(!pRangeMask || !pDestBuf || ! pSrcStr || (insertPos < 0)
+  || (pRangeMask->RangeFrom > MAX_NAME_LEN) || (pRangeMask->RangeTo > MAX_NAME_LEN) 
   || (pRangeMask->RangeFrom > pRangeMask->RangeTo))
   {
     return -1;
   }
 
-  if((strlen(pSrcStr) + MAX_CMD_PART_LEN) > MAXNAMELEN) // TODO: Check if this is bs
+  if((strlen(pSrcStr) + MAX_RANGE_STRING_LEN) > resultBufSize)
   {
     return -1;
   }
 
   // Start with a clean target buffer
-  strcpy(pDest, "");
+  strcpy(pDestBuf, "");
 
   // Apply the beginning until the insert position
-  strncat(pDest, pSrcStr, insertPos);
-  pDest[insertPos] = '\0';
+  strncat(pDestBuf, pSrcStr, insertPos);
+  pDestBuf[insertPos] = '\0';
 
   // Fill the command buf
-  createCommandMask(pRangeMask, commandPartBuf);
+  createRangeMaskString(pRangeMask, commandPartBuf);
 
   // Apply the command buf
-  strcat(pDest, commandPartBuf);
+  strcat(pDestBuf, commandPartBuf);
   
   // Apply the end, after the insert position
-  strcat(pDest, pSrcStr + insertPos);
+  strcat(pDestBuf, pSrcStr + insertPos);
 
   return (int)(insertPos + strlen(commandPartBuf));
 }

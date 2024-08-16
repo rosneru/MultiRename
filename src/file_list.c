@@ -89,15 +89,15 @@ struct Node* createFileNode(struct Locale* pLocale,
                                     LBNA_Column, 0,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAXNAMELEN,
+                                      LBNCA_MaxChars, MAX_NAME_LEN,
                                     LBNA_Column, 1,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAXNAMELEN,
+                                      LBNCA_MaxChars, MAX_NAME_LEN,
                                     LBNA_Column, 2,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAXNAMELEN,
+                                      LBNCA_MaxChars, MAX_NAME_LEN,
                                     TAG_DONE)))
   {
     pFileNode = (FileNode*) pNode;
@@ -106,10 +106,10 @@ struct Node* createFileNode(struct Locale* pLocale,
     pPathEnd = PathPart(pFileName);
     pNameStart = FilePart(pFileName);
     pathLen = pPathEnd - pFileName + 1;
-    if(pathLen > MAXPATHLEN)
+    if(pathLen > MAX_PATH_LEN)
     {
       // TODO: Notify truncation
-      pathLen = MAXPATHLEN;
+      pathLen = MAX_PATH_LEN;
     }
 
     strncpy(pFileNode->Path, pFileName, pathLen);

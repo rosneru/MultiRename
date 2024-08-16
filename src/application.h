@@ -28,9 +28,9 @@ typedef struct Application
   RangeSelectWindow* pRangeSelectWindow;
   struct Window* pIntuiWindow;
   ULONG SigMask;
-  char FilesPath[MAXPATHLEN + 1];
-  char WindowTitle[MAXPATHLEN + 32];
-  char ScratchBuf[SCRATCH_BUF_SIZE];
+  char FilesPath[MAX_PATH_LEN + 1];
+  char WindowTitle[MAX_PATH_LEN + 32];
+  char ScratchBuf[SCRATCH_BUF_SIZE + 1];
 } Application;
 
 Application* createApplication(int argc, char **argv);

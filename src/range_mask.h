@@ -3,7 +3,7 @@
 
 #include <exec/types.h>
 
-#define MAX_CMD_PART_LEN 9 // To allow [N101-106]
+#define MAX_RANGE_STRING_LEN 10     // To allow [N101-106]
 
 typedef enum
 {
@@ -20,26 +20,27 @@ typedef struct RangeMask
 } RangeMask;
 
 /**
- * Create a command mask like [N12-16] depending on the current
- * pRangeMask values. The craeted mask is written into
- * `pDestinationCmdBuf` which must havbe at least a size of
- * MAX_CMD_PART_LEN + 1 bytes.
+ *
+ * Create a range mask string like "[N12-16]" from given `RangeMask`.
+ * The created string is written into pResultStrBuf` which must have at
+ * least a size of MAX_RANGE_STRING_LEN + 1 bytes.
+ * 
+ * \returns TRUE on success and FALSE on error.
  */
-void createCommandMask(RangeMask* pRangeMask, char* pDestinationCmdBuf);
+BOOL createRangeMaskString(RangeMask* pRangeMask, char* pResultStrBuf);
 
 /**
- * Fill given `pDest` by inserting a command like [N12-16] at
- * `insertPos` into given `pSrcStr`. `pSrcStr` is not changed, only part
- * wise copied into `pDest`.
+ * Create a range mask string like "[N12-16]" from given `RangeMask` and
+ * then create /fill given `pResultStrBuf` with given `pSrcStr` with the
+ * created mask string inserted at `insertPos`.
  *
- * The inserted command is created depending on the `RequestedRangeType`
- * field of given `RangeMask`
- * 
- * \returns new buffer pos after the text is inserted or -1 on error.
+ * \returns new buffer pos in `pResultStrBuf` at the inserted mask
+ * string or -1 on error.
  */
-int insertRangedPart(RangeMask* pRangeMask,
-                     STRPTR pDest,
-                     STRPTR pSrcStr,
-                     UBYTE insertPos);
+int insertRangeMaskString(RangeMask* pRangeMask,
+                          STRPTR pResultStrBuf,
+                          ULONG resultBufSize,
+                          const STRPTR pSrcStr,
+                          UBYTE insertPos);
 
 #endif

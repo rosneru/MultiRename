@@ -73,7 +73,7 @@ BOOL createNewNames(struct List* pFilesList,
   {
     pFileNode = (FileNode*)pNode;
     applyActions(pFileNode,
-                 MAXNAMELEN + 1,      // buffer *is* one bigger than the
+                 MAX_NAME_LEN + 1,      // buffer *is* one bigger than the
                  &parser.ActionList,  // max name len for the trailing '\0'
                  pMask,
                  &counter);

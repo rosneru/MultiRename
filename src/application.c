@@ -74,7 +74,7 @@ void applySelectedRange(Application* pApp, STRPTR inputText);
 /**
  * Set the current working path as application window title.
  */
-void updateApplicationWindowTitle(Application* pApp);
+void updateMainWindowTitle(Application* pApp);
 
 /**
  * Calculates the new names in the processing list / ListBrowser.
@@ -153,11 +153,11 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
     pFileName = pWbArg[i].wa_Name;
     if(NameFromLock(pWbArg[i].wa_Lock,
                     pApp->pParsedArgs->pScratchPathBuf,
-                    MAXPATHLEN))
+                    MAX_PATH_LEN))
     {
       // Now scratch buf contains the name of the directory of the file
       // So next the fileName is appended to the buf
-      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
+      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
 
       appendFileNode(pApp->pFiles,
                      pApp->pParsedArgs->pScratchPathBuf,
@@ -385,7 +385,7 @@ BOOL runApplication(Application* pApp)
 
 /// Private function implementations
 
-void updateApplicationWindowTitle(Application* pApp)
+void updateMainWindowTitle(Application* pApp)
 {
   if(strlen(pApp->FilesPath) > 0)
   {
@@ -426,12 +426,12 @@ void applyNewFiles(Application* pApp)
                    TAG_DONE);
 
     // Apply the file path for this session
-    strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
+    strncpy(pApp->FilesPath, pFirstPath, MAX_PATH_LEN);
     addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
   }
 
   updateNewNames(pApp);
-  updateApplicationWindowTitle(pApp);
+  updateMainWindowTitle(pApp);
   notifyUserAboutSkippedFiles(pApp);
 }
 
@@ -539,13 +539,14 @@ void applySelectedRange(Application* pApp, STRPTR pInputText)
   if(pApp->RangeMask.RequestedRangeType == RRT_NAME)
   {
     bufferPos = strlen(pInputText);
-    if(0 > (bufferPos = insertRangedPart(&pApp->RangeMask,
-                                         pApp->ScratchBuf,
-                                         pInputText,
-                                         bufferPos)))
+    if(0 > (bufferPos = insertRangeMaskString(&pApp->RangeMask,
+                                              pApp->ScratchBuf,
+                                              SCRATCH_BUF_SIZE,
+                                              pInputText,
+                                              bufferPos)))
     {
       // TODO: Notify user
-      printf("insertRangedPart() failed.\n");
+      printf("insertRangeMaskString() failed.\n");
       return;
     }
 
@@ -557,8 +558,6 @@ void applySelectedRange(Application* pApp, STRPTR pInputText)
                    TAG_DONE);
   }
 }
-
-
 
 static void handleGadgets(Application* pApp, ULONG result)
 {
@@ -666,13 +665,6 @@ void intuiEventLoop(Application* pApp)
     }
   }
 }
-
-
-static ULONG myCompare(struct Hook *pHook, Object *pObj, struct LBSortMsg *pMsg)
-{
-  return 0;
-}
-
 
 Object* createLayout(void)
 {
