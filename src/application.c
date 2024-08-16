@@ -61,7 +61,7 @@
  * Set the current working path if necessary.
  * Updates window title with the current working path.
  * 
- * NOTE: List must be detached off ListBrowser before this call!
+ * NOTE: Attaches the list browser labels. Must be detached before this call!
  */
 void applyNewFiles(Application* pApp);
 
@@ -78,6 +78,7 @@ void updateMainWindowTitle(Application* pApp);
 
 /**
  * Calculates the new names in the processing list / ListBrowser.
+ * NOTE: De- and attaches the list browser labels.
  */
 BOOL updateNewNames(Application* pApp);
 
