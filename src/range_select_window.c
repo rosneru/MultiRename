@@ -65,6 +65,7 @@ static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
 enum gadids
 {
     GID_STRING_INPUT = 1
+  , GID_LABEL_LONGEST_ITEM
   , GID_STRING_RESULT_NAME
   , GID_STRING_RESULT_MASK
   , GID_SLI_FROM
@@ -158,7 +159,6 @@ RangeSelectWindow* createRangeSelectWindow(void)
 
 
   pRsw->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-    WA_Title, "MultiRename: Select name part",
     WA_Activate, TRUE,
     WA_CloseGadget, TRUE,
     WA_DepthGadget, TRUE,
@@ -186,7 +186,10 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_TabCycle, TRUE,
         ICA_TARGET, ICTARGET_IDCMP,
       TAG_DONE),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Longest name:", TAG_DONE),
+      CHILD_Label, m_ppGadgets[GID_LABEL_LONGEST_ITEM] = NewObject(LABEL_GetClass(), NULL,
+        GA_ID, GID_LABEL_LONGEST_ITEM, 
+        LABEL_Text, (ULONG)"Abcdefg",
+        TAG_DONE),
       LAYOUT_AddImage, NewObject(LABEL_GetClass(), NULL,
         LABEL_Text, "Select the characters to be inserted",
       TAG_DONE),
@@ -259,6 +262,12 @@ RangeSelectWindow* createRangeSelectWindow(void)
   return pRsw;
 }
 
+
+STRPTR pLongestName = "Longest name:";
+STRPTR pLongestExtension = "Longest extension:";
+STRPTR pWindowTitleSelectName = "MultiRename: Select name part";
+STRPTR pWindowTitleSelectExtension = "MultiRename: Select extension part";
+
 BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
                            struct Window* pParentIntuiWin,
                            ULONG* pParentSigMask,
@@ -266,6 +275,9 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
                            STRPTR pLongestName,
                            ULONG longestNameLen)
 {
+  STRPTR pWindowTitle;
+  STRPTR pLongestItemLabelText;
+
   if(!pRsw || !pRsw->pWinObject || !pParentSigMask || !pRangeMask)
   {
     return FALSE;
@@ -283,6 +295,25 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
            WA_Top, pParentIntuiWin->TopEdge + 30,
            TAG_DONE);
 
+  switch(pRangeMask->RequestedRangeType)
+  {
+    case RRT_NAME:
+      // Create a copy of the input string 'pLongestName' with no extension
+      strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
+
+      pWindowTitle = pWindowTitleSelectName;
+      pLongestItemLabelText = pLongestName;
+      break;
+    case RRT_EXTENSION:
+      // Create a copy of the input string 'pLongestName' with no extension
+      strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
+
+      pWindowTitle = pWindowTitleSelectExtension;
+      pLongestItemLabelText = pLongestExtension;
+      break;
+    default:
+      return FALSE;
+  }
 
   InitRequester(&pRsw->BlockingReq);
   Request(&pRsw->BlockingReq, pParentIntuiWin);
@@ -294,9 +325,11 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
     return FALSE;
   }
 
+  SetWindowTitles(pRsw->pIntuiWindow, pWindowTitle, (UBYTE *)~0);
 
-  // Create a copy of the input string 'pLongestName' with no extension
-  strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LABEL_LONGEST_ITEM], pRsw->pIntuiWindow, NULL,
+                 LABEL_Text, (ULONG)pLongestItemLabelText,
+                 TAG_DONE);
 
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_INPUT], pRsw->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pRsw->NameBuf,

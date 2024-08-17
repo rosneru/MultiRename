@@ -618,7 +618,42 @@ static void handleGadgets(Application* pApp, ULONG result)
       updateNewNames(pApp);
       break;
     }
-
+    case GID_BTN_NAME_COUNTER:
+    {
+      appendTextToStrGadget(pApp->pIntuiWindow,
+                            m_ppGadgets[GID_STR_NAME],
+                            "[C]",
+                            pApp->ScratchBuf,
+                            SCRATCH_BUF_SIZE); 
+      updateNewNames(pApp);
+      break;
+    }
+    case GID_BTN_EXTENSION:
+    {
+      appendTextToStrGadget(pApp->pIntuiWindow,
+                            m_ppGadgets[GID_STR_EXTENSION],
+                            "[E]",
+                            pApp->ScratchBuf,
+                            SCRATCH_BUF_SIZE); 
+      updateNewNames(pApp);
+      break;
+    }
+    case GID_BTN_EXTENSION_PART:
+    {
+      if((pFileNode = getLongestOldExtNode(pApp->pFiles)))
+      {
+        pApp->RangeMask.RequestedRangeType = RRT_EXTENSION;
+        openRangeSelectWindow(pApp->pRangeSelectWindow,
+                              pApp->pIntuiWindow,
+                              &pApp->SigMask,
+                              &pApp->RangeMask,
+                              pFileNode->OriginalName 
+                                + pFileNode->OriginalNameLen 
+                                + 1,
+                              pFileNode->OriginalExtLen);
+      }
+      break;
+    }
   }
 }
 

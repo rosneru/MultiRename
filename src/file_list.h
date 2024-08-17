@@ -16,6 +16,12 @@ void freeFileList(struct List* pFilesList);
  */
 FileNode* getLongestOldNameNode(struct List* pFilesList);
 
+/**
+ * Iterates the given pFilesList and return the FileNode* that contains
+ * the longest OriginalExtension.
+ */
+FileNode* getLongestOldExtNode(struct List* pFilesList);
+
 void printFileListOriginalName(struct List* pFilesList);
 void printFileListNewName(struct List* pFilesList);
 
