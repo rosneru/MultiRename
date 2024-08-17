@@ -69,7 +69,7 @@ void applyNewFiles(Application* pApp);
  * When range selection window was closed with Ok, the resulting mask is
  * inserted in current cursor position.
  */
-void applySelectedRange(Application* pApp, STRPTR inputText);
+BOOL applySelectedRange(Application* pApp);
 
 /**
  * Set the current working path as application window title.
@@ -533,31 +533,52 @@ BOOL updateNewNames(Application* pApp)
   return wasUpdatedSuccessfully;
 }
 
-void applySelectedRange(Application* pApp, STRPTR pInputText)
+BOOL applySelectedRange(Application* pApp)
 {
   long bufferPos;
+  STRPTR pText;
+  Object *pStrGadget;
 
-  if(pApp->RangeMask.RequestedRangeType == RRT_NAME)
+  switch(pApp->RangeMask.RequestedRangeType)
   {
-    bufferPos = strlen(pInputText);
-    if(0 > (bufferPos = insertRangeMaskString(&pApp->RangeMask,
-                                              pApp->ScratchBuf,
-                                              SCRATCH_BUF_SIZE,
-                                              pInputText,
-                                              bufferPos)))
-    {
-      // TODO: Notify user
-      printf("insertRangeMaskString() failed.\n");
-      return;
-    }
-
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
-                   pApp->pIntuiWindow,
-                   NULL,
-                   STRINGA_BufferPos, (ULONG) bufferPos,
-                   STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
-                   TAG_DONE);
+    case RRT_NAME:
+      if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText))
+      {
+        return FALSE;
+      }
+      pStrGadget = m_ppGadgets[GID_STR_NAME];
+      break;
+    case RRT_EXTENSION:
+      if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG*)&pText))
+      {
+        return FALSE;
+      }
+      pStrGadget = m_ppGadgets[GID_STR_EXTENSION];
+      break;
+    default:
+      return FALSE;
   }
+
+  bufferPos = strlen(pText);
+  if(0 > (bufferPos = insertRangeMaskString(&pApp->RangeMask,
+                                            pApp->ScratchBuf,
+                                            SCRATCH_BUF_SIZE,
+                                            pText,
+                                            bufferPos)))
+  {
+    // TODO: Notify user
+    printf("insertRangeMaskString() failed.\n");
+    return FALSE;
+  }
+
+  SetGadgetAttrs((struct Gadget *) pStrGadget,
+                  pApp->pIntuiWindow,
+                  NULL,
+                  STRINGA_BufferPos, (ULONG) bufferPos,
+                  STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
+                  TAG_DONE);
+
+  return TRUE;
 }
 
 static void handleGadgets(Application* pApp, ULONG result)
@@ -675,14 +696,13 @@ void intuiEventLoop(Application* pApp)
     handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
     if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
     {
-      if(GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText))
+      if(TRUE == applySelectedRange(pApp))
       {
-        applySelectedRange(pApp, pText);
         updateNewNames(pApp);
       }
       else
       {
-        printf("Got no STRINGA_TextVal\n");
+        printf("Failed to apply selected range\n");
       }
     }
 
