@@ -76,15 +76,16 @@ enum gadids
 
 static Object* m_ppGadgets[MAXGADGETS];
 static Object *pMainLayout;
-struct Hook m_SlidersHook;
+struct Hook m_SliderFromHook;
+struct Hook m_SliderToHook;
 
 
 
 /// Hook implementations
 
-void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
-                                        __REG__(a2, Object *pWindow),
-                                        __REG__(a1, struct Message *pMsg))
+void __ASM__ __SAVE_DS__ SliderFromMsgFunc(__REG__(a0, struct Hook *pHook),
+                                           __REG__(a2, Object *pWindow),
+                                           __REG__(a1, struct Message *pMsg))
 {
   ULONG fromLevel;
   ULONG toLevel;
@@ -97,6 +98,41 @@ void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
 
   GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_FROM], &fromLevel);
   GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_TO], &toLevel);
+
+  if(fromLevel > toLevel)
+  {
+    fromLevel = toLevel;
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_FROM], pRsw->pIntuiWindow, NULL,
+                   SLIDER_Level, (ULONG) fromLevel,
+                   TAG_DONE);
+  }
+
+  createResult(pRsw, fromLevel, toLevel);
+}
+
+void __ASM__ __SAVE_DS__ SliderToMsgFunc(__REG__(a0, struct Hook *pHook),
+                                         __REG__(a2, Object *pWindow),
+                                         __REG__(a1, struct Message *pMsg))
+{
+  ULONG fromLevel;
+  ULONG toLevel;
+  RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
+
+  if(!pRsw->pRangeMask)
+  {
+    return;
+  }
+
+  GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_FROM], &fromLevel);
+  GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_TO], &toLevel);
+
+  if(toLevel < fromLevel)
+  {
+    toLevel = fromLevel;
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_TO], pRsw->pIntuiWindow, NULL,
+                   SLIDER_Level, (ULONG) toLevel,
+                   TAG_DONE);
+  }
 
   createResult(pRsw, fromLevel, toLevel);
 }
@@ -112,9 +148,14 @@ RangeSelectWindow* createRangeSelectWindow(void)
     return NULL;
   }
 
-  m_SlidersHook.h_Entry = (ULONG (* )())SlidersMsgFunc;
-  m_SlidersHook.h_SubEntry = NULL;
-  m_SlidersHook.h_Data = pRsw;
+  m_SliderFromHook.h_Entry = (ULONG (* )())SliderFromMsgFunc;
+  m_SliderFromHook.h_SubEntry = NULL;
+  m_SliderFromHook.h_Data = pRsw;
+
+  m_SliderToHook.h_Entry = (ULONG (* )())SliderToMsgFunc;
+  m_SliderToHook.h_SubEntry = NULL;
+  m_SliderToHook.h_Data = pRsw;
+
 
   pRsw->pWinObject = NewObject(WINDOW_GetClass(), NULL,
     WA_Title, "MultiRename: Select name part",
@@ -159,7 +200,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         SLIDER_LevelFormat, "%2ld",
         SLIDER_LevelMaxLen, 3,
         SLIDER_LevelDomain, "222",
-        SLIDER_DispHook, &m_SlidersHook,
+        SLIDER_DispHook, &m_SliderFromHook,
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"From:", TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_SLI_TO] = NewObject(SLIDER_GetClass(), NULL,
@@ -171,7 +212,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
         SLIDER_LevelFormat, "%2ld",
         SLIDER_LevelMaxLen, 3,
         SLIDER_LevelDomain, "222",
-        SLIDER_DispHook, &m_SlidersHook,
+        SLIDER_DispHook, &m_SliderToHook,
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_STRING_RESULT_NAME] = NewObject(STRING_GetClass(), NULL,
