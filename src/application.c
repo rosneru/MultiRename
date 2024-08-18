@@ -201,10 +201,10 @@ Application* createApplication(int argc, char **argv)
           if((pApp->pFiles = createFileList()))
           {
             if((pApp->pParsedArgs = createParsedArgs(argc,
-                                                    argv,
-                                                    pApp->pFiles,
-                                                    pApp->pLocale,
-                                                    pApp->pNotifications)))
+                                                     argv,
+                                                     pApp->pFiles,
+                                                     pApp->pLocale,
+                                                     pApp->pNotifications)))
             {
               if((pMainLayout = createLayout()))
               {
@@ -402,13 +402,13 @@ void notifyUserAboutSkippedFiles(Application* pApp)
   if(containsSkippedNotifications(pApp->pNotifications))
   {
     if(!showEasyRequest(pApp->pIntuiWindow,
-                        "Continue|Show errors",
+                        "Continue|Show errors + continue",
                         "Failed to add some of the input files"))
     {
       printNotifications(pApp->pNotifications);
-      clearNotificationsExcept(pApp->pNotifications,
-                                NNT_SELECTED_PATH_INFO);
     }
+
+    clearNotificationsExcept(pApp->pNotifications, NNT_SELECTED_PATH_INFO);
   }
 }
 
@@ -416,19 +416,23 @@ void applyNewFiles(Application* pApp)
 {
   STRPTR pFirstPath;
 
-  // Does list contain at least one file?
-  if((pFirstPath = getFirstFilePath(pApp->pFiles)))
+  // FilePath not already set?
+  if(strlen(pApp->FilesPath))
   {
-    // Display the files list in ListBrowser
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                   pApp->pIntuiWindow, NULL,
-                   LISTBROWSER_Labels, (ULONG)pApp->pFiles,
-                   LISTBROWSER_AutoFit, TRUE,
-                   TAG_DONE);
+    // Does list contain at least one file?
+    if((pFirstPath = getFirstFilePath(pApp->pFiles)))
+    {
+      // Display the files list in ListBrowser
+      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                    pApp->pIntuiWindow, NULL,
+                    LISTBROWSER_Labels, (ULONG)pApp->pFiles,
+                    LISTBROWSER_AutoFit, TRUE,
+                    TAG_DONE);
 
-    // Apply the file path for this session
-    strncpy(pApp->FilesPath, pFirstPath, MAX_PATH_LEN);
-    addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
+      // Apply the file path for this session
+      strncpy(pApp->FilesPath, pFirstPath, MAX_PATH_LEN);
+      addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
+    }
   }
 
   updateNewNames(pApp);
@@ -733,22 +737,16 @@ Object* createLayout(void)
 
   m_pColumnInfo = AllocLBColumnInfo(3,
                                     LBCIA_Column, 0,
-                                      LBCIA_Flags, CIF_WEIGHTED,
                                       LBCIA_Sortable, FALSE,
                                       LBCIA_Title, "State",
-                                      LBCIA_Weight, 20,
                                     LBCIA_Column, 1,
-                                      LBCIA_Flags, CIF_WEIGHTED,
                                       LBCIA_AutoSort, TRUE,
                                       LBCIA_SortArrow, TRUE,
                                       LBCIA_SortDirection, LBMSORT_FORWARD,
                                       LBCIA_Title, "Old name",
-                                      LBCIA_Weight, 40,
                                     LBCIA_Column, 2,
-                                      LBCIA_Flags, CIF_WEIGHTED,
                                       LBCIA_Sortable, FALSE,
                                       LBCIA_Title, "New name",
-                                      LBCIA_Weight, 40,
                                     TAG_DONE);
 
   pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
@@ -899,11 +897,11 @@ Object* createLayout(void)
       LAYOUT_AddChild, m_ppGadgets[GID_LBR_PROCESSING_LIST] = NewObject(LISTBROWSER_GetClass(), NULL,
         GA_ID, GID_LBR_PROCESSING_LIST,
         GA_RelVerify, TRUE,
+        LISTBROWSER_AutoFit, TRUE,
         LISTBROWSER_ColumnInfo, (ULONG)m_pColumnInfo,
         LISTBROWSER_ColumnTitles, TRUE,
-        LISTBROWSER_TitleClickable, TRUE,
-        LISTBROWSER_AutoFit, TRUE,
         LISTBROWSER_HorizontalProp, TRUE,
+        LISTBROWSER_TitleClickable, TRUE,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
