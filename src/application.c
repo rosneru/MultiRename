@@ -691,6 +691,9 @@ void intuiEventLoop(Application* pApp)
   {
     receivedSig = Wait(pApp->SigMask);
 
+    // Handle the events of the range select window
+    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
+
     // Handle the events of this (main) window
     while ((result = DoMethod(pApp->pWinObject, WM_HANDLEINPUT, &code)))
     {
@@ -705,7 +708,8 @@ void intuiEventLoop(Application* pApp)
       }
     }
 
-    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
+    // If the range select window was closed with ACCEPTED state apply
+    // its result (selected range) and updfate the new names column.
     if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
     {
       pApp->pRangeSelectWindow->WindowState = RSW_STATE_IDLE;
