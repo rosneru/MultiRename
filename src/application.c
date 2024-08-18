@@ -680,7 +680,6 @@ static void handleGadgets(Application* pApp, ULONG result)
 
 void intuiEventLoop(Application* pApp)
 {
-  STRPTR pText;
   ULONG receivedSig;
   ULONG result;
   ULONG code;
@@ -691,20 +690,6 @@ void intuiEventLoop(Application* pApp)
   while (!end)
   {
     receivedSig = Wait(pApp->SigMask);
-
-    // Handle the events of the range select window (if it is open)
-    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
-    if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
-    {
-      if(TRUE == applySelectedRange(pApp))
-      {
-        updateNewNames(pApp);
-      }
-      else
-      {
-        printf("Failed to apply selected range\n");
-      }
-    }
 
     // Handle the events of this (main) window
     while ((result = DoMethod(pApp->pWinObject, WM_HANDLEINPUT, &code)))
@@ -717,6 +702,20 @@ void intuiEventLoop(Application* pApp)
         case WMHI_GADGETUP:
           handleGadgets(pApp, result);
           break;
+      }
+    }
+
+    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
+    if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
+    {
+      pApp->pRangeSelectWindow->WindowState = RSW_STATE_IDLE;
+      if(TRUE == applySelectedRange(pApp))
+      {
+        updateNewNames(pApp);
+      }
+      else
+      {
+        printf("Failed to apply selected range\n");
       }
     }
   }

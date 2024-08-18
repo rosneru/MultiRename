@@ -6,7 +6,8 @@
 
 typedef enum
 {
-    RSW_STATE_CANCELLED = 1
+    RSW_STATE_IDLE = 0
+  , RSW_STATE_CANCELLED
   , RSW_STATE_ACCEPTED
   , RSW_STATE_IS_OPEN
 } RangeSelectWindowState;
