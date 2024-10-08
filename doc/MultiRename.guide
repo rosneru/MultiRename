@@ -1,0 +1,37 @@
+The tool allows the simultaneous renaming of all selected files with the following functions:
+
+- Create a numbered file list 
+- Convert to upper/lower case letters 
+- Replace a specific text in the file name with another one
+- Inserting the date/time of the file 
+- Keep only certain letters of the file name 
+
+In the input fields square brackets [] are used as placeholders. The result is continuously displayed in a list. The files are only actually renamed when the start button is pressed. 
+
+# Input fields
+## Renaming mask: File name 
+In this field you can enter a definition for the new file name. The buttons below allow you to insert placeholders for the old name, parts of it, a counter or file date/time. Placeholders are always enclosed in square brackets [], while all other characters (without the square brackets) are transferred to the new name without change Example: [C][N2-8] numbers the files and takes over the letters 2 - 8 of the old name. A detailed description of all available placeholders can be found in the help. 
+
+## Extension
+
+Here you can change the file extension. In principle, all placeholders can be added to each of the two input fields. The renaming tool generates the renaming string as follows: Mask for file name + “.” + Mask for extension. The reason for two separate fields is to avoid accidentally removing the file extensions, which would destroy the link. 
+
+# Search and replace 
+
+The text in the 'Search for' field is replaced by the text in 'Replace with'. The capitalization in the 'Search for' field is only taken into account if it is checked. This function is used after the renaming mask.
+
+## Case sensitive 
+
+Converts the entire name to upper/lower case or first letter upper case, the rest lower case. This function is used after the renaming mask and after search & replace.
+
+## Define counter [C]: 
+### Start at
+Number of the first file. The files are always displayed in the order in which they appear in the result list, numbered. {CHECK You can sort the result list by clicking on the heading of the original file name}.
+
+### Increment
+
+The counter is incremented/decremented by this value. 
+
+### Number of digits
+
+Width of the counter field. {CHECK If number of digits > 1, the renaming tool inserts leading zeros}.
