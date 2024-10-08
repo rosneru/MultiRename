@@ -367,7 +367,6 @@ BOOL runApplication(Application* pApp)
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
     applyNewFiles(pApp);
-
     intuiEventLoop(pApp);
 
     // TODO: ClearMenuStrip()? before this..once a menu exists
@@ -402,7 +401,7 @@ void notifyUserAboutSkippedFiles(Application* pApp)
   if(containsSkippedNotifications(pApp->pNotifications))
   {
     if(!showEasyRequest(pApp->pIntuiWindow,
-                        "Continue|Show errors + continue",
+                        "Ok|Show errors",
                         "Failed to add some of the input files"))
     {
       printNotifications(pApp->pNotifications);
@@ -417,7 +416,7 @@ void applyNewFiles(Application* pApp)
   STRPTR pFirstPath;
 
   // FilePath not already set?
-  if(strlen(pApp->FilesPath))
+  if(!strlen(pApp->FilesPath))
   {
     // Does list contain at least one file?
     if((pFirstPath = getFirstFilePath(pApp->pFiles)))
