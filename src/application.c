@@ -5,6 +5,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <intuition/sghooks.h>
 #include <libraries/locale.h>
 #include <utility/hooks.h>
 #include <workbench/startup.h>
@@ -126,12 +127,11 @@ enum gadids
 };
 
 static Object* m_ppGadgets[MAXGADGETS];
-struct Hook m_AppHook;
 
 
 
 /// Hook implementations
-
+struct Hook m_AppHook;
 void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
                                     __REG__(a2, Object *pWindow),
                                     __REG__(a1, struct AppMessage *pMsg))
@@ -181,6 +181,15 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
   applyNewFiles(pApp);
 }
 
+struct Hook m_NameGadgetHook;
+void __ASM__ __SAVE_DS__ NameGadgetMsgFunc(__REG__(a0, struct Hook *pHook),
+                                           __REG__(a2, Object *pWindow),
+                                           __REG__(a1, struct Message *pMsg))
+{
+  Application* pApp = (Application*)pHook->h_Data;
+  updateNewNames(pApp);
+}
+
 /// Public function implementations
 
 Application* createApplication(int argc, char **argv)
@@ -224,6 +233,10 @@ Application* createApplication(int argc, char **argv)
                 m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
                 m_AppHook.h_SubEntry = NULL;
                 m_AppHook.h_Data = pApp;
+
+                m_NameGadgetHook.h_Entry = (ULONG (* )())NameGadgetMsgFunc;
+                m_NameGadgetHook.h_SubEntry = NULL;
+                m_NameGadgetHook.h_Data = pApp;
 
                 if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
                                                  WINDOW_Position, WPOS_CENTERSCREEN,
@@ -755,7 +768,7 @@ Object* createLayout(void)
     LAYOUT_Label, (ULONG)"Name",
     LAYOUT_AddChild, m_ppGadgets[GID_STR_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_NAME,
-      GA_RelVerify, TRUE,
+      STRINGA_EditHook, &m_NameGadgetHook,
       STRINGA_TextVal, (ULONG)"[N]",
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
