@@ -75,3 +75,4 @@ VSCode will be hit.
 
 With this done properly the `test_action_parser.c` entry point can be
 build and run in debug mode by simply hitting `F5` in VScode.
+
