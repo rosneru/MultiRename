@@ -183,9 +183,10 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
 
 struct Hook m_NameGadgetHook;
 void __ASM__ __SAVE_DS__ NameGadgetMsgFunc(__REG__(a0, struct Hook *pHook),
-                                           __REG__(a2, Object *pWindow),
+                                           __REG__(a2, Object *pObject),
                                            __REG__(a1, struct Message *pMsg))
 {
+  struct SGWork* pSGWork = (struct SGWork*)pObject;
   Application* pApp = (Application*)pHook->h_Data;
   updateNewNames(pApp);
 }
