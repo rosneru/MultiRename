@@ -148,11 +148,8 @@ RangeSelectWindow* createRangeSelectWindow(void)
       TAG_DONE),
       CHILD_Label, m_ppGadgets[GID_LABEL_LONGEST_ITEM] = NewObject(LABEL_GetClass(), NULL,
         GA_ID, GID_LABEL_LONGEST_ITEM, 
-        LABEL_Text, (ULONG)"Abcdefg",
+        LABEL_Text, (ULONG)"Longest item:",
         TAG_DONE),
-      LAYOUT_AddImage, NewObject(LABEL_GetClass(), NULL,
-        LABEL_Text, "Select the characters to be inserted",
-      TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
         GA_ID, GID_SLI_FROM,
         GA_RelVerify, TRUE,
@@ -194,39 +191,33 @@ RangeSelectWindow* createRangeSelectWindow(void)
         GA_TabCycle, TRUE,
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Result mask:", TAG_DONE),
-      // LAYOUT_AddImage, NewObject(BEVEL_GetClass(), NULL,
-      //   BEVEL_Style, BVS_SBAR_VERT,
-      // TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
-        LAYOUT_EvenSize, TRUE,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
+        LAYOUT_EvenSize, TRUE,
         LAYOUT_AddChild, m_ppGadgets[GID_BTN_OK] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_OK,
           GA_RelVerify, TRUE,
           GA_Text, (ULONG)"Ok",
           BUTTON_TextPadding, TRUE,
         TAG_DONE),
-        CHILD_WeightedWidth, 1,
-        LAYOUT_AddChild, NewObject(LABEL_GetClass(), NULL,
-          LABEL_Text, "",
-        TAG_DONE),
-        CHILD_WeightedWidth, 100,
+        CHILD_WeightedWidth, 0,
+        // LAYOUT_AddChild, NewObject(LABEL_GetClass(), NULL,
+        //   LABEL_Text, "",
+        // TAG_DONE),
+        // CHILD_WeightedWidth, 100,
         LAYOUT_AddChild, m_ppGadgets[GID_BTN_CANCEL] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_CANCEL,
           GA_RelVerify, TRUE,
           GA_Text, (ULONG)"Cancel",
           BUTTON_TextPadding, TRUE,
         TAG_DONE),
-        CHILD_WeightedWidth, 1,
+        CHILD_WeightedWidth, 0,
       TAG_DONE),
     TAG_DONE),
     TAG_DONE);
   return pRsw;
 }
 
-
-STRPTR pLongestName = "Longest name:";
-STRPTR pLongestExtension = "Longest extension:";
 STRPTR pWindowTitleSelectName = "MultiRename: Select name part";
 STRPTR pWindowTitleSelectExtension = "MultiRename: Select extension part";
 
@@ -238,7 +229,6 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
                            ULONG longestNameLen)
 {
   STRPTR pWindowTitle;
-  STRPTR pLongestItemLabelText;
 
   if(!pRsw || !pRsw->pWinObject || !pParentSigMask || !pRangeMask)
   {
@@ -260,18 +250,16 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
   switch(pRangeMask->RequestedRangeType)
   {
     case RRT_NAME:
+      pWindowTitle = pWindowTitleSelectName;
+
       // Create a copy of the input string 'pLongestName' with no extension
       strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
-
-      pWindowTitle = pWindowTitleSelectName;
-      pLongestItemLabelText = pLongestName;
       break;
     case RRT_EXTENSION:
+      pWindowTitle = pWindowTitleSelectExtension;
+
       // Create a copy of the input string 'pLongestName' with no extension
       strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
-
-      pWindowTitle = pWindowTitleSelectExtension;
-      pLongestItemLabelText = pLongestExtension;
       break;
     default:
       return FALSE;
@@ -288,10 +276,6 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
   }
 
   SetWindowTitles(pRsw->pIntuiWindow, pWindowTitle, (UBYTE *)~0);
-
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LABEL_LONGEST_ITEM], pRsw->pIntuiWindow, NULL,
-                 LABEL_Text, (ULONG)pLongestItemLabelText,
-                 TAG_DONE);
 
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_INPUT], pRsw->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pRsw->NameBuf,

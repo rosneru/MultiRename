@@ -79,7 +79,8 @@
     "icclass.h": "c",
     "stdlib.h": "c",
     "compiler-specific.h": "c",
-    "range_mask.h": "c"
+    "range_mask.h": "c",
+    "layout.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"
