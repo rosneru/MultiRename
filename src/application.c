@@ -680,9 +680,17 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_START:
     {
+      struct Requester sleepRequester;
+      InitRequester(&sleepRequester);
+      Request(&sleepRequester, pApp->pIntuiWindow);
+      SetWindowPointer(pApp->pIntuiWindow, WA_BusyPointer, TRUE, TAG_DONE);
+
       showEasyRequest(pApp->pIntuiWindow,
                       "Ok",
                       "Yes, this will be possible soon.");
+
+      EndRequest(&sleepRequester, pApp->pIntuiWindow);
+      SetWindowPointer(pApp->pIntuiWindow, WA_BusyPointer, FALSE, TAG_DONE);
       break;
     }
   }
