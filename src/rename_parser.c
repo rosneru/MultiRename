@@ -214,7 +214,7 @@ BOOL isCharAllowed(char c)
 
 BOOL isCharDigit(char c)
 {
-  return (BOOL)((c > 48) && (c < 58));
+  return (BOOL)((c >= 48) && (c < 58));
 }
 
 static void init_state_apply(ActionParser* pParser)

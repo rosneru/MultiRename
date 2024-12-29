@@ -89,15 +89,15 @@ struct Node* createFileNode(struct Locale* pLocale,
                                     LBNA_Column, 0,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAXNAMELEN,
+                                      LBNCA_MaxChars, MAX_NAME_LEN,
                                     LBNA_Column, 1,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAXNAMELEN,
+                                      LBNCA_MaxChars, MAX_NAME_LEN,
                                     LBNA_Column, 2,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAXNAMELEN,
+                                      LBNCA_MaxChars, MAX_NAME_LEN,
                                     TAG_DONE)))
   {
     pFileNode = (FileNode*) pNode;
@@ -106,10 +106,10 @@ struct Node* createFileNode(struct Locale* pLocale,
     pPathEnd = PathPart(pFileName);
     pNameStart = FilePart(pFileName);
     pathLen = pPathEnd - pFileName + 1;
-    if(pathLen > MAXPATHLEN)
+    if(pathLen > MAX_PATH_LEN)
     {
       // TODO: Notify truncation
-      pathLen = MAXPATHLEN;
+      pathLen = MAX_PATH_LEN;
     }
 
     strncpy(pFileNode->Path, pFileName, pathLen);
@@ -120,8 +120,9 @@ struct Node* createFileNode(struct Locale* pLocale,
     if((pLastDotPosition = strrchr(pNameStart, '.')))
     {
       pFileNode->OriginalNameLen = pLastDotPosition - pNameStart;
-      pFileNode->OriginalExtLen = strlen(pFileNode->OriginalName +
-                                         pFileNode->OriginalNameLen);
+      pFileNode->OriginalExtLen = strlen(pFileNode->OriginalName
+                                          + pFileNode->OriginalNameLen
+                                          + 1); // +1 for the dot '.'
     }
     else
     {
@@ -214,7 +215,30 @@ FileNode* getLongestOldNameNode(struct List* pFilesList)
   return pMaxLengthNode;
 }
 
+FileNode* getLongestOldExtNode(struct List* pFilesList)
+{
+  struct Node* pNode;
+  FileNode* pFileNode;
+  FileNode* pMaxLengthNode = NULL;
+  ULONG maxLength = 0;
 
+  if(!pFilesList)
+  {
+    return NULL;
+  }
+
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    if(pFileNode->OriginalExtLen > maxLength)
+    {
+      maxLength = pFileNode->OriginalExtLen;
+      pMaxLengthNode = pFileNode;
+    }
+  }
+
+  return pMaxLengthNode;
+}
 
 void printFileListOriginalName(struct List* pFilesList)
 {

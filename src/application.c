@@ -61,7 +61,7 @@
  * Set the current working path if necessary.
  * Updates window title with the current working path.
  * 
- * NOTE: List must be detached off ListBrowser before this call!
+ * NOTE: Attaches the list browser labels. Must be detached before this call!
  */
 void applyNewFiles(Application* pApp);
 
@@ -69,15 +69,16 @@ void applyNewFiles(Application* pApp);
  * When range selection window was closed with Ok, the resulting mask is
  * inserted in current cursor position.
  */
-void applySelectedRange(Application* pApp);
+BOOL applySelectedRange(Application* pApp);
 
 /**
  * Set the current working path as application window title.
  */
-void updateApplicationWindowTitle(Application* pApp);
+void updateMainWindowTitle(Application* pApp);
 
 /**
  * Calculates the new names in the processing list / ListBrowser.
+ * NOTE: De- and attaches the list browser labels.
  */
 BOOL updateNewNames(Application* pApp);
 
@@ -86,22 +87,6 @@ BOOL updateNewNames(Application* pApp);
  * With the option to display the details.
  */
 void notifyUserAboutSkippedFiles(Application* pApp);
-
-/**
- * Fill given pDest by inserting a command like [N12-16] at insert
- * position into given pSrcStr. pSrcStr is not changed, only part wise
- * copied into pDest.
- *
- * The inserted command is created of the insertCmd character, which can
- * be every char, but only 'N' and 'E' are interpret by the caller for
- * now, and the range insertFrom and insertTo.
- */
-int insertPartIntoString(STRPTR pDest,
-                         STRPTR pSrcStr,
-                         UBYTE insertPos,
-                         char insertCmd,
-                         UBYTE insertFrom,
-                         UBYTE insertTo);
 
 /**
  * The application event loop.
@@ -141,7 +126,6 @@ enum gadids
 };
 
 static Object* m_ppGadgets[MAXGADGETS];
-struct Hook m_CompareHook;
 struct Hook m_AppHook;
 
 
@@ -170,11 +154,11 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
     pFileName = pWbArg[i].wa_Name;
     if(NameFromLock(pWbArg[i].wa_Lock,
                     pApp->pParsedArgs->pScratchPathBuf,
-                    MAXPATHLEN))
+                    MAX_PATH_LEN))
     {
       // Now scratch buf contains the name of the directory of the file
       // So next the fileName is appended to the buf
-      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
+      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
 
       appendFileNode(pApp->pFiles,
                      pApp->pParsedArgs->pScratchPathBuf,
@@ -217,10 +201,10 @@ Application* createApplication(int argc, char **argv)
           if((pApp->pFiles = createFileList()))
           {
             if((pApp->pParsedArgs = createParsedArgs(argc,
-                                                    argv,
-                                                    pApp->pFiles,
-                                                    pApp->pLocale,
-                                                    pApp->pNotifications)))
+                                                     argv,
+                                                     pApp->pFiles,
+                                                     pApp->pLocale,
+                                                     pApp->pNotifications)))
             {
               if((pMainLayout = createLayout()))
               {
@@ -236,7 +220,11 @@ Application* createApplication(int argc, char **argv)
                   zoomData[3] = pScreen->Height - screenBarHeight - 1;
                   UnlockPubScreen(NULL, pScreen);
                 }
-                
+
+                m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
+                m_AppHook.h_SubEntry = NULL;
+                m_AppHook.h_Data = pApp;
+
                 if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
                                                  WINDOW_Position, WPOS_CENTERSCREEN,
                                                  WA_Activate, TRUE,
@@ -375,16 +363,10 @@ BOOL runApplication(Application* pApp)
     return FALSE;
   }
 
-  m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
-  m_AppHook.h_SubEntry = NULL;
-  m_AppHook.h_Data = pApp;
-
-
   if((pApp->pIntuiWindow =
     (struct Window*)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
     applyNewFiles(pApp);
-
     intuiEventLoop(pApp);
 
     // TODO: ClearMenuStrip()? before this..once a menu exists
@@ -403,7 +385,7 @@ BOOL runApplication(Application* pApp)
 
 /// Private function implementations
 
-void updateApplicationWindowTitle(Application* pApp)
+void updateMainWindowTitle(Application* pApp)
 {
   if(strlen(pApp->FilesPath) > 0)
   {
@@ -419,13 +401,13 @@ void notifyUserAboutSkippedFiles(Application* pApp)
   if(containsSkippedNotifications(pApp->pNotifications))
   {
     if(!showEasyRequest(pApp->pIntuiWindow,
-                        "Continue|Show errors",
+                        "Ok|Show errors",
                         "Failed to add some of the input files"))
     {
       printNotifications(pApp->pNotifications);
-      clearNotificationsExcept(pApp->pNotifications,
-                                NNT_SELECTED_PATH_INFO);
     }
+
+    clearNotificationsExcept(pApp->pNotifications, NNT_SELECTED_PATH_INFO);
   }
 }
 
@@ -433,23 +415,27 @@ void applyNewFiles(Application* pApp)
 {
   STRPTR pFirstPath;
 
-  // Does list contain at least one file?
-  if((pFirstPath = getFirstFilePath(pApp->pFiles)))
+  // FilePath not already set?
+  if(!strlen(pApp->FilesPath))
   {
-    // Display the files list in ListBrowser
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                   pApp->pIntuiWindow, NULL,
-                   LISTBROWSER_Labels, (ULONG)pApp->pFiles,
-                   LISTBROWSER_AutoFit, TRUE,
-                   TAG_DONE);
+    // Does list contain at least one file?
+    if((pFirstPath = getFirstFilePath(pApp->pFiles)))
+    {
+      // Display the files list in ListBrowser
+      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                    pApp->pIntuiWindow, NULL,
+                    LISTBROWSER_Labels, (ULONG)pApp->pFiles,
+                    LISTBROWSER_AutoFit, TRUE,
+                    TAG_DONE);
 
-    // Apply the file path for this session
-    strncpy(pApp->FilesPath, pFirstPath, MAXPATHLEN);
-    addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
+      // Apply the file path for this session
+      strncpy(pApp->FilesPath, pFirstPath, MAX_PATH_LEN);
+      addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
+    }
   }
 
   updateNewNames(pApp);
-  updateApplicationWindowTitle(pApp);
+  updateMainWindowTitle(pApp);
   notifyUserAboutSkippedFiles(pApp);
 }
 
@@ -550,85 +536,53 @@ BOOL updateNewNames(Application* pApp)
   return wasUpdatedSuccessfully;
 }
 
-#define MAX_CMD_PART_LEN 12
-
-int insertPartIntoString(STRPTR pDest,
-                         STRPTR pSrcStr,
-                         UBYTE insertPos,
-                         char insertCmd,
-                         UBYTE insertFrom,
-                         UBYTE insertTo)
+BOOL applySelectedRange(Application* pApp)
 {
-  char commandPartBuf[12];
-
-  if(!pDest || ! pSrcStr || (insertPos < 0)
-  || (insertFrom > MAXNAMELEN) || (insertTo > MAXNAMELEN) 
-  || (insertFrom > insertTo))
-  {
-    return -1;
-  }
-
-  if((strlen(pSrcStr) + MAX_CMD_PART_LEN) > MAXNAMELEN)
-  {
-    return -1;
-  }
-
-  // Start with a clean target buffer
-  strcpy(pDest, "");
-
-  // Apply the beginning until the insert position
-  strncat(pDest, pSrcStr, insertPos);
-  pDest[insertPos] = '\0';
-
-  // Fill the command buf
-  sprintf(commandPartBuf, "[%c%d-%d]", insertCmd, insertFrom, insertTo);
-
-  // Apply the command buf
-  strcat(pDest, commandPartBuf);
-  
-  // Apply the end, after the insert position
-  strcat(pDest, pSrcStr + insertPos);
-
-  return (int)(insertPos + strlen(commandPartBuf));
-}
-
-
-void applySelectedRange(Application* pApp)
-{
-  STRPTR pText;
   long bufferPos;
+  STRPTR pText;
+  Object *pStrGadget;
 
-  if(pApp->ScratchBuf[0] == 'N')
+  switch(pApp->RangeMask.RequestedRangeType)
   {
-    if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText))
-    {
-      printf("Got no STRINGA_TextVal\n");
-      return;
-    }
-
-    bufferPos = strlen(pText);
-    if(0 > (bufferPos = insertPartIntoString(pApp->ScratchBuf,
-                                   pText,
-                                   bufferPos,
-                                   'N',
-                                   pApp->pRangeSelectWindow->RangeFrom,
-                                   pApp->pRangeSelectWindow->RangeTo)))
-    {
-      // TODO: Notify user
-      printf("insertPartIntoString() failed.\n");
-      return;
-    }
-
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
-                   pApp->pIntuiWindow,
-                   NULL,
-                   STRINGA_BufferPos, (ULONG) bufferPos,
-                   STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
-                   TAG_DONE);
+    case RRT_NAME:
+      if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pText))
+      {
+        return FALSE;
+      }
+      pStrGadget = m_ppGadgets[GID_STR_NAME];
+      break;
+    case RRT_EXTENSION:
+      if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG*)&pText))
+      {
+        return FALSE;
+      }
+      pStrGadget = m_ppGadgets[GID_STR_EXTENSION];
+      break;
+    default:
+      return FALSE;
   }
+
+  bufferPos = strlen(pText);
+  if(0 > (bufferPos = insertRangeMaskString(&pApp->RangeMask,
+                                            pApp->ScratchBuf,
+                                            SCRATCH_BUF_SIZE,
+                                            pText,
+                                            bufferPos)))
+  {
+    // TODO: Notify user
+    printf("insertRangeMaskString() failed.\n");
+    return FALSE;
+  }
+
+  SetGadgetAttrs((struct Gadget *) pStrGadget,
+                  pApp->pIntuiWindow,
+                  NULL,
+                  STRINGA_BufferPos, (ULONG) bufferPos,
+                  STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
+                  TAG_DONE);
+
+  return TRUE;
 }
-
-
 
 static void handleGadgets(Application* pApp, ULONG result)
 {
@@ -658,13 +612,11 @@ static void handleGadgets(Application* pApp, ULONG result)
     {
       if((pFileNode = getLongestOldNameNode(pApp->pFiles)))
       {
-        // Mark operation for `applySelectedRange()` which will be
-        // called when the range select window is closed positively with
-        // its Apply/ok button.
-        pApp->ScratchBuf[0] = 'N';
+        pApp->RangeMask.RequestedRangeType = RRT_NAME;
         openRangeSelectWindow(pApp->pRangeSelectWindow,
                               pApp->pIntuiWindow,
                               &pApp->SigMask,
+                              &pApp->RangeMask,
                               pFileNode->OriginalName,
                               pFileNode->OriginalNameLen);
       }
@@ -690,7 +642,42 @@ static void handleGadgets(Application* pApp, ULONG result)
       updateNewNames(pApp);
       break;
     }
-
+    case GID_BTN_NAME_COUNTER:
+    {
+      appendTextToStrGadget(pApp->pIntuiWindow,
+                            m_ppGadgets[GID_STR_NAME],
+                            "[C]",
+                            pApp->ScratchBuf,
+                            SCRATCH_BUF_SIZE); 
+      updateNewNames(pApp);
+      break;
+    }
+    case GID_BTN_EXTENSION:
+    {
+      appendTextToStrGadget(pApp->pIntuiWindow,
+                            m_ppGadgets[GID_STR_EXTENSION],
+                            "[E]",
+                            pApp->ScratchBuf,
+                            SCRATCH_BUF_SIZE); 
+      updateNewNames(pApp);
+      break;
+    }
+    case GID_BTN_EXTENSION_PART:
+    {
+      if((pFileNode = getLongestOldExtNode(pApp->pFiles)))
+      {
+        pApp->RangeMask.RequestedRangeType = RRT_EXTENSION;
+        openRangeSelectWindow(pApp->pRangeSelectWindow,
+                              pApp->pIntuiWindow,
+                              &pApp->SigMask,
+                              &pApp->RangeMask,
+                              pFileNode->OriginalName 
+                                + pFileNode->OriginalNameLen 
+                                + 1,
+                              pFileNode->OriginalExtLen);
+      }
+      break;
+    }
   }
 }
 
@@ -707,12 +694,8 @@ void intuiEventLoop(Application* pApp)
   {
     receivedSig = Wait(pApp->SigMask);
 
-    // Handle the events of the range select window (if it is open)
-    if(TRUE == handleRangeSelectWindowEvents(pApp->pRangeSelectWindow))
-    {
-      applySelectedRange(pApp);
-      updateNewNames(pApp);
-    }
+    // Handle the events of the range select window
+    handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);
 
     // Handle the events of this (main) window
     while ((result = DoMethod(pApp->pWinObject, WM_HANDLEINPUT, &code)))
@@ -727,15 +710,23 @@ void intuiEventLoop(Application* pApp)
           break;
       }
     }
+
+    // If the range select window was closed with ACCEPTED state apply
+    // its result (selected range) and updfate the new names column.
+    if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
+    {
+      pApp->pRangeSelectWindow->WindowState = RSW_STATE_IDLE;
+      if(TRUE == applySelectedRange(pApp))
+      {
+        updateNewNames(pApp);
+      }
+      else
+      {
+        printf("Failed to apply selected range\n");
+      }
+    }
   }
 }
-
-
-static ULONG myCompare(struct Hook *pHook, Object *pObj, struct LBSortMsg *pMsg)
-{
-  return 0;
-}
-
 
 Object* createLayout(void)
 {
@@ -743,29 +734,18 @@ Object* createLayout(void)
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
 
-  // Initialize CompareHook for sorting the "Old name" column
-  m_CompareHook.h_Entry = (ULONG (*)()) myCompare;
-  m_CompareHook.h_SubEntry = NULL;
-  m_CompareHook.h_Data = NULL;
-
   m_pColumnInfo = AllocLBColumnInfo(3,
                                     LBCIA_Column, 0,
-                                      LBCIA_Flags, CIF_WEIGHTED,
                                       LBCIA_Sortable, FALSE,
                                       LBCIA_Title, "State",
-                                      LBCIA_Weight, 20,
                                     LBCIA_Column, 1,
-                                      LBCIA_Flags, CIF_WEIGHTED,
                                       LBCIA_AutoSort, TRUE,
                                       LBCIA_SortArrow, TRUE,
                                       LBCIA_SortDirection, LBMSORT_FORWARD,
                                       LBCIA_Title, "Old name",
-                                      LBCIA_Weight, 40,
                                     LBCIA_Column, 2,
-                                      LBCIA_Flags, CIF_WEIGHTED,
                                       LBCIA_Sortable, FALSE,
                                       LBCIA_Title, "New name",
-                                      LBCIA_Weight, 40,
                                     TAG_DONE);
 
   pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
@@ -916,11 +896,11 @@ Object* createLayout(void)
       LAYOUT_AddChild, m_ppGadgets[GID_LBR_PROCESSING_LIST] = NewObject(LISTBROWSER_GetClass(), NULL,
         GA_ID, GID_LBR_PROCESSING_LIST,
         GA_RelVerify, TRUE,
+        LISTBROWSER_AutoFit, TRUE,
         LISTBROWSER_ColumnInfo, (ULONG)m_pColumnInfo,
         LISTBROWSER_ColumnTitles, TRUE,
-        LISTBROWSER_TitleClickable, TRUE,
-        LISTBROWSER_AutoFit, TRUE,
         LISTBROWSER_HorizontalProp, TRUE,
+        LISTBROWSER_TitleClickable, TRUE,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,

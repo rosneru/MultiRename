@@ -104,7 +104,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
     {
       if((lock = Lock(*ppFiles, SHARED_LOCK)))
       {
-        if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAXPATHLEN))
+        if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
           appendFileNode(pFilesList,
                          pParsedArgs->pScratchPathBuf,
@@ -190,9 +190,9 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
       else
       {
         pFileName = pWbArg[i].wa_Name;
-        if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pScratchPathBuf, MAXPATHLEN))
+        if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
-          AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAXPATHLEN);
+          AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
           appendFileNode(pFilesList,
                          pParsedArgs->pScratchPathBuf,
                          pLocale,

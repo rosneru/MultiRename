@@ -11,6 +11,7 @@
 #include "file_list.h"
 #include "notifications.h"
 #include "parsed_args.h"
+#include "range_mask.h"
 #include "range_select_window.h"
 
 #define SCRATCH_BUF_SIZE 1024
@@ -23,12 +24,13 @@ typedef struct Application
   ParsedArgs* pParsedArgs;
   struct List* pFiles;
   Object* pWinObject;
+  RangeMask RangeMask;
   RangeSelectWindow* pRangeSelectWindow;
   struct Window* pIntuiWindow;
   ULONG SigMask;
-  char FilesPath[MAXPATHLEN + 1];
-  char WindowTitle[MAXPATHLEN + 32];
-  char ScratchBuf[SCRATCH_BUF_SIZE];
+  char FilesPath[MAX_PATH_LEN + 1];
+  char WindowTitle[MAX_PATH_LEN + 32];
+  char ScratchBuf[SCRATCH_BUF_SIZE + 1];
 } Application;
 
 Application* createApplication(int argc, char **argv);

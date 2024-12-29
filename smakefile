@@ -33,6 +33,9 @@ $(OBJDIR)notifications.o : src/notifications.c
 $(OBJDIR)parsed_args.o : src/parsed_args.c
 	$(CC) nolink src/parsed_args.c
 
+$(OBJDIR)range_mask.o : src/range_mask.c
+	$(CC) nolink src/range_mask.c
+
 $(OBJDIR)range_select_window.o : src/range_select_window.c
 	$(CC) nolink src/range_select_window.c
 
@@ -57,7 +60,7 @@ $(OBJDIR)ui_tools.o : src/ui_tools.c
 OBJS = $(OBJDIR)application.o  $(OBJDIR)file_list.o $(OBJDIR)date_tools.o
 OBJS = $(OBJS) $(OBJDIR)main.o
 OBJS = $(OBJS) $(OBJDIR)notifications.o $(OBJDIR)parsed_args.o
-OBJS = $(OBJS) $(OBJDIR)range_select_window.o
+OBJS = $(OBJS) $(OBJDIR)range_mask.o $(OBJDIR)range_select_window.o
 OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_counter.o
 OBJS = $(OBJS) $(OBJDIR)rename_parser.o $(OBJDIR)requester.o
 OBJS = $(OBJS) $(OBJDIR)string_tools.o $(OBJDIR)ui_tools.o

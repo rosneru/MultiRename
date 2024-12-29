@@ -45,11 +45,13 @@ void closeLibs(void);
 struct IntuitionBase *IntuitionBase = NULL;
 struct Library* WindowBase = NULL;
 struct Library* LayoutBase = NULL;
+struct Library* BevelBase = NULL;
 struct Library* ButtonBase = NULL;
 struct Library* ChooserBase = NULL;
+struct Library* IntegerBase = NULL;
 struct Library* ListBrowserBase = NULL;
 struct Library* LabelBase = NULL;
-struct Library* IntegerBase = NULL;
+struct Library* SliderBase = NULL;
 struct Library* StringBase = NULL;
 
 
@@ -111,6 +113,12 @@ BOOL openLibs(void)
     return FALSE;
   }
 
+  if(NULL == (BevelBase = OpenLibrary("images/bevel.image", 47)))
+  {
+    PutStr("Failed to open bevel.image v47.\n");
+    return FALSE;
+  }
+
   if(NULL == (ButtonBase = OpenLibrary("gadgets/button.gadget", 47)))
   {
     PutStr("Failed to open button.gadget v47.\n");
@@ -120,6 +128,12 @@ BOOL openLibs(void)
   if(NULL == (ChooserBase = OpenLibrary("gadgets/chooser.gadget", 47)))
   {
     PutStr("Failed to open chooser.gadget v47.\n");
+    return FALSE;
+  }
+
+  if(NULL == (IntegerBase = OpenLibrary("gadgets/integer.gadget", 47)))
+  {
+    PutStr("Failed to open integer.gadget v47.\n");
     return FALSE;
   }
 
@@ -135,12 +149,13 @@ BOOL openLibs(void)
     return FALSE;
   }
 
-  if(NULL == (IntegerBase = OpenLibrary("gadgets/integer.gadget", 47)))
+
+  if(NULL == (SliderBase = OpenLibrary("gadgets/slider.gadget", 47)))
   {
-    PutStr("Failed to open integer.gadget v47.\n");
+    PutStr("Failed to open slider.gadget v47.\n");
     return FALSE;
   }
-  
+
   if(NULL == (StringBase = OpenLibrary("gadgets/string.gadget", 47)))
   {
     PutStr("Failed to open string.gadget v47.\n");
@@ -157,9 +172,9 @@ void closeLibs(void)
     CloseLibrary(StringBase);
   }
 
-  if(NULL != IntegerBase)
+  if(NULL != SliderBase)
   {
-    CloseLibrary(IntegerBase);
+    CloseLibrary(SliderBase);
   }
 
   if(NULL != LabelBase)
@@ -172,6 +187,11 @@ void closeLibs(void)
     CloseLibrary(ListBrowserBase);
   }
 
+  if(NULL != IntegerBase)
+  {
+    CloseLibrary(IntegerBase);
+  }
+
   if(NULL != ChooserBase)
   {
     CloseLibrary(ChooserBase);
@@ -180,6 +200,11 @@ void closeLibs(void)
   if(NULL != ButtonBase)
   {
     CloseLibrary(ButtonBase);
+  }
+
+  if(NULL != BevelBase)
+  {
+    CloseLibrary(BevelBase);
   }
 
   if(NULL != LayoutBase)

@@ -1,0 +1,14 @@
+# Search and replace 
+
+{TODO The placeholders ? * (one/multiple characters) and regular expressions are supported}.
+
+{TODO Several texts can be replaced at once: ä|ö|ü => ae|oe|ue}
+
+## Case sensitive 
+
+{TODO Use the placeholders [U], [L], and [n] to convert only certain parts of the name to upper/lower case }.
+
+## Define counter
+### Start at
+
+{TODO (or alphabetically if you enter a letter as the start value)}

@@ -77,7 +77,10 @@
     "date_tools.h": "c",
     "locale.h": "c",
     "icclass.h": "c",
-    "stdlib.h": "c"
+    "stdlib.h": "c",
+    "compiler-specific.h": "c",
+    "range_mask.h": "c",
+    "layout.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"
