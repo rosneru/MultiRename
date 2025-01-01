@@ -24,6 +24,13 @@ void applyActions(FileNode* pFileNode,
                   STRPTR pMask,
                   Counter* pCounter);
 
+/**
+ * Calculate and fill a Token for the new name that will be used for
+ * duplicate detection in the first pass before the actual renaming
+ * starts.
+ */
+void createNewNameToken(FileNode* pFileNode);
+
 
 /// Public function implementations
 
@@ -74,9 +81,11 @@ BOOL createNewNames(struct List* pFilesList,
     pFileNode = (FileNode*)pNode;
     applyActions(pFileNode,
                  MAX_NAME_LEN + 1,      // buffer *is* one bigger than the
-                 &parser.ActionList,  // max name len for the trailing '\0'
+                 &parser.ActionList,    // max name len for the trailing '\0'
                  pMask,
                  &counter);
+
+    createNewNameToken(pFileNode);
   }
 
   freeActionNodes(&parser.ActionList);
@@ -267,4 +276,22 @@ void applyActions(FileNode* pFileNode,
     pFileNode->NewName[lastIndex] = '\0';
   }
 
+}
+
+void createNewNameToken(FileNode* pFileNode)
+{
+  ULONG i;
+  const char *pItemText;
+
+  if(!pFileNode)
+  {
+    return;
+  }
+
+  pItemText = pFileNode->NewName;
+  pFileNode->NewNameToken = 0;
+  for (i = 0; i < pFileNode->NewNameFullLen; i++)
+  {
+    pFileNode->NewNameToken += 2 * pFileNode->NewNameToken + *(pItemText++);
+  }
 }

@@ -22,8 +22,8 @@ typedef struct DateTimeParts
 
 
 /**
- * Create string parts (year, month, ..., @see struct above) of given
- * pDateStamp and fill given pDateTimeParts struct with these.
+ * Create string parts (year, month, etc.) from `pDateStamp` and fill 
+ * `pDateTimeParts` struct with these.
  *
  * An open locale is needed too, but can be opened as default (NULL)
  * for this.
