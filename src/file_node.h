@@ -18,6 +18,8 @@ typedef struct FileNode
   char NewName[MAX_NAME_LEN + 1];
   ULONG NewNameFullLen;
   BOOL IsNewNameTruncated;
+  ULONG NewNameToken;
+  USHORT TokenOccurrenceNumber;
 } FileNode;
 
 

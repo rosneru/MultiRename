@@ -678,6 +678,13 @@ static void handleGadgets(Application* pApp, ULONG result)
       }
       break;
     }
+    case GID_BTN_START:
+    {
+      showEasyRequest(pApp->pIntuiWindow,
+                      "Ok",
+                      "Yes, this will be possible soon.");
+      break;
+    }
   }
 }
 
