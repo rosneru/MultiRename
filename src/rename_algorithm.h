@@ -6,9 +6,9 @@
 #include "rename_counter.h"
 
 /**
- * Iterates the given 'list of FileNodes'. For every FileNode the field
- * NewName is newly filled according the OriginalName and given parameters
- * pNameMask, pExtMask and counter settings.
+ * Iterates the 'pFilesList'. For every FileNode the content of field
+ * NewName is calculated and set according the OriginalName and
+ * parameters `pNameMask`, `pExtMask` and counter settings.
  *
  */
 BOOL createNewNames(struct List* pFilesList,

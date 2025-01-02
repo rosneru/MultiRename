@@ -9,11 +9,11 @@
 #include "rename_algorithm.h"
 
 
-/// Private function forward declarations
+/// Private function declarations
 
 
 /**
- * Fills the given NewName field of given FileNode* with the new name
+ * Fills the NewName field of `FileNode*` with the new name
  * that is computed from the OriginalName field, the rename mask pMask,
  * the counter and the list of rename actions (that must have been
  * parsed from the pMask in the former step)

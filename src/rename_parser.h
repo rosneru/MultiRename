@@ -60,7 +60,7 @@ typedef struct
 void initActionParser(ActionParser* pParser, STRPTR pMask);
 
 /**
- * Parses the given pMask. It creates a number of nodes and adds it to
+ * Parses the pMask. It creates a number of nodes and adds it to
  * pParser->ActionList. After done with the actions, freeActionNodes()
  * must be called.
  */

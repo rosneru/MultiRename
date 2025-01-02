@@ -17,20 +17,23 @@
 /// Forwards
 
 /**
- * Print given list of FileNodes, only the original names but with dates
+ * Print all FileNodes of `pFilesList`, only the original names but with
+ * dates
  */
 void printFileListOriginalName(struct List* pFilesList);
 
 /**
- * Print given list of FileNodes, original and new names, but no dates
+ * Print all FileNodes of `pFilesList`, original and new names, but no
+ * dates
  */
 void printFileList(struct List* pFilesList, const char* pTitle);
 
 /**
- * Set the DateTimeParts field in given FileNode to given date time
- * string. The given DateTime must have a length of 19 chars, one less
- * than DATETIMEBUF_SIZE, which is defined in date_tools.h and be in the
- * format "2024-05-06-12-54-23"
+ * Set the date time parts pointers in `pFileNode`
+ * (`OriginalDate.pYear`, `OriginalDate.pMonth`, etc) to the appropriate
+ * parts of `pDateString` which must have a length of 19 chars (one less
+ * than DATETIMEBUF_SIZE, which is defined in date_tools.h) and be in
+ * the format "2024-05-06-12-54-23"
  */
 void fillFileNodesDateTime(FileNode* pFileNode, const char* pDateString);
 

@@ -21,7 +21,7 @@ typedef struct RangeMask
 
 /**
  *
- * Create a range mask string like "[N12-16]" from given `RangeMask`.
+ * Create a range mask string like "[N12-16]" from `RangeMask`.
  * The created string is written into pResultStrBuf` which must have at
  * least a size of MAX_RANGE_STRING_LEN + 1 bytes.
  * 
@@ -30,9 +30,9 @@ typedef struct RangeMask
 BOOL createRangeMaskString(RangeMask* pRangeMask, char* pResultStrBuf);
 
 /**
- * Create a range mask string like "[N12-16]" from given `RangeMask` and
- * then create /fill given `pResultStrBuf` with given `pSrcStr` with the
- * created mask string inserted at `insertPos`.
+ * Create a range mask string like "[N12-16]" from `RangeMask` and
+ * then create /fill `pResultStrBuf` with `pSrcStr` with the created 
+ * mask string inserted at `insertPos`.
  *
  * \returns new buffer pos in `pResultStrBuf` at the inserted mask
  * string or -1 on error.

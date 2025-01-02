@@ -5,8 +5,9 @@
 #include <intuition/classusr.h>
 
 /**
- * Append given `pTextToAppend` to the text that is already in given
- * `pStrGadget` (which is displayed in given `pIntuiWindow`).
+ * Append `pTextToAppend` to the existing text in `pStrGadget`.
+ * The parent window of the str gadget, `pIntuiWindow` must be given 
+ * too.
  *
  * Also, a temporary buffer `pScratchBuf` and ist size must be provided
  * to perform the concatenating there before writing the result to the
