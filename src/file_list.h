@@ -7,8 +7,21 @@
 #include "notifications.h"
 
 
+/**
+ * Create a list to store `FileNode` items.
+ */
 struct List* createFileList(void);
+
+/**
+ * Destroys the nodes and then the list itself.
+ * NOTE: The nodes are freed by a call of `FreeListBrowserNode()` each.
+ */
 void freeFileList(struct List* pFilesList);
+
+/**
+ * Counts and returns the number of `FileNode` items in this list.
+ */
+ULONG countFileNodes(struct List* pFilesList);
 
 /**
  * Iterates the pFilesList and return the FileNode* that contains
@@ -22,7 +35,14 @@ FileNode* getLongestOldNameNode(struct List* pFilesList);
  */
 FileNode* getLongestOldExtNode(struct List* pFilesList);
 
+/**
+ * Print the original name field of each `FileNode` in list.
+ */
 void printFileListOriginalName(struct List* pFilesList);
+
+/**
+ * Print the new name field of each `FileNode` in list.
+ */
 void printFileListNewName(struct List* pFilesList);
 
 

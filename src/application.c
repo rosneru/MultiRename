@@ -56,6 +56,8 @@
 
 /// Private function declarations
 
+void startRename(Application* pApp);
+
 /**
  * Re-attaches the list of FileNodes to the list browser.
  * Set the current working path if necessary.
@@ -411,6 +413,17 @@ void notifyUserAboutSkippedFiles(Application* pApp)
   }
 }
 
+void startRename(Application* pApp)
+{
+  ULONG fileCount;
+
+  fileCount = countFileNodes(pApp->pFiles);
+
+  showEasyRequest(pApp->pIntuiWindow,
+                  "Ok",
+                  "Yes, this will be possible soon.");
+}
+
 void applyNewFiles(Application* pApp)
 {
   STRPTR pFirstPath;
@@ -680,9 +693,7 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_START:
     {
-      showEasyRequest(pApp->pIntuiWindow,
-                      "Ok",
-                      "Yes, this will be possible soon.");
+      startRename(pApp);
       break;
     }
   }

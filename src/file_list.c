@@ -190,6 +190,19 @@ void freeFileList(struct List* pFilesList)
   FreeVec(pFilesList);
 }
 
+ULONG countFileNodes(struct List* pFilesList)
+{
+  ULONG count = 0;
+  struct Node* pNode;
+
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+      count++;
+  }
+
+  return count;
+}
+
 FileNode* getLongestOldNameNode(struct List* pFilesList)
 {
   struct Node* pNode;

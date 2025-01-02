@@ -22,6 +22,7 @@ add_executable (MultiRename_gcc
                 rename_counter.c
                 rename_algorithm.c
                 rename_parser.c
+                rename.c
                 requester.c
                 string_tools.c
                 ui_tools.c)

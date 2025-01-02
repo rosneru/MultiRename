@@ -13,7 +13,6 @@ enum {ARG_FILES, ARG_PUBSCREEN, ARG_ARRAY_SIZE};
 
 typedef struct ParsedArgs
 {
-  STRPTR pProcessingDir;
   char* pPubScreenName;
   struct DiskObject* pDiskObject;
   char pScratchPathBuf[MAX_PATH_LEN + 1];
