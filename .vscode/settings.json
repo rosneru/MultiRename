@@ -80,7 +80,8 @@
     "stdlib.h": "c",
     "compiler-specific.h": "c",
     "range_mask.h": "c",
-    "layout.h": "c"
+    "layout.h": "c",
+    "rename_algorithm.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

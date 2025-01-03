@@ -23,4 +23,14 @@ TokenCount* createTokenCounts(ULONG fileCount);
  */
 void freeTokenCounts(TokenCount* pTokenCounts);
 
+
+/**
+ * Fill the field `NewNameToken` of every FileNode in list `pFileNodes`
+ * by parsing the `pTokenCounts` array.
+ */
+void fillTokenOccurrences(struct List* pFilesList,
+                          TokenCount* pTokenCounts,
+                          ULONG numTokenCounts);
+
+
 #endif

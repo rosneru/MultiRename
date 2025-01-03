@@ -6,6 +6,18 @@
 
 #include "rename.h"
 
+/// Private function declarations
+
+TokenCount *appendTokenCount(ULONG appendToken,
+                             TokenCount* pTokenCounts,
+                             ULONG numTokenCounts);
+TokenCount *findTokenCount(ULONG searchToken,
+                           TokenCount* pTokenCounts,
+                           ULONG numTokenCounts);
+
+///
+/// Public function implementations
+
 TokenCount* createTokenCounts(ULONG fileCount)
 {
   TokenCount* pTokenCounts;
@@ -14,6 +26,8 @@ TokenCount* createTokenCounts(ULONG fileCount)
   {
     return NULL;
   }
+
+  return pTokenCounts;
 }
 
 
@@ -21,73 +35,87 @@ void freeTokenCounts(TokenCount* pTokenCounts)
 {
   if(!pTokenCounts)
   {
-    return NULL;
+    return;
   }
 
   FreeVec(pTokenCounts);
 }
 
-// === BEGIN private ===
-TokenCount *findTokenCount(ULONG searchToken,
-                           ULONG itemCount)
+void fillTokenOccurrences(struct List* pFilesList,
+                          TokenCount* pTokenCounts,
+                          ULONG numTokenCounts)
 {
   ULONG i;
-  for (i = 0; i < itemCount; i++)
-  {
-    // if (tokenCounts[i].Token == searchToken)
-    // {
-    //   return &tokenCounts[i];
-    // }
-  }
-
-  return NULL;
-}
-
-TokenCount *appendTokenCount(ULONG token,
-                             ULONG itemCount)
-{
-  ULONG i;
-
-  for (i = 0; i < itemCount; i++)
-  {
-    // if (tokenCounts[i].Token == 0 && tokenCounts[i].Count == 0)
-    // {
-    //   tokenCounts[i].Token = token;
-    //   tokenCounts[i].Count = 1;
-    //   return &tokenCounts[i];
-    // }
-  }
-
-  return NULL;
-}
-// === END private ===
-
-void parseTokenOccurrences(struct List *pFileList, ULONG itemCount)
-{
-  ULONG i;
+  struct Node* pNode;
+  FileNode* pFileNode;
   TokenCount* pTokenCount;
 
-  // if (!pItems)
-  // {
-  //   return;
-  // }
+  if (!pFilesList || !pTokenCounts || numTokenCounts < 1)
+  {
+    return;
+  }
 
-  // for (i = 0; i < itemCount; i++)
-  // {
-  //   if (pTokenCount = findTokenCount(items[i].Token, itemCount))
-  //   {
-  //     pTokenCount->Count++;
-  //   }
-  //   else
-  //   {
-  //     if (!(pTokenCount = appendTokenCount(items[i].Token, itemCount)))
-  //     {
-  //       printf("Failed to append token count for item '%10lu: %s'\n", items[i].Token,
-  //                                                                     items[i].pText);
-  //       continue;
-  //     }
-  //   }
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
 
-    // items[i].OccurrenceNumber = pTokenCount->Count;
-  // }
+    if ((pTokenCount = findTokenCount(pFileNode->NewNameToken,
+                                      pTokenCounts,
+                                      numTokenCounts)))
+    {
+      pTokenCount->Count++;
+    }
+    else
+    {
+      if (!(pTokenCount = appendTokenCount(pFileNode->NewNameToken, pTokenCounts, numTokenCounts)))
+      {
+        printf("Failed to append token count for item '%10lu: %s'\n", pFileNode->NewNameToken,
+                                                                      pFileNode->NewName);
+        continue;
+      }
+    }
+
+    pFileNode->TokenOccurrenceNumber = pTokenCount->Count;
+
+  }
 }
+
+///
+/// Private function implementations
+
+TokenCount *findTokenCount(ULONG searchToken,
+                           TokenCount* pTokenCounts,
+                           ULONG numTokenCounts)
+{
+  ULONG i;
+  for (i = 0; i < numTokenCounts; i++)
+  {
+    if (pTokenCounts[i].Token == searchToken)
+    {
+      return &pTokenCounts[i];
+    }
+  }
+
+  return NULL;
+}
+
+TokenCount *appendTokenCount(ULONG appendToken,
+                             TokenCount* pTokenCounts,
+                             ULONG numTokenCounts)
+{
+  ULONG i;
+
+  for (i = 0; i < numTokenCounts; i++)
+  {
+    if (pTokenCounts[i].Token == 0 && pTokenCounts[i].Count == 0)
+    {
+      pTokenCounts[i].Token = appendToken;
+      pTokenCounts[i].Count = 1;
+      return &pTokenCounts[i];
+    }
+  }
+
+  return NULL;
+}
+
+///
