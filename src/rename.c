@@ -6,7 +6,7 @@
 
 #include "rename.h"
 
-/// Private function declarations
+/// Forwards / private function declarations
 
 TokenCount *appendTokenCount(ULONG appendToken,
                              TokenCount* pTokenCounts,

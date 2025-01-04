@@ -23,29 +23,38 @@
 #include "file_list.h"
 
 
-// Thomas Richter @ RMRM DOS, 2024: It is certainly a burden to always
-// allocate temporary BCPL objects from the heap through the
-// exec.library or the os.library, and doing so can also fragment the
-// AmigaOs memory unnecessarily. However, allocation of automatic
-// objects from the stack does not ensure long-word alignment in
-// general. To work around this burden, one can use a trick and instead
-// request from the compiler a somewhat longer object with automatic
-// storage duration and align the requested object manually within the
-// memory obtained this way. The following macro performs this trick:
+/// D_S macro definition
 
+// Thomas Richter @ RMRM DOS, 2024: It is certainly a burden to always allocate temporary BCPL objects from the heap through the exec.library or the os.library, and doing so can also fragment the AmigaOs memory unnecessarily. However, allocation of automatic objects from the stack does not ensure long-word alignment in general. To work around this burden, one can use a trick and instead request from the compiler a somewhat longer object with automatic storage duration and align the requested object manually within the memory obtained this way. The following macro performs this trick:
+
+/**
+ * Thomas Richter @ RKRM DOS, 2024: It is certainly a burden to always
+ * allocate temporary BCPL objects from the heap through the
+ * exec.library or the os.library, and doing so can also fragment the
+ * AmigaOs memory unnecessarily. However, allocation of automatic
+ * objects from the stack does not ensure long-word alignment in
+ * general. To work around this burden, one can use a trick and instead
+ * request from the compiler a somewhat longer object with automatic
+ * storage duration and align the requested object manually within the
+ * memory obtained this way. The D_S macro (see below) performs this
+ * trick.
+ * 
+ * It is used as follows:
+ *     `D_S (struct FileInfoBlock, fib);`
+ * 
+ * At this point, fib is a pointer to a properly aligned struct
+ * FileInfoBlock, e.g. this is equivalent to
+ *     `struct FileInfoBlock _tmp;`
+ *     `struct FileInfoBlock *fib = &tmp;`
+ * Except that the created pointer is properly aligned and can safely be
+ * passed into the dos.library.
+ */
 #define D_S(type,name) char a_##name[sizeof(type)+3]; \
                        type *name = (type *)((ULONG)(a_##name+3) & ~3UL)
 
-// It is used as follows:
-//     D_S (struct FileInfoBlock, fib);
-//
-// At this point, fib is a pointer to a properly aligned struct
-// FileInfoBlock, e.g. this is equivalent to
-//     struct FileInfoBlock _tmp;
-//     struct FileInfoBlock *fib = &tmp;
-// Except that the created pointer is properly aligned and can safely be
-// passed into the dos.library.
 
+///
+/// Public function implementations
 
 struct Node* createFileNode(struct Locale* pLocale,
                             BPTR pLock,
@@ -345,3 +354,5 @@ STRPTR getFirstFilePath(struct List* pFilesList)
 
   return ((FileNode*)pFilesList->lh_Head)->Path;
 }
+
+///

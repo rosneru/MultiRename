@@ -19,11 +19,13 @@
 #include "application.h"
 
 
-/**
- * Private function declarations
- */
+/// Forwards / private function declarations
+
 BOOL openLibs(void);
 void closeLibs(void);
+
+///
+/// Private variables
 
 /**
  * There are 2 problems regarding the use of Reaction BOOPSIES:
@@ -54,8 +56,8 @@ struct Library* LabelBase = NULL;
 struct Library* SliderBase = NULL;
 struct Library* StringBase = NULL;
 
-
-
+///
+/// Public function implementations
 
 /**
  * CLI entry point
@@ -90,7 +92,8 @@ void wbmain(struct WBStartup* wb)
   main(0, (char **) wb);
 }
 
-
+///
+/// Private function implementations
 
 BOOL openLibs(void)
 {
@@ -222,3 +225,5 @@ void closeLibs(void)
     CloseLibrary((struct Library*)IntuitionBase);
   }
 }
+
+///

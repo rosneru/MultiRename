@@ -54,7 +54,7 @@
 #include "ui_tools.h"
 #include "application.h"
 
-/// Private function declarations
+/// Forwards / private function declarations
 
 void startRename(Application* pApp);
 
@@ -100,6 +100,7 @@ void intuiEventLoop(Application* pApp);
  */
 Object* createLayout(void);
 
+///
 /// Private variables
 
 struct ColumnInfo *m_pColumnInfo = NULL;
@@ -131,7 +132,7 @@ static Object* m_ppGadgets[MAXGADGETS];
 struct Hook m_AppHook;
 
 
-
+///
 /// Hook implementations
 
 void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
@@ -183,6 +184,7 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
   applyNewFiles(pApp);
 }
 
+///
 /// Public function implementations
 
 Application* createApplication(int argc, char **argv)
@@ -290,8 +292,8 @@ Application* createApplication(int argc, char **argv)
       }
       else
       {
-          PutStr("Failed to create the message port for window drag'n drop.\n");
-          disposeApplication(pApp);
+        PutStr("Failed to create the message port for window drag'n drop.\n");
+        disposeApplication(pApp);
       }
     }
     else
@@ -384,7 +386,7 @@ BOOL runApplication(Application* pApp)
   return FALSE;
 }
 
-
+///
 /// Private function implementations
 
 void updateMainWindowTitle(Application* pApp)
@@ -935,3 +937,5 @@ Object* createLayout(void)
 
   return pMainLayout;
 }
+
+///

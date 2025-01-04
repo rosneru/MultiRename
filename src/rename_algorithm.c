@@ -9,8 +9,7 @@
 #include "rename_algorithm.h"
 
 
-/// Private function declarations
-
+/// Forwards / private function declarations
 
 /**
  * Fills the NewName field of `FileNode*` with the new name
@@ -31,9 +30,8 @@ void applyActions(FileNode* pFileNode,
  */
 void createNewNameToken(FileNode* pFileNode);
 
-
+///
 /// Public function implementations
-
 
 BOOL createNewNames(struct List* pFilesList,
                   STRPTR pNameMask,
@@ -93,9 +91,8 @@ BOOL createNewNames(struct List* pFilesList,
   return TRUE;
 }
 
-
+///
 /// Private function implementations
-
 
 void applyActions(FileNode* pFileNode,
                   ULONG bufSize,
@@ -295,3 +292,5 @@ void createNewNameToken(FileNode* pFileNode)
     pFileNode->NewNameToken += 2 * pFileNode->NewNameToken + *(pItemText++);
   }
 }
+
+///
