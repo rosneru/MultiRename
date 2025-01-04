@@ -22,6 +22,11 @@ TokenCount* createTokenCounts(ULONG fileCount)
 {
   TokenCount* pTokenCounts;
 
+  if(fileCount < 1)
+  {
+    return NULL;
+  }
+
   if(!(pTokenCounts = AllocVec(fileCount * sizeof(TokenCount), MEMF_CLEAR)))
   {
     return NULL;

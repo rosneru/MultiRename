@@ -49,6 +49,7 @@
 #include "file_list.h"
 #include "notifications.h"
 #include "range_select_window.h"
+#include "rename.h"
 #include "rename_algorithm.h"
 #include "requester.h"
 #include "ui_tools.h"
@@ -418,12 +419,48 @@ void notifyUserAboutSkippedFiles(Application* pApp)
 void startRename(Application* pApp)
 {
   ULONG fileCount;
+  TokenCount* pTokenCounts;
+  struct Node* pNode;
+  FileNode* pFileNode;
 
   fileCount = countFileNodes(pApp->pFiles);
+  if(fileCount == 0)
+  {
+    showEasyRequest(pApp->pIntuiWindow,
+                    "Ok",
+                    "No files to rename.");
+    return;
+  }
+
+  if(!(pTokenCounts = createTokenCounts(fileCount)))
+  {
+      showEasyRequest(pApp->pIntuiWindow,
+                      "Ok",
+                      "Aborted: Failed to pre-process / create tokens.");
+      return;
+  }
+
+  fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
+
+  for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    if(pFileNode->TokenOccurrenceNumber > 1)
+    {
+        showEasyRequest(pApp->pIntuiWindow,
+                        "Abort",
+                        "Can't continue: Duplicate names.");
+        freeTokenCounts(pTokenCounts);
+        return;
+    }
+  }
 
   showEasyRequest(pApp->pIntuiWindow,
                   "Ok",
-                  "Yes, this will be possible soon.");
+                  "Finished renaming.");
+
+
+  freeTokenCounts(pTokenCounts);
 }
 
 void applyNewFiles(Application* pApp)
