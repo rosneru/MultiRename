@@ -25,8 +25,6 @@
 
 /// D_S macro definition
 
-// Thomas Richter @ RMRM DOS, 2024: It is certainly a burden to always allocate temporary BCPL objects from the heap through the exec.library or the os.library, and doing so can also fragment the AmigaOs memory unnecessarily. However, allocation of automatic objects from the stack does not ensure long-word alignment in general. To work around this burden, one can use a trick and instead request from the compiler a somewhat longer object with automatic storage duration and align the requested object manually within the memory obtained this way. The following macro performs this trick:
-
 /**
  * Thomas Richter @ RKRM DOS, 2024: It is certainly a burden to always
  * allocate temporary BCPL objects from the heap through the
