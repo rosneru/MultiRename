@@ -11,6 +11,15 @@ typedef struct
 } TokenCount;
 
 
+/**
+ * Rename every file node in given list of `FileNode*` from 
+ * `pFileNode->OriginalName` to `pFileNode->NewName`.
+ * 
+ * Returns TRUE on success, and FALSE on error together with a detailed
+ * notification of on which files the rename process idid fail 
+ */
+BOOL renameFiles(struct List* pFilesList, struct List* pNotifications);
+
 
 /**
  * Create and return an array of empty TokenCount objects of size

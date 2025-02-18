@@ -449,15 +449,27 @@ void startRename(Application* pApp)
     {
         showEasyRequest(pApp->pIntuiWindow,
                         "Abort",
-                        "Can't continue: Duplicate names.");
+                        "Can't rename: Duplicate names.");
         freeTokenCounts(pTokenCounts);
         return;
     }
   }
 
-  showEasyRequest(pApp->pIntuiWindow,
-                  "Ok",
-                  "Finished renaming.");
+  if(renameFiles(pApp->pFiles, pApp->pNotifications))
+  {
+    showEasyRequest(pApp->pIntuiWindow,
+                    "Ok",
+                    "Finished renaming.");
+  }
+  else
+  {
+    if(!showEasyRequest(pApp->pIntuiWindow,
+      "Ok|Show errors",
+      "Failed to rename some of the input files"))
+    {
+      printNotifications(pApp->pNotifications);
+    }
+  }
 
 
   freeTokenCounts(pTokenCounts);

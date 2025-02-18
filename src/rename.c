@@ -18,6 +18,12 @@ TokenCount *findTokenCount(ULONG searchToken,
 ///
 /// Public function implementations
 
+BOOL renameFiles(struct List* pFilesList, struct List* pNotifications)
+{
+  return TRUE;
+}
+
+
 TokenCount* createTokenCounts(ULONG fileCount)
 {
   TokenCount* pTokenCounts;
