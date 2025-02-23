@@ -20,6 +20,20 @@ TokenCount *findTokenCount(ULONG searchToken,
 
 BOOL renameFiles(struct List* pFilesList, struct List* pNotifications)
 {
+  struct Node* pNode;
+  FileNode* pFileNode;
+
+  if (!pFilesList || !pNotifications)
+  {
+    return FALSE;
+  }
+
+  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    pFileNode = (FileNode*)pNode;
+    printf("%s ==> %s\n", pFileNode->OriginalName, pFileNode->NewName);
+  }
+
   return TRUE;
 }
 
