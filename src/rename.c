@@ -28,6 +28,12 @@ BOOL renameFiles(struct List* pFilesList, struct List* pNotifications)
     return FALSE;
   }
 
+  // TODO
+  // 1. How to get th lock of files directory?
+  // 2. Change dir to files directory
+  // 3. Call Rename() in loop below.
+  // 3.1. Add errors to notifications
+
   for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
