@@ -4,7 +4,7 @@
 #include <exec/nodes.h>
 #include "date_tools.h"
 
-#define MAX_PATH_LEN 255
+#define MAX_PATH_LEN 2048
 #define MAX_NAME_LEN 107    // 107 maximum in FFS, PFS
 
 typedef struct FileNode

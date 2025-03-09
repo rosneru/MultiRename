@@ -29,6 +29,7 @@ typedef struct Application
   struct Window* pIntuiWindow;
   ULONG SigMask;
   char FilesPath[MAX_PATH_LEN + 1];
+  BPTR FilesDirLock;
   char WindowTitle[MAX_PATH_LEN + 32];
   char ScratchBuf[SCRATCH_BUF_SIZE + 1];
 } Application;

@@ -47,6 +47,7 @@
 #include <string.h>
 
 #include "file_list.h"
+#include "file_tools.h"
 #include "notifications.h"
 #include "range_select_window.h"
 #include "rename.h"
@@ -338,6 +339,11 @@ void disposeApplication(Application* pApp)
     freeParsedArgs(pApp->pParsedArgs);
   }
 
+  if(pApp->FilesDirLock)
+  {
+    UnLock(pApp->FilesDirLock);
+  }
+
   if(pApp->pFiles)
   {
     freeFileList(pApp->pFiles);
@@ -480,7 +486,7 @@ void applyNewFiles(Application* pApp)
   STRPTR pFirstPath;
 
   // FilePath not already set?
-  if(!strlen(pApp->FilesPath))
+  if(!pApp->FilesDirLock)
   {
     // Does list contain at least one file?
     if((pFirstPath = getFirstFilePath(pApp->pFiles)))
@@ -492,9 +498,18 @@ void applyNewFiles(Application* pApp)
                     LISTBROWSER_AutoFit, TRUE,
                     TAG_DONE);
 
-      // Apply the file path for this session
-      strncpy(pApp->FilesPath, pFirstPath, MAX_PATH_LEN);
-      addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
+      if((pApp->FilesDirLock = lockFromLongName(pFirstPath)))
+      {
+        // Apply the file path for this session
+        strncpy(pApp->FilesPath, pFirstPath, MAX_PATH_LEN);
+        addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
+      }
+      else
+      {
+        addNotification(pApp->pNotifications,
+                        NNT_SKIPPED_FAILED_LOCK,
+                        pFirstPath);
+      }
     }
   }
 

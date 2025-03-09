@@ -176,7 +176,7 @@ void printNotifications(struct List* pList)
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
   {
-    printf("Skipped %u input file(s) because they couldn't be / "
+    printf("Skipped %u input file(s) because they couldn't be "
            "examined:\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -192,8 +192,7 @@ void printNotifications(struct List* pList)
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
   {
-    printf("Skipped %u input file(s) because they couldn't be / "
-           "locked:\n", count);
+    printf("Failed to lock %u input file(s) / dir(s):\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -216,13 +215,17 @@ BOOL containsSkippedNotifications(struct List* pList)
     return TRUE;
   }
 
-
   if(0 < getNotificationCountByType(pList, NNT_SKIPPED_INFO_FILE))
   {
     return TRUE;
   }
 
   if(0 < getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH))
+  {
+    return TRUE;
+  }
+
+  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK))
   {
     return TRUE;
   }
