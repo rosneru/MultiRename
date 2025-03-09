@@ -24,6 +24,9 @@ $(OBJDIR)date_tools.o : src/date_tools.c
 $(OBJDIR)file_list.o : src/file_list.c
 	$(CC) nolink src/file_list.c
 
+$(OBJDIR)file_tools.o : src/file_tools.c
+	$(CC) nolink src/file_tools.c
+
 $(OBJDIR)main.o : src/main.c
 	$(CC) nolink src/main.c
 
@@ -60,8 +63,8 @@ $(OBJDIR)string_tools.o : src/string_tools.c
 $(OBJDIR)ui_tools.o : src/ui_tools.c
 	$(CC) nolink src/ui_tools.c
 
-OBJS = $(OBJDIR)application.o  $(OBJDIR)file_list.o $(OBJDIR)date_tools.o
-OBJS = $(OBJS) $(OBJDIR)main.o
+OBJS = $(OBJDIR)application.o $(OBJDIR)file_list.o $(OBJDIR)file_tools.o
+OBJS = $(OBJS) $(OBJDIR)date_tools.o $(OBJDIR)main.o
 OBJS = $(OBJS) $(OBJDIR)notifications.o $(OBJDIR)parsed_args.o
 OBJS = $(OBJS) $(OBJDIR)range_mask.o $(OBJDIR)range_select_window.o
 OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_counter.o
