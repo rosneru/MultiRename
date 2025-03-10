@@ -3,7 +3,7 @@
 
 #include <exec/lists.h>
 #include <exec/types.h>
-#include "../file_node.h"
+#include "../file_nodes.h"
 #include "../rename_algorithm.h"
 #include "../rename_counter.h"
 
@@ -20,13 +20,13 @@
  * Print all FileNodes of `pFilesList`, only the original names but with
  * dates
  */
-void printFileListOriginalName(struct List* pFilesList);
+void printFileListOriginalName(FileNodes* pFiles);
 
 /**
  * Print all FileNodes of `pFilesList`, original and new names, but no
  * dates
  */
-void printFileList(struct List* pFilesList, const char* pTitle);
+void printFileList(FileNodes* pFiles, const char* pTitle);
 
 /**
  * Set the date time parts pointers in `pFileNode`
@@ -47,7 +47,7 @@ FileNode node3 = { {0}, "Shared:dev/projects/MultiRename/testdata/", "My_3rd_att
 int main(void)
 {
   int i;
-  struct List fileList;
+  FileNodes files;
   Counter counter;
 
   fillFileNodesDateTime(&node1, "1978-06-18-12-00-11");
@@ -55,11 +55,11 @@ int main(void)
   fillFileNodesDateTime(&node3, "2017-11-23-22-38-22");
 
   // Initialize the list
-  NewList(&fileList);
+  NewList(files.pList);
 
-  AddTail(&fileList, (struct Node*) &node1);
-  AddTail(&fileList, (struct Node*) &node2);
-  AddTail(&fileList, (struct Node*) &node3);
+  AddTail(files.pList, (struct Node*) &node1);
+  AddTail(files.pList, (struct Node*) &node2);
+  AddTail(files.pList, (struct Node*) &node3);
 
   initCounter(&counter, 2, 2, 3);
   printf("Testing a Counter(2, 2, 3) with init value and 2 iterations..\n");
@@ -84,12 +84,12 @@ int main(void)
 
   printf("sizeof(LONG) = %lu\n", sizeof(LONG));
 
-  printFileListOriginalName(&fileList);
+  printFileListOriginalName(&files);
 
   // test_name_2
-  if(createNewNames(&fileList, "Abc - [N]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "Abc - [N]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_name_2: 'Abc - [N]', '[E]'");
+    printFileList(&files, "test_name_2: 'Abc - [N]', '[E]'");
   }
   else
   {
@@ -97,9 +97,9 @@ int main(void)
   }
 
   // test_name_4
-  if(createNewNames(&fileList, "Aa[N]Bb", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "Aa[N]Bb", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_name_4: 'Aa[N]Bb', '[E]'");
+    printFileList(&files, "test_name_4: 'Aa[N]Bb', '[E]'");
   }
   else
   {
@@ -107,9 +107,9 @@ int main(void)
   }
 
   // test_name_5
-  if(createNewNames(&fileList, "", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_name_5 (Create empty names): '', '[E]'");
+    printFileList(&files, "test_name_5 (Create empty names): '', '[E]'");
   }
   else
   {
@@ -117,9 +117,9 @@ int main(void)
   }
 
   // test_name_6
-  if(createNewNames(&fileList, "Abc - [N", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "Abc - [N", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_name_6: Error because unclosed name cmd: 'Abc - [N', '[E]'");
+    printFileList(&files, "test_name_6: Error because unclosed name cmd: 'Abc - [N', '[E]'");
   }
   else
   {
@@ -127,9 +127,9 @@ int main(void)
   }
 
   // test_name_7
-  if(createNewNames(&fileList, "Abc - [N]]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "Abc - [N]]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_name_7: Error because double closed name cmd: 'Abc - [N', '[E]'");
+    printFileList(&files, "test_name_7: Error because double closed name cmd: 'Abc - [N', '[E]'");
   }
   else
   {
@@ -137,9 +137,9 @@ int main(void)
   }
 
   // test_name_part_1
-  if(createNewNames(&fileList, "[N4-6]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "[N4-6]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_name_part_1: '[N4-6]', '[E]'");
+    printFileList(&files, "test_name_part_1: '[N4-6]', '[E]'");
   }
   else
   {
@@ -147,9 +147,9 @@ int main(void)
   }
 
   // test_counter_mixed_2
-  if(createNewNames(&fileList, "[N4-6] New[C] [N8-29]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "[N4-6] New[C] [N8-29]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_counter_mixed_2: '[N4-6] New[C] [N8-29]', '[E]'");
+    printFileList(&files, "test_counter_mixed_2: '[N4-6] New[C] [N8-29]', '[E]'");
   }
   else
   {
@@ -157,9 +157,9 @@ int main(void)
   }
 
   // test_SegmentationFault_resulting_name_too_long
-  if(createNewNames(&fileList, "[N][N][N][N][N]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "[N][N][N][N][N]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_SegmentationFault_resulting_name_too_long: '[N][N][N][N][N]', '[E]'");
+    printFileList(&files, "test_SegmentationFault_resulting_name_too_long: '[N][N][N][N][N]', '[E]'");
   }
   else
   {
@@ -167,9 +167,9 @@ int main(void)
   }
 
   // test_date_1
-  if(createNewNames(&fileList, "[YMD]-[hms]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "[YMD]-[hms]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_date_1: '[YMD]-[hms]', '[E]'");
+    printFileList(&files, "test_date_1: '[YMD]-[hms]', '[E]'");
   }
   else
   {
@@ -177,9 +177,9 @@ int main(void)
   }
 
   // test_date_2
-  if(createNewNames(&fileList, "[Y]-[M]-[D] - [hms]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "[Y]-[M]-[D] - [hms]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_date_2: '[Y]-[M]-[D] - [hms]', '[E]'");
+    printFileList(&files, "test_date_2: '[Y]-[M]-[D] - [hms]', '[E]'");
   }
   else
   {
@@ -187,9 +187,9 @@ int main(void)
   }
 
   // test_date_3
-  if(createNewNames(&fileList, "[YYY]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "[YYY]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_date_3: '[YYY]', '[E]'");
+    printFileList(&files, "test_date_3: '[YYY]', '[E]'");
   }
   else
   {
@@ -197,9 +197,9 @@ int main(void)
   }
 
   // test_date_4
-  if(createNewNames(&fileList, "[Y][Y][Y]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, "[Y][Y][Y]", "[E]", 1, 1, 1))
   {
-    printFileList(&fileList, "test_date_4: '[Y][Y][Y]', '[E]'");
+    printFileList(&files, "test_date_4: '[Y][Y][Y]', '[E]'");
   }
   else
   {
@@ -210,7 +210,7 @@ int main(void)
 
 
 
-void printFileList(struct List* pFilesList, const char* pTitle)
+void printFileList(FileNodes* pFiles, const char* pTitle)
 {
   struct Node* pNode;
   FileNode* pFileNode;
@@ -219,7 +219,7 @@ void printFileList(struct List* pFilesList, const char* pTitle)
   printf("** %s **\n", pTitle);
   printf("Trunc|Original name                          |New name\n");
   printf("=====|=======================================|=======================================\n");
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     if(pFileNode->IsNewNameTruncated)
@@ -240,7 +240,7 @@ void printFileList(struct List* pFilesList, const char* pTitle)
 }
 
 
-void printFileListOriginalName(struct List* pFilesList)
+void printFileListOriginalName(FileNodes* pFiles)
 {
   struct Node* pNode;
   FileNode* pFileNode;
@@ -248,7 +248,7 @@ void printFileListOriginalName(struct List* pFilesList)
   printf("** Original file list **\n");
   printf("Name                                   |date\n");
   printf("=======================================|=======================================\n");
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     printf("%-39s|%s-%s-%s, %s:%s:%s\n", pFileNode->OriginalName,

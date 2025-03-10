@@ -1,6 +1,8 @@
 #ifdef __clang__
+  #include <clib/dos_protos.h>
   #include <clib/exec_protos.h>
 #else
+  #include <proto/dos.h>
   #include <proto/exec.h>
 #endif
 
@@ -18,12 +20,12 @@ TokenCount *findTokenCount(ULONG searchToken,
 ///
 /// Public function implementations
 
-BOOL renameFiles(struct List* pFilesList, struct List* pNotifications)
+BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications)
 {
   struct Node* pNode;
   FileNode* pFileNode;
 
-  if (!pFilesList || !pNotifications)
+  if (!pFiles || !pFiles->pList || !pNotifications)
   {
     return FALSE;
   }
@@ -34,10 +36,10 @@ BOOL renameFiles(struct List* pFilesList, struct List* pNotifications)
   // 3. Call Rename() in loop below.
   // 3.1. Add errors to notifications
 
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    printf("%s ==> %s\n", pFileNode->OriginalName, pFileNode->NewName);
+    Printf("%s ==> %s\n", pFileNode->OriginalName, pFileNode->NewName);
   }
 
   return TRUE;
@@ -72,21 +74,20 @@ void freeTokenCounts(TokenCount* pTokenCounts)
   FreeVec(pTokenCounts);
 }
 
-void fillTokenOccurrences(struct List* pFilesList,
+void fillTokenOccurrences(FileNodes* pFiles,
                           TokenCount* pTokenCounts,
                           ULONG numTokenCounts)
 {
-  ULONG i;
   struct Node* pNode;
   FileNode* pFileNode;
   TokenCount* pTokenCount;
 
-  if (!pFilesList || !pTokenCounts || numTokenCounts < 1)
+  if (!pFiles || !pFiles->pList || !pTokenCounts || numTokenCounts < 1)
   {
     return;
   }
 
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
 
@@ -100,7 +101,7 @@ void fillTokenOccurrences(struct List* pFilesList,
     {
       if (!(pTokenCount = appendTokenCount(pFileNode->NewNameToken, pTokenCounts, numTokenCounts)))
       {
-        printf("Failed to append token count for item '%10lu: %s'\n", pFileNode->NewNameToken,
+        Printf("Failed to append token count for item '%10du: %s'\n", pFileNode->NewNameToken,
                                                                       pFileNode->NewName);
         continue;
       }

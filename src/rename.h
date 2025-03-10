@@ -1,7 +1,7 @@
 #ifndef RENAME_H
 #define RENAME_H
 
-#include "file_list.h"
+#include "file_nodes.h"
 
 
 typedef struct
@@ -18,7 +18,7 @@ typedef struct
  * Returns TRUE on success, and FALSE on error together with a detailed
  * notification of on which files the rename process idid fail 
  */
-BOOL renameFiles(struct List* pFilesList, struct List* pNotifications);
+BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications);
 
 
 /**
@@ -34,10 +34,10 @@ void freeTokenCounts(TokenCount* pTokenCounts);
 
 
 /**
- * Fill the field `NewNameToken` of every FileNode in list `pFileNodes`
+ * Fill the field `NewNameToken` of every FileNode in list `pFiles`
  * by parsing the `pTokenCounts` array.
  */
-void fillTokenOccurrences(struct List* pFilesList,
+void fillTokenOccurrences(FileNodes* pFiles,
                           TokenCount* pTokenCounts,
                           ULONG numTokenCounts);
 

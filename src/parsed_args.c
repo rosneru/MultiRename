@@ -15,18 +15,18 @@
 #include <workbench/startup.h>
 #include <workbench/workbench.h>
 
-#include "file_list.h"
+#include "file_nodes.h"
 #include "notifications.h"
 #include "parsed_args.h"
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
-                         struct List* pFilesList,
+                         FileNodes* pFileNodes,
                          struct Locale* pLocale,
                          struct List* pNotifications);
 
 void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        char **argv,
-                       struct List* pFilesList,
+                       FileNodes* pFileNodes,
                        struct Locale* pLocale,
                        struct List* pNotifications);
 
@@ -35,7 +35,7 @@ static struct RDArgs* pReadArgs = NULL;
 
 ParsedArgs* createParsedArgs(int argc,
                              char **argv,
-                             struct List* pFilesList,
+                             FileNodes* pFileNodes,
                              struct Locale* pLocale,
                              struct List* pNotifications)
 {
@@ -50,13 +50,13 @@ ParsedArgs* createParsedArgs(int argc,
   if(argc == 0)
   {
     // Started from Workbench
-    readWorkbenchArgs(pParsedArgs, argv, pFilesList, pLocale, pNotifications);
+    readWorkbenchArgs(pParsedArgs, argv, pFileNodes, pLocale, pNotifications);
 
   }
   else
   {
     // Started from CLI
-    readCommandLineArgs(pParsedArgs, pFilesList, pLocale, pNotifications);
+    readCommandLineArgs(pParsedArgs, pFileNodes, pLocale, pNotifications);
   }
 
   return pParsedArgs;
@@ -78,7 +78,7 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
-                         struct List* pFilesList,
+                         FileNodes* pFileNodes,
                          struct Locale* pLocale,
                          struct List* pNotifications)
 {
@@ -106,7 +106,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
       {
         if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
-          appendFileNode(pFilesList,
+          appendFileNode(pFileNodes,
                          pParsedArgs->pScratchPathBuf,
                          pLocale,
                          pNotifications);
@@ -116,7 +116,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
           if(IoErr() == ERROR_LINE_TOO_LONG)
           {
             // For the error notification only the file name not the
-            // relative path is needed.
+            // path is needed.
             pFileName = FilePart(*ppFiles);
             addNotification(pNotifications,
                             NNT_SKIPPED_PATH_TOO_LONG,
@@ -146,7 +146,7 @@ char* toolTypeValue(const STRPTR* ppTooltypeArray, const char* pTooltypeName)
 
 void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        char **argv,
-                       struct List* pFilesList,
+                       FileNodes* pFileNodes,
                        struct Locale* pLocale,
                        struct List* pNotifications)
 {
@@ -193,7 +193,7 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
         if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
           AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
-          appendFileNode(pFilesList,
+          appendFileNode(pFileNodes,
                          pParsedArgs->pScratchPathBuf,
                          pLocale,
                          pNotifications);

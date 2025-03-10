@@ -46,7 +46,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "file_list.h"
+#include "file_nodes.h"
 #include "file_tools.h"
 #include "notifications.h"
 #include "range_select_window.h"
@@ -204,7 +204,7 @@ Application* createApplication(int argc, char **argv)
       {
         if((pApp->pNotifications = createNotificationList()))
         {
-          if((pApp->pFiles = createFileList()))
+          if((pApp->pFiles = createFileNodes()))
           {
             if((pApp->pParsedArgs = createParsedArgs(argc,
                                                      argv,
@@ -346,7 +346,7 @@ void disposeApplication(Application* pApp)
 
   if(pApp->pFiles)
   {
-    freeFileList(pApp->pFiles);
+    freeFileNodes(pApp->pFiles);
   }
 
   if(pApp->pNotifications)
@@ -448,7 +448,7 @@ void startRename(Application* pApp)
 
   fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
 
-  for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     if(pFileNode->TokenOccurrenceNumber > 1)
@@ -556,7 +556,7 @@ BOOL updateNewNames(Application* pApp)
                     counterPlacesValue))
   {
     // Set the updated NewName text for each ListBrowser node
-    for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for(pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       pFileNode = (FileNode*)pNode;
       
@@ -582,7 +582,7 @@ BOOL updateNewNames(Application* pApp)
   {
     // createNewNames() failed.
     // Set <Error!> for every ListBrowser nodes NewName column.
-    for(pNode = pApp->pFiles->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for(pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       pFileNode = (FileNode*)pNode;
       SetListBrowserNodeAttrs(pNode,
@@ -767,7 +767,6 @@ static void handleGadgets(Application* pApp, ULONG result)
 
 void intuiEventLoop(Application* pApp)
 {
-  ULONG receivedSig;
   ULONG result;
   ULONG code;
   BOOL end = FALSE;
@@ -776,7 +775,7 @@ void intuiEventLoop(Application* pApp)
 
   while (!end)
   {
-    receivedSig = Wait(pApp->SigMask);
+    Wait(pApp->SigMask);
 
     // Handle the events of the range select window
     handleRangeSelectWindowEvents(pApp->pRangeSelectWindow);

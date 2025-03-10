@@ -33,12 +33,12 @@ void createNewNameToken(FileNode* pFileNode);
 ///
 /// Public function implementations
 
-BOOL createNewNames(struct List* pFilesList,
-                  STRPTR pNameMask,
-                  STRPTR pExtMask,
-                  LONG counterStart,
-                  LONG counterInc,
-                  BYTE counterWidth)
+BOOL createNewNames(FileNodes* pFiles,
+                    STRPTR pNameMask,
+                    STRPTR pExtMask,
+                    LONG counterStart,
+                    LONG counterInc,
+                    BYTE counterWidth)
 {
   struct Node* pNode;
   FileNode* pFileNode;
@@ -47,7 +47,7 @@ BOOL createNewNames(struct List* pFilesList,
   Counter counter;
   ActionParser parser;
 
-  if(!pFilesList || ! pNameMask || ! pExtMask)
+  if(!pFiles || !pFiles->pList || ! pNameMask || ! pExtMask)
   {
     return FALSE;
   }
@@ -74,7 +74,7 @@ BOOL createNewNames(struct List* pFilesList,
     return FALSE;
   }
 
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     applyActions(pFileNode,

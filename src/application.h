@@ -8,7 +8,7 @@
 #include <intuition/intuition.h>
 #include <libraries/locale.h>
 
-#include "file_list.h"
+#include "file_nodes.h"
 #include "notifications.h"
 #include "parsed_args.h"
 #include "range_mask.h"
@@ -22,14 +22,14 @@ typedef struct Application
   struct MsgPort* pAppWindowPort;
   struct List* pNotifications;
   ParsedArgs* pParsedArgs;
-  struct List* pFiles;
+  FileNodes* pFiles;
   Object* pWinObject;
   RangeMask RangeMask;
   RangeSelectWindow* pRangeSelectWindow;
   struct Window* pIntuiWindow;
   ULONG SigMask;
   char FilesPath[MAX_PATH_LEN + 1];
-  BPTR FilesDirLock;
+  BPTR FilesDirLock; // TODO: Use from InputFile
   char WindowTitle[MAX_PATH_LEN + 32];
   char ScratchBuf[SCRATCH_BUF_SIZE + 1];
 } Application;

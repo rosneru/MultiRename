@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #include "notifications.h"
-#include "file_list.h"
+#include "file_nodes.h"
 
 
 /// D_S macro definition
@@ -164,45 +164,45 @@ struct Node* createFileNode(struct Locale* pLocale,
 }
 
 
-struct List* createFileList(void)
+FileNodes* createFileNodes(void)
 {
-  struct List* pFilesList;
-  if(!(pFilesList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
+  FileNodes* pFileNodes;
+  if(!(pFileNodes = AllocVec(sizeof(struct List), MEMF_CLEAR)))
   {
     return NULL;
   }
 
-  NewList(pFilesList);
-  return pFilesList;
+  NewList(pFileNodes->pList);
+  return pFileNodes;
 }
 
 
-void freeFileList(struct List* pFilesList)
+void freeFileNodes(FileNodes* pFileNodes)
 {
   struct Node* pWorkNode;
   struct Node* pNextNode;
 
-  if(!pFilesList)
+  if(!pFileNodes)
   {
     return;
   }
 
-  pWorkNode = pFilesList->lh_Head;
+  pWorkNode = pFileNodes->pList->lh_Head;
   while((pNextNode = pWorkNode->ln_Succ))
   {
     FreeListBrowserNode(pWorkNode);
     pWorkNode = pNextNode;
   }
 
-  FreeVec(pFilesList);
+  FreeVec(pFileNodes);
 }
 
-ULONG countFileNodes(struct List* pFilesList)
+ULONG countFileNodes(FileNodes* pFileNodes)
 {
   ULONG count = 0;
   struct Node* pNode;
 
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFileNodes->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
       count++;
   }
@@ -210,19 +210,19 @@ ULONG countFileNodes(struct List* pFilesList)
   return count;
 }
 
-FileNode* getLongestOldNameNode(struct List* pFilesList)
+FileNode* getLongestOldNameNode(FileNodes* pFileNodes)
 {
   struct Node* pNode;
   FileNode* pFileNode;
   FileNode* pMaxLengthNode = NULL;
   ULONG maxLength = 0;
 
-  if(!pFilesList)
+  if(!pFileNodes->pList)
   {
     return NULL;
   }
 
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFileNodes->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     if(pFileNode->OriginalNameLen > maxLength)
@@ -235,19 +235,19 @@ FileNode* getLongestOldNameNode(struct List* pFilesList)
   return pMaxLengthNode;
 }
 
-FileNode* getLongestOldExtNode(struct List* pFilesList)
+FileNode* getLongestOldExtNode(FileNodes* pFileNodes)
 {
   struct Node* pNode;
   FileNode* pFileNode;
   FileNode* pMaxLengthNode = NULL;
   ULONG maxLength = 0;
 
-  if(!pFilesList)
+  if(!pFileNodes->pList)
   {
     return NULL;
   }
 
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFileNodes->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     if(pFileNode->OriginalExtLen > maxLength)
@@ -260,14 +260,14 @@ FileNode* getLongestOldExtNode(struct List* pFilesList)
   return pMaxLengthNode;
 }
 
-void printFileListOriginalName(struct List* pFilesList)
+void printFileListOriginalName(FileNodes* pFileNodes)
 {
   struct Node* pNode;
   FileNode* pFileNode;
   printf("** Original file list **\n");
   printf("Name                                   |date\n");
   printf("=======================================|=======================================\n");
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFileNodes->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     printf("%-39s|%s-%s-%s, %s:%s:%s\n", pFileNode->OriginalName,
@@ -283,13 +283,13 @@ void printFileListOriginalName(struct List* pFilesList)
 }
 
 
-void printFileListNewName(struct List* pFilesList)
+void printFileListNewName(FileNodes* pFileNodes)
 {
   struct Node* pNode;
   FileNode* pFileNode;
   printf("New name list\n");
   printf("=============\n");
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFileNodes->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     printf("  %s\n", pFileNode->NewName);
@@ -298,7 +298,7 @@ void printFileListNewName(struct List* pFilesList)
   printf("\n");
 }
 
-BOOL appendFileNode(struct List* pFilesList,
+BOOL appendFileNode(FileNodes* pFileNodes,
                     STRPTR pFileFullPath,
                     struct Locale* pLocale,
                     struct List* pNotifications)
@@ -307,7 +307,7 @@ BOOL appendFileNode(struct List* pFilesList,
   struct Node *pNode;
   STRPTR pWorkingPath;
 
-  if(!pFilesList || !pFileFullPath || !pNotifications)
+  if(!pFileNodes || !pFileNodes->pList || !pFileFullPath || !pNotifications)
   {
     return FALSE;
   }
@@ -325,7 +325,7 @@ BOOL appendFileNode(struct List* pFilesList,
     return FALSE;
   }
 
-  if((pWorkingPath = getFirstFilePath(pFilesList))
+  if((pWorkingPath = getFirstFilePath(pFileNodes))
   && (strcmp(((FileNode*)pNode)->Path, pWorkingPath) != 0))
   {
     // This file has a different path as the former ones: skip it
@@ -337,20 +337,20 @@ BOOL appendFileNode(struct List* pFilesList,
   }
 
   // File has the same path as the former ones: add it
-  AddTail(pFilesList, pNode);
+  AddTail(pFileNodes->pList, pNode);
   UnLock(pLock);
   return TRUE;
 }
 
 
-STRPTR getFirstFilePath(struct List* pFilesList)
+STRPTR getFirstFilePath(FileNodes* pFileNodes)
 {
-  if(NULL == pFilesList->lh_Head->ln_Succ)
+  if(NULL == pFileNodes->pList->lh_Head->ln_Succ)
   {
     return NULL;
   }
 
-  return ((FileNode*)pFilesList->lh_Head)->Path;
+  return ((FileNode*)pFileNodes->pList->lh_Head)->Path;
 }
 
 ///

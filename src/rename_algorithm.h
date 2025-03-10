@@ -4,6 +4,7 @@
 #include <exec/lists.h>
 #include <exec/types.h>
 #include "rename_counter.h"
+#include "file_nodes.h"
 
 /**
  * Iterates the 'pFilesList'. For every FileNode the content of field
@@ -11,7 +12,7 @@
  * parameters `pNameMask`, `pExtMask` and counter settings.
  *
  */
-BOOL createNewNames(struct List* pFilesList,
+BOOL createNewNames(FileNodes* pFiles,
                     STRPTR pNameMask,
                     STRPTR pExtMask,
                     LONG counterStart,

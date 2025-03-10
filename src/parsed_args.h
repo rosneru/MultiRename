@@ -20,7 +20,7 @@ typedef struct ParsedArgs
 
 ParsedArgs* createParsedArgs(int argc,
                              char **argv,
-                             struct List* pFilesList,
+                             FileNodes* pFileNodes,
                              struct Locale* pLocale,
                              struct List* pNotifications);
 
