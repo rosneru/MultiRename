@@ -494,7 +494,7 @@ void applyNewFiles(Application* pApp)
       // Display the files list in ListBrowser
       SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                     pApp->pIntuiWindow, NULL,
-                    LISTBROWSER_Labels, (ULONG)pApp->pFiles,
+                    LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
                     LISTBROWSER_AutoFit, TRUE,
                     TAG_DONE);
 
@@ -601,7 +601,7 @@ BOOL updateNewNames(Application* pApp)
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFiles,
+                  LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
                   TAG_DONE);
 
   // De-/activate Start button depending if all names were updated
