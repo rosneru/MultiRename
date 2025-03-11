@@ -52,7 +52,7 @@
 
 
 ///
-/// Public function implementations
+/// Private function implementations
 
 struct Node* createFileNode(struct Locale* pLocale,
                             BPTR pLock,
@@ -163,19 +163,26 @@ struct Node* createFileNode(struct Locale* pLocale,
   }
 }
 
+///
+/// Public function implementations
 
 FileNodes* createFileNodes(void)
 {
   FileNodes* pFileNodes;
-  if(!(pFileNodes = AllocVec(sizeof(struct List), MEMF_CLEAR)))
+  if(!(pFileNodes = AllocVec(sizeof(FileNodes), MEMF_CLEAR)))
   {
+    return NULL;
+  }
+
+  if(!(pFileNodes->pList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
+  {
+    freeFileNodes(pFileNodes);
     return NULL;
   }
 
   NewList(pFileNodes->pList);
   return pFileNodes;
 }
-
 
 void freeFileNodes(FileNodes* pFileNodes)
 {
@@ -187,11 +194,16 @@ void freeFileNodes(FileNodes* pFileNodes)
     return;
   }
 
-  pWorkNode = pFileNodes->pList->lh_Head;
-  while((pNextNode = pWorkNode->ln_Succ))
+  if(pFileNodes->pList)
   {
-    FreeListBrowserNode(pWorkNode);
-    pWorkNode = pNextNode;
+    pWorkNode = pFileNodes->pList->lh_Head;
+    while((pNextNode = pWorkNode->ln_Succ))
+    {
+      FreeListBrowserNode(pWorkNode);
+      pWorkNode = pNextNode;
+    }
+
+    FreeVec(pFileNodes->pList);
   }
 
   FreeVec(pFileNodes);

@@ -19,6 +19,8 @@
 #include "notifications.h"
 #include "parsed_args.h"
 
+/// Forwards / private function declarations
+
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
                          FileNodes* pFileNodes,
                          struct Locale* pLocale,
@@ -32,6 +34,9 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
 
 static struct RDArgs* pReadArgs = NULL;
 
+
+///
+/// Public function implementations
 
 ParsedArgs* createParsedArgs(int argc,
                              char **argv,
@@ -76,6 +81,8 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 
 }
 
+///
+/// Private function implementations
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
                          FileNodes* pFileNodes,
@@ -213,3 +220,5 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
     }
   }
 }
+
+///
