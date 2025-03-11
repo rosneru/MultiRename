@@ -22,13 +22,13 @@
 /// Forwards / private function declarations
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
-                         FileNodes* pFileNodes,
+                         FileNodes* pFiles,
                          struct Locale* pLocale,
                          struct List* pNotifications);
 
 void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        char **argv,
-                       FileNodes* pFileNodes,
+                       FileNodes* pFiles,
                        struct Locale* pLocale,
                        struct List* pNotifications);
 
@@ -40,7 +40,7 @@ static struct RDArgs* pReadArgs = NULL;
 
 ParsedArgs* createParsedArgs(int argc,
                              char **argv,
-                             FileNodes* pFileNodes,
+                             FileNodes* pFiles,
                              struct Locale* pLocale,
                              struct List* pNotifications)
 {
@@ -55,13 +55,13 @@ ParsedArgs* createParsedArgs(int argc,
   if(argc == 0)
   {
     // Started from Workbench
-    readWorkbenchArgs(pParsedArgs, argv, pFileNodes, pLocale, pNotifications);
+    readWorkbenchArgs(pParsedArgs, argv, pFiles, pLocale, pNotifications);
 
   }
   else
   {
     // Started from CLI
-    readCommandLineArgs(pParsedArgs, pFileNodes, pLocale, pNotifications);
+    readCommandLineArgs(pParsedArgs, pFiles, pLocale, pNotifications);
   }
 
   return pParsedArgs;
@@ -85,7 +85,7 @@ void freeParsedArgs(ParsedArgs* pParsedArgs)
 /// Private function implementations
 
 void readCommandLineArgs(ParsedArgs* pParsedArgs,
-                         FileNodes* pFileNodes,
+                         FileNodes* pFiles,
                          struct Locale* pLocale,
                          struct List* pNotifications)
 {
@@ -113,7 +113,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
       {
         if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
-          appendFileNode(pFileNodes,
+          appendFileNode(pFiles,
                          pParsedArgs->pScratchPathBuf,
                          pLocale,
                          pNotifications);
@@ -153,7 +153,7 @@ char* toolTypeValue(const STRPTR* ppTooltypeArray, const char* pTooltypeName)
 
 void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        char **argv,
-                       FileNodes* pFileNodes,
+                       FileNodes* pFiles,
                        struct Locale* pLocale,
                        struct List* pNotifications)
 {
@@ -200,7 +200,7 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
         if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
           AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
-          appendFileNode(pFileNodes,
+          appendFileNode(pFiles,
                          pParsedArgs->pScratchPathBuf,
                          pLocale,
                          pNotifications);

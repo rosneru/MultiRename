@@ -22,40 +22,40 @@ FileNodes* createFileNodes(void);
  * Destroys the nodes and then the list itself.
  * NOTE: The nodes are freed by a call of `FreeListBrowserNode()` each.
  */
-void freeFileNodes(FileNodes* pFileNodes);
+void freeFileNodes(FileNodes* pFiles);
 
 /**
  * Counts and returns the number of `FileNode` items in this list.
  */
-ULONG countFileNodes(FileNodes* pFileNodes);
+ULONG countFileNodes(FileNodes* pFiles);
 
 /**
  * Iterates the pFileNodesList and return the FileNode* that contains
  * the longest OriginalName.
  */
-FileNode* getLongestOldNameNode(FileNodes* pFileNodes);
+FileNode* getLongestOldNameNode(FileNodes* pFiles);
 
 /**
  * Iterates the pFileNodesList and return the FileNode* that contains
  * the longest OriginalExtension.
  */
-FileNode* getLongestOldExtNode(FileNodes* pFileNodes);
+FileNode* getLongestOldExtNode(FileNodes* pFiles);
 
 /**
  * Print the original name field of each `FileNode` in list.
  */
-void printFileListOriginalName(FileNodes* pFileNodes);
+void printFileListOriginalName(FileNodes* pFiles);
 
 /**
  * Print the new name field of each `FileNode` in list.
  */
-void printFileListNewName(FileNodes* pFileNodes);
+void printFileListNewName(FileNodes* pFiles);
 
 
 /**
  * Create a file note for `pFileFullPath` and add it to `pFileNodesList`.
  */
-BOOL appendFileNode(FileNodes* pFileNodes,
+BOOL appendFileNode(FileNodes* pFiles,
                     STRPTR pFileFullPath,
                     struct Locale* pLocale,
                     struct List* pNotifications);
@@ -64,6 +64,6 @@ BOOL appendFileNode(FileNodes* pFileNodes,
  * Return the path of the first FileNode in list or NULL if there
  * is none.
  */
-STRPTR getFirstFilePath(FileNodes* pFileNodes);
+STRPTR getFirstFilePath(FileNodes* pFiles);
 
 #endif
