@@ -31,15 +31,16 @@ BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications)
   }
 
   // TODO
-  // 1. How to get th lock of files directory?
+  // 1. How to get th lock of files directory?. DONE.
   // 2. Change dir to files directory
+  Printf("Entering directory '%s'\n", pFiles->DirPath);
+  
   // 3. Call Rename() in loop below.
   // 3.1. Add errors to notifications
-
   for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    Printf("%s ==> %s\n", pFileNode->OriginalName, pFileNode->NewName);
+    Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
   }
 
   return TRUE;
