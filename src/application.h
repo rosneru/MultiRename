@@ -28,8 +28,6 @@ typedef struct Application
   RangeSelectWindow* pRangeSelectWindow;
   struct Window* pIntuiWindow;
   ULONG SigMask;
-  char FilesPath[MAX_PATH_LEN + 1];
-  BPTR FilesDirLock; // TODO: Use from InputFile
   char WindowTitle[MAX_PATH_LEN + 32];
   char ScratchBuf[SCRATCH_BUF_SIZE + 1];
 } Application;

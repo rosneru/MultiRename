@@ -1,5 +1,5 @@
-#ifndef FILE_NODESHAHAHHA_H
-#define FILE_NODESHAHAHHA_H
+#ifndef FILE_NODES_H
+#define FILE_NODES_H
 
 #include <exec/types.h>
 #include <libraries/locale.h>
@@ -10,7 +10,8 @@
 typedef struct FileNodes
 {
   struct List* pList;
-  BPTR FilesDirLock;  // TODO Why does BPTR not work???
+  BPTR DirLock;
+  char DirPath[MAX_PATH_LEN + 1];
 } FileNodes;
 
 /**
@@ -23,6 +24,27 @@ FileNodes* createFileNodes(void);
  * NOTE: The nodes are freed by a call of `FreeListBrowserNode()` each.
  */
 void freeFileNodes(FileNodes* pFiles);
+
+/**
+ * Returns the lock to the files directory or ZERO if such a directory
+ * hasn't been set in current session.
+ */
+BPTR getFilesDirLock(FileNodes* pFiles);
+
+/**
+ * Apply the given lock for the files dir. If there is already a files
+ * dir lock set it is released first.
+ */
+BOOL setFilesDirLock(FileNodes* pFiles, BPTR pFilesDirLock);
+
+/**
+ * Returns the files directory path or an empty string "" if such a
+ * directory hasn't been set in current session.
+ *
+ * NOTE: The path name is created when the lock is applied in
+ * `setFilesDirLock(..)`
+ */
+char* getFilesDirPath(FileNodes* pFiles);
 
 /**
  * Counts and returns the number of `FileNode` items in this list.

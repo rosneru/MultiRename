@@ -16,6 +16,7 @@
 #include <workbench/workbench.h>
 
 #include "file_nodes.h"
+#include "file_tools.h"
 #include "notifications.h"
 #include "parsed_args.h"
 
@@ -56,7 +57,6 @@ ParsedArgs* createParsedArgs(int argc,
   {
     // Started from Workbench
     readWorkbenchArgs(pParsedArgs, argv, pFiles, pLocale, pNotifications);
-
   }
   else
   {
@@ -109,10 +109,15 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
 
     while(*ppFiles)
     {
-      if((lock = Lock(*ppFiles, SHARED_LOCK)))
+      if((lock = lockFromLongName(*ppFiles)))
       {
         if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
+          if(!getFilesDirLock(pFiles))
+          {
+            setFilesDirLock(pFiles, ParentDir(lock));
+          }
+
           appendFileNode(pFiles,
                          pParsedArgs->pScratchPathBuf,
                          pLocale,
@@ -199,6 +204,11 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
         pFileName = pWbArg[i].wa_Name;
         if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
         {
+          if(!getFilesDirLock(pFiles))
+          {
+            setFilesDirLock(pFiles, DupLock(pWbArg[i].wa_Lock));
+          }
+
           AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
           appendFileNode(pFiles,
                          pParsedArgs->pScratchPathBuf,

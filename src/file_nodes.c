@@ -20,6 +20,7 @@
 #include <stdio.h>
 
 #include "notifications.h"
+#include "file_tools.h"
 #include "file_nodes.h"
 
 
@@ -194,6 +195,11 @@ void freeFileNodes(FileNodes* pFiles)
     return;
   }
 
+  if(pFiles->DirLock)
+  {
+    UnLock(pFiles->DirLock);
+  }
+
   if(pFiles->pList)
   {
     pWorkNode = pFiles->pList->lh_Head;
@@ -207,6 +213,29 @@ void freeFileNodes(FileNodes* pFiles)
   }
 
   FreeVec(pFiles);
+}
+
+BPTR getFilesDirLock(FileNodes* pFiles)
+{
+  return pFiles->DirLock;
+}
+
+BOOL setFilesDirLock(FileNodes* pFiles, BPTR pFilesDirLock)
+{
+  BOOL result;
+  if(pFiles->DirLock)
+  {
+    UnLock(pFiles->DirLock);
+  }
+
+  pFiles->DirLock = pFilesDirLock;
+  result = NameFromLock(pFilesDirLock, pFiles->DirPath, MAX_PATH_LEN);
+  return result;
+}
+
+char* getFilesDirPath(FileNodes* pFiles)
+{
+  return pFiles->DirPath;
 }
 
 ULONG countFileNodes(FileNodes* pFiles)
@@ -324,7 +353,7 @@ BOOL appendFileNode(FileNodes* pFiles,
     return FALSE;
   }
 
-  if(!(pLock = Lock(pFileFullPath, SHARED_LOCK)))
+  if(!(pLock = lockFromLongName(pFileFullPath)))
   {
     addNotification(pNotifications,
                     NNT_SKIPPED_FAILED_LOCK,

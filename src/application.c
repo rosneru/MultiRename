@@ -339,11 +339,6 @@ void disposeApplication(Application* pApp)
     freeParsedArgs(pApp->pParsedArgs);
   }
 
-  if(pApp->FilesDirLock)
-  {
-    UnLock(pApp->FilesDirLock);
-  }
-
   if(pApp->pFiles)
   {
     freeFileNodes(pApp->pFiles);
@@ -395,13 +390,13 @@ BOOL runApplication(Application* pApp)
 
 ///
 /// Private function implementations
-
 void updateMainWindowTitle(Application* pApp)
 {
-  if(strlen(pApp->FilesPath) > 0)
+  // If a files is already set (e.e. a lock exists)
+  if(getFilesDirLock(pApp->pFiles))
   {
     strcpy(pApp->WindowTitle, "MultiRename in [");
-    strcat(pApp->WindowTitle, pApp->FilesPath);
+    strcat(pApp->WindowTitle, getFilesDirPath(pApp->pFiles));
     strcat(pApp->WindowTitle, "]");
     SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
   }
@@ -485,32 +480,15 @@ void applyNewFiles(Application* pApp)
 {
   STRPTR pFirstPath;
 
-  // FilePath not already set?
-  if(!pApp->FilesDirLock)
+  // Does list contain at least one file?
+  if((pFirstPath = getFirstFilePath(pApp->pFiles)))
   {
-    // Does list contain at least one file?
-    if((pFirstPath = getFirstFilePath(pApp->pFiles)))
-    {
-      // Display the files list in ListBrowser
-      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                    pApp->pIntuiWindow, NULL,
-                    LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                    LISTBROWSER_AutoFit, TRUE,
-                    TAG_DONE);
-
-      if((pApp->FilesDirLock = lockFromLongName(pFirstPath)))
-      {
-        // Apply the file path for this session
-        strncpy(pApp->FilesPath, pFirstPath, MAX_PATH_LEN);
-        addNotification(pApp->pNotifications, NNT_SELECTED_PATH_INFO, pFirstPath);
-      }
-      else
-      {
-        addNotification(pApp->pNotifications,
-                        NNT_SKIPPED_FAILED_LOCK,
-                        pFirstPath);
-      }
-    }
+    // Display the files list in ListBrowser
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                  pApp->pIntuiWindow, NULL,
+                  LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                  LISTBROWSER_AutoFit, TRUE,
+                  TAG_DONE);
   }
 
   updateNewNames(pApp);
