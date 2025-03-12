@@ -34,6 +34,11 @@ BPTR getFilesDirLock(FileNodes* pFiles);
 /**
  * Apply the given lock for the files dir. If there is already a files
  * dir lock set it is released first.
+ *
+ * Returns TRUE on success and FALSE on failure. Failure can occur
+ * because this also creates the dir path name an there is a (rare)
+ * chance the path doesn't fit into the `FileNodes::DirPath` buffer.
+ * Then `IoErr()` will return `ERROR_LINE_TOO_LONG`.
  */
 BOOL setFilesDirLock(FileNodes* pFiles, BPTR pFilesDirLock);
 
@@ -41,7 +46,7 @@ BOOL setFilesDirLock(FileNodes* pFiles, BPTR pFilesDirLock);
  * Returns the files directory path or an empty string "" if such a
  * directory hasn't been set in current session.
  *
- * NOTE: The path name is created when the lock is applied in
+ * The path name is created when the lock is applied in
  * `setFilesDirLock(..)`
  */
 char* getFilesDirPath(FileNodes* pFiles);

@@ -479,10 +479,30 @@ void startRename(Application* pApp)
 void applyNewFiles(Application* pApp)
 {
   STRPTR pFirstPath;
+  BPTR lock;
 
   // Does list contain at least one file?
   if((pFirstPath = getFirstFilePath(pApp->pFiles)))
   {
+    if(!getFilesDirLock(pApp->pFiles))
+    {
+      if((lock = lockFromLongName(pFirstPath)))
+      {
+        if(!setFilesDirLock(pApp->pFiles, ParentDir(lock)))
+        {
+          addNotification(pApp->pNotifications,
+                          NNT_SKIPPED_PATH_TOO_LONG,
+                          pFirstPath);
+        }
+      }
+      else
+      {
+        addNotification(pApp->pNotifications,
+                        NNT_SKIPPED_FAILED_LOCK,
+                        pFirstPath);
+      }
+    }
+
     // Display the files list in ListBrowser
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, NULL,
