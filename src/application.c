@@ -5,6 +5,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <libraries/gadtools.h>
 #include <libraries/locale.h>
 #include <utility/hooks.h>
 #include <workbench/startup.h>
@@ -109,6 +110,21 @@ struct ColumnInfo *m_pColumnInfo = NULL;
 
 static UBYTE *m_ppCounterPlaces[] = { "1", "2", "3", "4", "5",
                                       "6", "7", "8", "9", "10", NULL };
+
+
+/* Menu Structure as used by GadTools. There is no need to call any of the GadTools
+** functions, such as CreateMenu(). This structure can be passed straight to the
+** window on creation.
+*/
+struct NewMenu newMenu[] =
+{
+  { NM_TITLE,   "Project",           0 , 0, 0, NULL},
+  {   NM_ITEM,    "New",            "n", 0, 0, NULL},
+  {   NM_ITEM,    "About",           0 , 0, 0, NULL},
+  {   NM_ITEM,    NM_BARLABEL,       0 , 0, 0, NULL},
+  {   NM_ITEM,    "Quit",           "q", 0, 0, NULL},
+  { NM_END, NULL, NULL, 0, 0, NULL}
+};
 
 enum gadids
 {
@@ -243,8 +259,10 @@ Application* createApplication(int argc, char **argv)
                                                  WA_Height, 480,
                                                  WA_Zoom, (ULONG) zoomData,
                                                  WA_AutoAdjust, TRUE,
+                                                 WA_NewLookMenus, TRUE,
                                                  WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
                                                  WINDOW_Layout, pMainLayout,
+                                                 WINDOW_NewMenu, newMenu,
                                                  WINDOW_AppPort, pApp->pAppWindowPort,
                                                  WINDOW_AppWindow, TRUE,
                                                  WINDOW_AppMsgHook, &m_AppHook,
