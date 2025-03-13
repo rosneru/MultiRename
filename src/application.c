@@ -505,10 +505,10 @@ void applyNewFiles(Application* pApp)
 
     // Display the files list in ListBrowser
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                  LISTBROWSER_AutoFit, TRUE,
-                  TAG_DONE);
+                   pApp->pIntuiWindow, NULL,
+                   LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                   LISTBROWSER_AutoFit, TRUE,
+                   TAG_DONE);
   }
 
   updateNewNames(pApp);
@@ -652,11 +652,11 @@ BOOL applySelectedRange(Application* pApp)
   }
 
   SetGadgetAttrs((struct Gadget *) pStrGadget,
-                  pApp->pIntuiWindow,
-                  NULL,
-                  STRINGA_BufferPos, (ULONG) bufferPos,
-                  STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
-                  TAG_DONE);
+                 pApp->pIntuiWindow,
+                 NULL,
+                 STRINGA_BufferPos, (ULONG) bufferPos,
+                 STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
+                 TAG_DONE);
 
   return TRUE;
 }
