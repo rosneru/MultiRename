@@ -7,13 +7,15 @@
 
 #include "notifications.h"
 
-#define ARG_TEMPLATE "FILES/M,PUBSCREEN/K"
-enum {ARG_FILES, ARG_PUBSCREEN, ARG_ARRAY_SIZE};
+#define ARG_TEMPLATE "FILES/M,PUBSCREEN/K,LONGNAMES/K,SKIPICONS/K"
+enum { ARG_FILES, ARG_PUBSCREEN, ARG_LONGNAMES, ARG_SKIPICONS, ARG_ARRAY_SIZE };
 
 
 typedef struct ParsedArgs
 {
   char* pPubScreenName;
+  BOOL AreLongNamesAllowed;
+  BOOL AreIconsSkipped;
   struct DiskObject* pDiskObject;
   char pScratchPathBuf[MAX_PATH_LEN + 1];
 } ParsedArgs;

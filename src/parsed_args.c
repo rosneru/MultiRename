@@ -147,6 +147,9 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
   {
     pParsedArgs->pPubScreenName = (char*)args[ARG_PUBSCREEN];
   }
+
+  pParsedArgs->AreLongNamesAllowed = args[ARG_LONGNAMES] != 0;
+  pParsedArgs->AreIconsSkipped = args[ARG_SKIPICONS] != 0;
 }
 
 
@@ -195,6 +198,9 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
           {
             pParsedArgs->pPubScreenName = pValue;
           }
+
+          pParsedArgs->AreLongNamesAllowed = toolTypeValue(ppTooltypeArray, "LONGNAMES") != NULL;
+          pParsedArgs->AreIconsSkipped = toolTypeValue(ppTooltypeArray, "SKIPICONS") != NULL;
         }
         // Change current directory back to the former one
         CurrentDir(oldDir);
