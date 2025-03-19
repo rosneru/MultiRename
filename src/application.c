@@ -188,29 +188,94 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
 }
 
 ///
+/// Helper implementation
+struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
+struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECKIT|MENUTOGGLE, 0, NULL};
+
+struct NewMenu mainWindowNewMenu[] =
+{
+  { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
+  {   NM_ITEM,    "New",                  "n", 0,                  0, NULL},
+  {   NM_ITEM,    "About",                 0 , 0,                  0, NULL},
+  {   NM_ITEM,    NM_BARLABEL,             0 , 0,                  0, NULL},
+  {   NM_ITEM,    "Quit",                 "q", 0,                  0, NULL},
+  { NM_TITLE,   "Settings",                0 , 0,                  0, NULL},
+  {   NM_ITEM,    "Allow long filenames",  0 , CHECKIT|MENUTOGGLE, 0, NULL},
+  {   NM_ITEM,    "Skip icons",            0 , CHECKIT|MENUTOGGLE, 0, NULL},
+  { NM_END, NULL, NULL, 0, 0, NULL}
+};
+
+Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
+{
+  struct Screen* pScreen;
+  ULONG screenBarHeight;
+  // Calculate an alternative size of the window for when
+  // the ZOOM gadget is clicked. It should use the whole
+  // screen minus the screen title bar.
+  UWORD zoomData[] = { 0, 20, 320, 256};
+  Object* pWindowObject;
+
+  if(!pApp || !pApp->pParsedArgs || !pMainWindowLayout)
+  {
+    return NULL;
+  }
+
+  if(pApp->pParsedArgs->AreLongNamesAllowed)
+  {
+    // TODO: Dirty!! Rethink how to change it.
+    mainWindowNewMenu[6].nm_Flags |= CHECKED;
+  }
+
+  if(pApp->pParsedArgs->AreIconsSkipped)
+  {
+    // TODO: Dirty!! Rethink how to change it.
+    mainWindowNewMenu[7].nm_Flags |= CHECKED;
+  }
+
+  if(pScreen = LockPubScreen(NULL))
+  {
+    screenBarHeight = pScreen->BarHeight + pScreen->BarVBorder;
+    zoomData[1] = screenBarHeight + 1;
+    zoomData[2] = pScreen->Width;
+    zoomData[3] = pScreen->Height - screenBarHeight - 1;
+    UnlockPubScreen(NULL, pScreen);
+  }
+
+  m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
+  m_AppHook.h_SubEntry = NULL;
+  m_AppHook.h_Data = pApp;
+
+  pWindowObject = NewObject(WINDOW_GetClass(), NULL,
+    WINDOW_Position, WPOS_CENTERSCREEN,
+    WA_Activate, TRUE,
+    WA_Title, "MultiRename",
+    WA_CloseGadget, TRUE,
+    WA_DepthGadget, TRUE,
+    WA_DragBar, TRUE,
+    WA_SizeGadget, TRUE,
+    WA_Width, 640,
+    WA_Height, 480,
+    WA_Zoom, (ULONG) zoomData,
+    WA_AutoAdjust, TRUE,
+    WA_NewLookMenus, TRUE,
+    WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
+    WINDOW_Layout, pMainWindowLayout,
+    WINDOW_NewMenu, mainWindowNewMenu,
+    WINDOW_AppPort, pApp->pAppWindowPort,
+    WINDOW_AppWindow, TRUE,
+    WINDOW_AppMsgHook, &m_AppHook,
+    TAG_DONE);
+
+  return pWindowObject;
+}
+
+///
 /// Public function implementations
 
 Application* createApplication(int argc, char **argv)
 {
-  struct Screen* pScreen;
-  ULONG screenBarHeight;
   Object* pMainLayout;
   Application* pApp;
-
-  BOOL allowLongNamesFlag = CHECKIT|MENUTOGGLE; // TODO but how to add the CHECKED later in case arg is provided
-  BOOL skipIconsFlag = CHECKIT|MENUTOGGLE;
-  struct NewMenu newMenu[] =
-  {
-    { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
-    {   NM_ITEM,    "New",                  "n", 0,                  0, NULL},
-    {   NM_ITEM,    "About",                 0 , 0,                  0, NULL},
-    {   NM_ITEM,    NM_BARLABEL,             0 , 0,                  0, NULL},
-    {   NM_ITEM,    "Quit",                 "q", 0,                  0, NULL},
-    { NM_TITLE,   "Settings",                0 , 0,                  0, NULL},
-    {   NM_ITEM,    "Allow long filenames",  0 , allowLongNamesFlag, 0, NULL},
-    {   NM_ITEM,    "Skip icons",            0 , skipIconsFlag,      0, NULL},
-    { NM_END, NULL, NULL, 0, 0, NULL}
-  };
 
   if((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
@@ -230,43 +295,7 @@ Application* createApplication(int argc, char **argv)
             {
               if((pMainLayout = createLayout()))
               {
-                // Calculate an alternative size of the window for when
-                // the ZOOM gadget is clicked. It should use the whole
-                // screen minus the screen title bar.
-                UWORD zoomData[] = { 0, 20, 320, 256};
-                if(pScreen = LockPubScreen(NULL))
-                {
-                  screenBarHeight = pScreen->BarHeight + pScreen->BarVBorder;
-                  zoomData[1] = screenBarHeight + 1;
-                  zoomData[2] = pScreen->Width;
-                  zoomData[3] = pScreen->Height - screenBarHeight - 1;
-                  UnlockPubScreen(NULL, pScreen);
-                }
-
-                m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
-                m_AppHook.h_SubEntry = NULL;
-                m_AppHook.h_Data = pApp;
-
-                if((pApp->pWinObject = NewObject(WINDOW_GetClass(), NULL,
-                                                 WINDOW_Position, WPOS_CENTERSCREEN,
-                                                 WA_Activate, TRUE,
-                                                 WA_Title, "MultiRename",
-                                                 WA_CloseGadget, TRUE,
-                                                 WA_DepthGadget, TRUE,
-                                                 WA_DragBar, TRUE,
-                                                 WA_SizeGadget, TRUE,
-                                                 WA_Width, 640,
-                                                 WA_Height, 480,
-                                                 WA_Zoom, (ULONG) zoomData,
-                                                 WA_AutoAdjust, TRUE,
-                                                 WA_NewLookMenus, TRUE,
-                                                 WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
-                                                 WINDOW_Layout, pMainLayout,
-                                                 WINDOW_NewMenu, newMenu,
-                                                 WINDOW_AppPort, pApp->pAppWindowPort,
-                                                 WINDOW_AppWindow, TRUE,
-                                                 WINDOW_AppMsgHook, &m_AppHook,
-                                                 TAG_DONE)))
+                if((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
                   if((pApp->pRangeSelectWindow = createRangeSelectWindow()))
                   {

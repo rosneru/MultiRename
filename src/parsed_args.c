@@ -158,7 +158,6 @@ char* toolTypeValue(const STRPTR* ppTooltypeArray, const char* pTooltypeName)
   return (char*)FindToolType((CONST_STRPTR*)ppTooltypeArray, (STRPTR)pTooltypeName);
 }
 
-
 void readWorkbenchArgs(ParsedArgs* pParsedArgs,
                        char **argv,
                        FileNodes* pFiles,
@@ -173,6 +172,7 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
 
   struct WBStartup* pWbStartup = (struct WBStartup*) argv;
   struct WBArg* pWbArg = pWbStartup->sm_ArgList;
+
   for(i=0; i < pWbStartup->sm_NumArgs; i++)
   {
     if((pWbArg[i].wa_Lock != 0))  // TODO check. Was 'NULL' before.
@@ -181,15 +181,13 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
       {
         //
         // The first pWbArg is the application icon itself. Getting
-        // the PUBSCREEN tooltype from it
+        // the tooltypes from it
         //
 
         // Change current directory the application location
         oldDir = CurrentDir(pWbArg[i].wa_Lock);
 
-        pParsedArgs->pDiskObject = GetDiskObjectNew((STRPTR) pWbArg[i].wa_Name);
-
-        if(NULL == pParsedArgs->pDiskObject)
+        if((pParsedArgs->pDiskObject = GetDiskObjectNew((STRPTR) pWbArg[i].wa_Name)))
         {
           ppTooltypeArray = pParsedArgs->pDiskObject->do_ToolTypes;
 
