@@ -207,7 +207,6 @@ struct NewMenu mainWindowNewMenu[] =
 
 Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
 {
-  struct Screen* pScreen;
   ULONG screenBarHeight;
   // Calculate an alternative size of the window for when
   // the ZOOM gadget is clicked. It should use the whole
@@ -232,14 +231,30 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
     mainWindowNewMenu[7].nm_Flags |= CHECKED;
   }
 
-  if(pScreen = LockPubScreen(NULL))
+  if(pApp->pParsedArgs->pPubScreenName)
   {
-    screenBarHeight = pScreen->BarHeight + pScreen->BarVBorder;
-    zoomData[1] = screenBarHeight + 1;
-    zoomData[2] = pScreen->Width;
-    zoomData[3] = pScreen->Height - screenBarHeight - 1;
-    UnlockPubScreen(NULL, pScreen);
+    if(!(pApp->pPubScreen = LockPubScreen(pApp->pParsedArgs->pPubScreenName)))
+    {
+      Printf("Failed to lock public screen '%s'\n",
+        pApp->pParsedArgs->pPubScreenName);
+      return NULL;
+    }
   }
+  else
+  {
+    if(!(pApp->pPubScreen = LockPubScreen(NULL)))
+    {
+      PutStr("Failed to lock default public screen.\n");
+      return NULL;
+    }
+  }
+  
+  screenBarHeight = pApp->pPubScreen ->BarHeight 
+                  + pApp->pPubScreen ->BarVBorder;
+
+  zoomData[1] = screenBarHeight + 1;
+  zoomData[2] = pApp->pPubScreen ->Width;
+  zoomData[3] = pApp->pPubScreen ->Height - screenBarHeight - 1;
 
   m_AppHook.h_Entry = (ULONG (* )())AppMsgFunc;
   m_AppHook.h_SubEntry = NULL;
@@ -256,6 +271,7 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
     WA_Width, 640,
     WA_Height, 480,
     WA_Zoom, (ULONG) zoomData,
+    WA_PubScreen, pApp->pPubScreen,
     WA_AutoAdjust, TRUE,
     WA_NewLookMenus, TRUE,
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
@@ -374,6 +390,11 @@ void disposeApplication(Application* pApp)
   if(pApp->pWinObject)
   {
     DisposeObject(pApp->pWinObject);
+  }
+
+  if(pApp->pPubScreen)
+  {
+    UnlockPubScreen(NULL, pApp->pPubScreen);
   }
 
   if(m_pColumnInfo)

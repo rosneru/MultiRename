@@ -27,6 +27,7 @@ typedef struct Application
   RangeMask RangeMask;
   RangeSelectWindow* pRangeSelectWindow;
   struct Window* pIntuiWindow;
+  struct Screen* pPubScreen;
   ULONG SigMask;
   char WindowTitle[MAX_PATH_LEN + 32];
   char ScratchBuf[SCRATCH_BUF_SIZE + 1];
