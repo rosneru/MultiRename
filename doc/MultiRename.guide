@@ -6,7 +6,15 @@ The tool allows the simultaneous renaming of all selected files with the followi
 - Inserting the date/time of the file 
 - Keep only certain letters of the file name 
 
-In the input fields square brackets [] are used as placeholders. The result is continuously displayed in a list. The files are only actually renamed when the start button is pressed. 
+In the input fields square brackets [] are used as placeholders for special values like date or part of original name selection. Below the input fields are buttons to help with the special values. The expected result of the rename process is displayed in a processing list bewlo the input section. The renaming begins when the start button is pressed.
+
+The default maximum length of file names created by the tool is 32 characters, as this was the length supported on the Amiga from the beginning. If you use a file system with long file name support like PFS, SFS or the FFS v46+ (came with AmigaOS 3.1.4 onward) you can use the LONGNAMES tooltype / argument or the menu setting "Allow long filenames" - which the allows 107 characters. 
+
+Default behavior is that icons (.info files) are also processed. So, the allowed name length is reduced to 27 or 102 (in long name mode) characters. When SKIPICONS is set as tooltype / argument or the menu item "Settings" -> "Skip icons" is manually checked the full name length is available. This is 32 characters or 107 characters in long name mode.
+
+# Icon handling 
+
+Note that Icons are never visible in the MultiRename's processing list, even in icons processing mode not. Instead the behavior is that for each file in the list there is a check if a .info file exists for it, and if so, this .info file is renamed, accordingly.
 
 # Input fields
 ## Renaming mask: File name 
