@@ -192,21 +192,53 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
 struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
 struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECKIT|MENUTOGGLE, 0, NULL};
 
+enum
+{ 
+  MENU_PROJECT_NEW,
+  MENU_PROJECT_ABOUT,
+  MENU_PROJECT_QUIT,
+  MENU_SETTINGS_LONGNAMES,
+  MENU_SETTINGS_SKIPICONS,
+ };
+
 struct NewMenu mainWindowNewMenu[] =
 {
   { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
-  {   NM_ITEM,    "New",                  "n", 0,                  0, NULL},
-  {   NM_ITEM,    "About",                 0 , 0,                  0, NULL},
+  {   NM_ITEM,    "New",                  "n", 0,                  0, MENU_PROJECT_NEW},
+  {   NM_ITEM,    "About",                 0 , 0,                  0, MENU_PROJECT_ABOUT},
   {   NM_ITEM,    NM_BARLABEL,             0 , 0,                  0, NULL},
-  {   NM_ITEM,    "Quit",                 "q", 0,                  0, NULL},
+  {   NM_ITEM,    "Quit",                 "q", 0,                  0, MENU_PROJECT_QUIT},
   { NM_TITLE,   "Settings",                0 , 0,                  0, NULL},
-  {   NM_ITEM,    "Allow long filenames",  0 , CHECKIT|MENUTOGGLE, 0, NULL},
-  {   NM_ITEM,    "Skip icons",            0 , CHECKIT|MENUTOGGLE, 0, NULL},
+  {   NM_ITEM,    "Allow long filenames",  0 , CHECKIT|MENUTOGGLE, 0, MENU_SETTINGS_LONGNAMES},
+  {   NM_ITEM,    "Skip icons",            0 , CHECKIT|MENUTOGGLE, 0, MENU_SETTINGS_SKIPICONS},
   { NM_END, NULL, NULL, 0, 0, NULL}
 };
 
+struct NewMenu* findNewMenuItem(struct NewMenu* pNewMenuArray, ULONG itemId)
+{
+  ULONG i = 0;
+  
+  if(!pNewMenuArray)
+  {
+    return NULL;
+  }
+
+  while(pNewMenuArray[i].nm_Type != NM_END)
+  {
+    if((ULONG)pNewMenuArray[i].nm_UserData == itemId)
+    {
+      return &pNewMenuArray[i];
+    }
+
+    i++;
+  }
+
+  return NULL;
+}
+
 Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
 {
+  struct NewMenu* pNewMenuItem;
   ULONG screenBarHeight;
   // Calculate an alternative size of the window for when
   // the ZOOM gadget is clicked. It should use the whole
@@ -221,14 +253,18 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
 
   if(pApp->pParsedArgs->AreLongNamesAllowed)
   {
-    // TODO: Dirty!! Rethink how to change it.
-    mainWindowNewMenu[6].nm_Flags |= CHECKED;
+    if((pNewMenuItem = findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_LONGNAMES)))
+    {
+      pNewMenuItem->nm_Flags |= CHECKED;
+    }
   }
 
   if(pApp->pParsedArgs->AreIconsSkipped)
   {
-    // TODO: Dirty!! Rethink how to change it.
-    mainWindowNewMenu[7].nm_Flags |= CHECKED;
+    if((pNewMenuItem = findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_SKIPICONS)))
+    {
+      pNewMenuItem->nm_Flags |= CHECKED;
+    }
   }
 
   if(pApp->pParsedArgs->pPubScreenName)
@@ -236,7 +272,7 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
     if(!(pApp->pPubScreen = LockPubScreen(pApp->pParsedArgs->pPubScreenName)))
     {
       Printf("Failed to lock public screen '%s'\n",
-        pApp->pParsedArgs->pPubScreenName);
+             pApp->pParsedArgs->pPubScreenName);
       return NULL;
     }
   }
