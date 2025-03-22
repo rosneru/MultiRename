@@ -28,7 +28,9 @@ typedef struct Application
   RangeSelectWindow* pRangeSelectWindow;
   struct Window* pIntuiWindow;
   struct Screen* pPubScreen;
+  STRPTR pAboutMessage;
   ULONG SigMask;
+  BOOL IsExitRequested;
   char WindowTitle[MAX_PATH_LEN + 32];
   char ScratchBuf[SCRATCH_BUF_SIZE + 1];
 } Application;

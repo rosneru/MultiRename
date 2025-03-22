@@ -57,6 +57,17 @@
 #include "ui_tools.h"
 #include "application.h"
 
+/// Defines
+
+#define VERSTAG "\0$VER: MultiRename 0.5 (22.3.2025)"
+#define COPYRIGHT "\n\nCopyright(c) 2024 Uwe Rosner (u.rosner@ymail.com)\n\n"
+#define DISTRIBUTION "This release of App may be freely distributed.\n" \
+                     "It may not be commercially distributed without the" \
+                     "\nexplicit permission of the author.\n\n\n"
+#define SCREEN_PREFIX "Screen name: "
+
+
+///
 /// Forwards / private function declarations
 
 void startRename(Application* pApp);
@@ -234,6 +245,21 @@ struct NewMenu* findNewMenuItem(struct NewMenu* pNewMenuArray, ULONG itemId)
   }
 
   return NULL;
+}
+
+
+STRPTR createAboutMessage(Application* pApp)
+{
+  STRPTR pAboutMsg;
+  ULONG totalLength = strlen(VERSTAG + 7)
+                    + strlen(COPYRIGHT)
+                    + strlen(DISTRIBUTION)
+                    + strlen(SCREEN_PREFIX);
+                    //+ strlen(getPubScreenName()) + 1;
+
+  // TODO: Continue here, AllocVec, etc
+  
+
 }
 
 Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
@@ -867,15 +893,62 @@ static void handleGadgets(Application* pApp, ULONG result)
   }
 }
 
+
+
+
+
+static void handleMenu(Application* pApp, ULONG result)
+{
+  struct MenuItem* pItem;
+  ULONG selection;
+  selection = (result & WMHI_MENUMASK);
+
+  while (selection != MENUNULL && !pApp->IsExitRequested)
+  {
+    pItem = ItemAddress(pApp->pIntuiWindow->MenuStrip, selection);
+    APTR pUserData = GTMENUITEM_USERDATA(pItem);
+    if(!pUserData)
+    {
+      continue;
+    }
+
+    switch((ULONG)pUserData)
+    {
+      case MENU_PROJECT_NEW:
+      {
+        // TODO: Reset files and filedir lock
+        break;
+      }
+
+      case MENU_PROJECT_ABOUT:
+      {
+
+        pApp->IsExitRequested = TRUE;
+        break;
+      }
+
+      case MENU_PROJECT_QUIT:
+      {
+        pApp->IsExitRequested = TRUE;
+        break;
+      }
+
+
+    }
+
+    // Essential for processing more than one menu selection
+    selection = pItem->NextSelect;
+  }
+}
+
 void intuiEventLoop(Application* pApp)
 {
   ULONG result;
   ULONG code;
-  BOOL end = FALSE;
 
   GetAttr(WINDOW_SigMask, pApp->pWinObject, &pApp->SigMask);
 
-  while (!end)
+  while (!pApp->IsExitRequested)
   {
     Wait(pApp->SigMask);
 
@@ -888,10 +961,13 @@ void intuiEventLoop(Application* pApp)
       switch (result & WMHI_CLASSMASK)
       {
         case WMHI_CLOSEWINDOW:
-          end = TRUE;
+          pApp->IsExitRequested = TRUE;
           break;
         case WMHI_GADGETUP:
           handleGadgets(pApp, result);
+          break;
+        case WMHI_MENUPICK:
+          handleMenu(pApp, result);
           break;
       }
     }
