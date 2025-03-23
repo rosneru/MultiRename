@@ -61,11 +61,9 @@
 
 #define VERSTAG "\0$VER: MultiRename 0.5 (22.3.2025)"
 #define COPYRIGHT "\n\nCopyright(c) 2024 Uwe Rosner (u.rosner@ymail.com)\n\n"
-#define DISTRIBUTION "This release of App may be freely distributed.\n" \
-                     "It may not be commercially distributed without the" \
-                     "\nexplicit permission of the author.\n\n\n"
-#define SCREEN_PREFIX "Screen name: "
-
+#define DISTRIBUTION "This release of MultiRename may be freely distributed.\n" \
+                     "It may not be commercially distributed without the\n" \
+                     "explicit permission of the author.\n"
 
 ///
 /// Forwards / private function declarations
@@ -248,18 +246,23 @@ struct NewMenu* findNewMenuItem(struct NewMenu* pNewMenuArray, ULONG itemId)
 }
 
 
-STRPTR createAboutMessage(Application* pApp)
+STRPTR createAboutMessage()
 {
   STRPTR pAboutMsg;
   ULONG totalLength = strlen(VERSTAG + 7)
                     + strlen(COPYRIGHT)
-                    + strlen(DISTRIBUTION)
-                    + strlen(SCREEN_PREFIX);
-                    //+ strlen(getPubScreenName()) + 1;
+                    + strlen(DISTRIBUTION) + 1;
 
-  // TODO: Continue here, AllocVec, etc
+  if(!(pAboutMsg = AllocVec(totalLength * sizeof(char), MEMF_CLEAR)))
+  {
+    return NULL;
+  }
+
+  strcpy(pAboutMsg, VERSTAG + 7);
+  strcat(pAboutMsg, COPYRIGHT);
+  strcat(pAboutMsg, DISTRIBUTION);
   
-
+  return pAboutMsg;
 }
 
 Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
@@ -377,7 +380,15 @@ Application* createApplication(int argc, char **argv)
                 {
                   if((pApp->pRangeSelectWindow = createRangeSelectWindow()))
                   {
-                    return pApp;
+                    if((pApp->pAboutMessage = createAboutMessage()))
+                    {
+                      return pApp;
+                    }
+                    else
+                    {
+                      PutStr("Failed to create the about message.\n");
+                      disposeApplication(pApp);
+                    }
                   }
                   else
                   {
@@ -442,6 +453,11 @@ void disposeApplication(Application* pApp)
   if(!pApp)
   {
     return;
+  }
+
+  if(pApp->pAboutMessage)
+  {
+    FreeVec(pApp->pAboutMessage);
   }
 
   if(pApp->pRangeSelectWindow)
@@ -922,8 +938,7 @@ static void handleMenu(Application* pApp, ULONG result)
 
       case MENU_PROJECT_ABOUT:
       {
-
-        pApp->IsExitRequested = TRUE;
+        showEasyRequest(pApp->pIntuiWindow, "Ok", pApp->pAboutMessage);
         break;
       }
 
