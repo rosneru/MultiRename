@@ -5,6 +5,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <libraries/asl.h>
 #include <libraries/gadtools.h>
 #include <libraries/locale.h>
 #include <utility/hooks.h>
@@ -15,6 +16,7 @@
 
 #ifdef __clang__
   #include <clib/alib_protos.h>
+  #include <clib/asl_protos.h>
   #include <clib/exec_protos.h>
   #include <clib/dos_protos.h>
   #include <clib/intuition_protos.h>
@@ -29,6 +31,7 @@
   #include <clib/window_protos.h>
 #else
   #include <proto/alib.h>
+  #include <proto/asl.h>
   #include <proto/dos.h>
   #include <proto/exec.h>
   #include <proto/intuition.h>
@@ -204,6 +207,7 @@ struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECK
 enum
 { 
   MENU_PROJECT_NEW,
+  MENU_PROJECT_ADD_FILES,
   MENU_PROJECT_ABOUT,
   MENU_PROJECT_QUIT,
   MENU_SETTINGS_LONGNAMES,
@@ -214,6 +218,8 @@ struct NewMenu mainWindowNewMenu[] =
 {
   { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
   {   NM_ITEM,    "New",                  "n", 0,                  0, MENU_PROJECT_NEW},
+  {   NM_ITEM,    "Add files...",         "a", 0,                  0, MENU_PROJECT_ADD_FILES},
+  {   NM_ITEM,    NM_BARLABEL,             0 , 0,                  0, NULL},
   {   NM_ITEM,    "About",                 0 , 0,                  0, MENU_PROJECT_ABOUT},
   {   NM_ITEM,    NM_BARLABEL,             0 , 0,                  0, NULL},
   {   NM_ITEM,    "Quit",                 "q", 0,                  0, MENU_PROJECT_QUIT},
@@ -910,6 +916,47 @@ static void handleGadgets(Application* pApp, ULONG result)
 }
 
 
+void openFiles(struct Window* pParentWindow, STRPTR pHeaderText)
+{
+  struct Requester sleepRequester;
+  struct FileRequester* pFileRequest;
+
+  // Allocate data structure for the ASL requester
+  if(!(pFileRequest = (struct FileRequester*)
+    AllocAslRequestTags(ASL_FileRequest,
+                        ASLFR_TitleText, (ULONG) pHeaderText,
+                        // ASLFR_InitialDrawer, (ULONG) initialPath.c_str(),
+                        // ASLFR_InitialFile, (ULONG) initialFile.c_str(),
+                        ASLFR_Window, (ULONG) pParentWindow,
+                        ASLFR_RejectIcons, TRUE,
+                        ASLFR_DoMultiSelect, TRUE,
+                        // ASLFR_IntuiMsgFunc, (ULONG)&aslHook,
+                        TAG_DONE)))
+  {
+    // Data struct allocation failed
+    return;
+  }
+
+  // Block the window that this requester is tied to
+  InitRequester(&sleepRequester);
+  Request(&sleepRequester, pParentWindow);
+  SetWindowPointer(pParentWindow, WA_BusyPointer, TRUE, TAG_DONE);
+
+  // Open the file requester and wait until the user selected a file
+  if(AslRequestTags(pFileRequest, TAG_DONE) == FALSE)
+  {
+    // Unblock the window
+    EndRequest(&sleepRequester, pParentWindow);
+    SetWindowPointer(pParentWindow, WA_BusyPointer, FALSE, TAG_DONE);
+    FreeAslRequest(pFileRequest);
+    return;
+  }
+
+  // Unblock the window
+  EndRequest(&sleepRequester, pParentWindow);
+  SetWindowPointer(pParentWindow, WA_BusyPointer, FALSE, TAG_DONE);
+  FreeAslRequest(pFileRequest);
+}
 
 
 
@@ -933,6 +980,12 @@ static void handleMenu(Application* pApp, ULONG result)
       case MENU_PROJECT_NEW:
       {
         // TODO: Reset files and filedir lock
+        break;
+      }
+
+      case MENU_PROJECT_ADD_FILES:
+      {
+        openFiles(pApp->pIntuiWindow, "Select files to rename");
         break;
       }
 
