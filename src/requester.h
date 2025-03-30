@@ -13,6 +13,14 @@ long showEasyRequest(struct Window* pWindow,
                      char* pButtonTexts,
                      char* pMessage);
 
-void openFiles(struct Window* pParentWindow, STRPTR pHeaderText);
+/**
+ * Returns NULL on error. On success it returns a pointer to a 
+ * `struct FileRequester` for access of the selected files.
+ * NOTE: This must be freed after use by `freeMultiFileSelector(..)`
+ */
+struct FileRequester* showMultiFileSelector(struct Window* pParentWindow,
+                                            STRPTR pHeaderText);
+
+void freeMultiFileSelector(struct FileRequester* pFileRequester);
 
 #endif

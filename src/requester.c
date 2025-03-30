@@ -44,7 +44,8 @@ long showEasyRequest(struct Window* pWindow,
 }
 
 
-void openFiles(struct Window* pParentWindow, STRPTR pHeaderText)
+struct FileRequester* showMultiFileSelector(struct Window* pParentWindow,
+                                            STRPTR pHeaderText)
 {
   struct Requester sleepRequester;
   struct FileRequester* pFileRequest;
@@ -73,15 +74,23 @@ void openFiles(struct Window* pParentWindow, STRPTR pHeaderText)
   // Open the file requester and wait until the user selected a file
   if(AslRequestTags(pFileRequest, TAG_DONE) == FALSE)
   {
-    // Unblock the window
-    EndRequest(&sleepRequester, pParentWindow);
-    SetWindowPointer(pParentWindow, WA_BusyPointer, FALSE, TAG_DONE);
-    FreeAslRequest(pFileRequest);
-    return;
+    FreeAslRequest((APTR)pFileRequest);
+    pFileRequest = NULL;
   }
 
   // Unblock the window
   EndRequest(&sleepRequester, pParentWindow);
   SetWindowPointer(pParentWindow, WA_BusyPointer, FALSE, TAG_DONE);
-  FreeAslRequest(pFileRequest);
+
+  return pFileRequest;
+}
+
+void freeMultiFileSelector(struct FileRequester* pFileRequester)
+{
+  if(!pFileRequester)
+  {
+    return;
+  }
+
+  FreeAslRequest((APTR)pFileRequester);
 }

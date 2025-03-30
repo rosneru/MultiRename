@@ -5,6 +5,7 @@
 #include <intuition/classusr.h>
 #include <intuition/gadgetclass.h>
 #include <intuition/icclass.h>
+#include <libraries/asl.h>
 #include <libraries/gadtools.h>
 #include <libraries/locale.h>
 #include <utility/hooks.h>
@@ -69,6 +70,16 @@
 /// Forwards / private function declarations
 
 void startRename(Application* pApp);
+
+/**
+ * Iterate the given array of WbArgs and (try to) add each file to the
+ * application processing list.
+ *
+ * NOTE: Detaches the list browser labels and the it calls
+ * `applyNewFiles()` which then attaches them again.
+ */
+void appendFilesByWbArgs(Application* pApp, struct WBArg *pArgs, ULONG numArgs);
+
 
 /**
  * Re-attaches the list of FileNodes to the list browser.
@@ -143,7 +154,6 @@ enum gadids
 static Object* m_ppGadgets[MAXGADGETS];
 struct Hook m_AppHook;
 
-
 ///
 /// Hook implementations
 
@@ -151,49 +161,8 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
                                     __REG__(a2, Object *pWindow),
                                     __REG__(a1, struct AppMessage *pMsg))
 {
-  ULONG i;
-  STRPTR pFileName;
-  struct WBArg *pWbArg = pMsg->am_ArgList;
   Application* pApp = (Application*)pHook->h_Data;
-
-  // Detach list from ListBrowser. Must be done before changing the list.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  LISTBROWSER_Labels, ~0,
-                  TAG_DONE);
-
-  // Iterate the files of the args and append them as FileNode if possible
-  for(i = 0; i < pMsg->am_NumArgs; i++)
-  {
-    pFileName = pWbArg[i].wa_Name;
-    if(NameFromLock(pWbArg[i].wa_Lock,
-                    pApp->pParsedArgs->pScratchPathBuf,
-                    MAX_PATH_LEN))
-    {
-      // Now scratch buf contains the name of the directory of the file
-      // So next the fileName is appended to the buf
-      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
-
-      appendFileNode(pApp->pFiles,
-                     pApp->pParsedArgs->pScratchPathBuf,
-                     pApp->pLocale,
-                     pApp->pNotifications);
-    }
-    else
-    {
-      if(IoErr() == ERROR_LINE_TOO_LONG)
-      {
-        // For the error notification only the file name not the
-        // relative path is needed.
-        addNotification(pApp->pNotifications,
-                        NNT_SKIPPED_PATH_TOO_LONG,
-                        pFileName);
-      }
-    }
-  }
-
-  applyNewFiles(pApp);
+  appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
 }
 
 ///
@@ -625,6 +594,56 @@ void startRename(Application* pApp)
   freeTokenCounts(pTokenCounts);
 }
 
+void appendFilesByWbArgs(Application* pApp, struct WBArg *pArgs, ULONG numArgs)
+{
+  ULONG i;
+  STRPTR pFileName;
+
+  if(numArgs == 0)
+  {
+    return;
+  }
+
+  // Detach list from ListBrowser. Must be done before changing the list.
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, ~0,
+                  TAG_DONE);
+
+  // Iterate the files of the args and append them as FileNode if possible
+  for(i = 0; i < numArgs; i++)
+  {
+    pFileName = pArgs[i].wa_Name;
+    if(NameFromLock(pArgs[i].wa_Lock,
+                    pApp->pParsedArgs->pScratchPathBuf,
+                    MAX_PATH_LEN))
+    {
+      // Now scratch buf contains the name of the directory of the file
+      // So next the fileName is appended to the buf
+      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
+
+      appendFileNode(pApp->pFiles,
+                     pApp->pParsedArgs->pScratchPathBuf,
+                     pApp->pLocale,
+                     pApp->pNotifications);
+    }
+    else
+    {
+      if(IoErr() == ERROR_LINE_TOO_LONG)
+      {
+        // For the error notification only the file name not the
+        // relative path is needed.
+        addNotification(pApp->pNotifications,
+                        NNT_SKIPPED_PATH_TOO_LONG,
+                        pFileName);
+      }
+    }
+  }
+
+  applyNewFiles(pApp);
+}
+
 void applyNewFiles(Application* pApp)
 {
   STRPTR pFirstPath;
@@ -917,6 +936,7 @@ static void handleMenu(Application* pApp, ULONG result)
 {
   struct MenuItem* pItem;
   ULONG selection;
+  struct FileRequester* pFileReq;
   selection = (result & WMHI_MENUMASK);
 
   while (selection != MENUNULL && !pApp->IsExitRequested)
@@ -938,7 +958,13 @@ static void handleMenu(Application* pApp, ULONG result)
 
       case MENU_PROJECT_ADD_FILES:
       {
-        openFiles(pApp->pIntuiWindow, "Select files to rename");
+        if((pFileReq = showMultiFileSelector(pApp->pIntuiWindow,
+                                             "Select files to rename")))
+        {
+          appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
+          freeMultiFileSelector(pFileReq);
+          pFileReq = NULL;
+        }
         break;
       }
 
