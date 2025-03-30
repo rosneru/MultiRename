@@ -13,4 +13,6 @@ long showEasyRequest(struct Window* pWindow,
                      char* pButtonTexts,
                      char* pMessage);
 
+void openFiles(struct Window* pParentWindow, STRPTR pHeaderText);
+
 #endif

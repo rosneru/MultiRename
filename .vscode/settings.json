@@ -83,7 +83,8 @@
     "layout.h": "c",
     "rename_algorithm.h": "c",
     "parsed_args.h": "c",
-    "intuition.h": "c"
+    "intuition.h": "c",
+    "exec.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"
