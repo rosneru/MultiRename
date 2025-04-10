@@ -19,7 +19,8 @@ long showEasyRequest(struct Window* pWindow,
  * NOTE: This must be freed after use by `freeMultiFileSelector(..)`
  */
 struct FileRequester* showMultiFileSelector(struct Window* pParentWindow,
-                                            STRPTR pHeaderText);
+                                            STRPTR pHeaderText,
+                                            struct Hook* pIntuiMsgHook);
 
 void freeMultiFileSelector(struct FileRequester* pFileRequester);
 

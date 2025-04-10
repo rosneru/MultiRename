@@ -43,12 +43,13 @@ long showEasyRequest(struct Window* pWindow,
   return result;
 }
 
-
 struct FileRequester* showMultiFileSelector(struct Window* pParentWindow,
-                                            STRPTR pHeaderText)
+                                            STRPTR pHeaderText,
+                                            struct Hook* pIntuiMsgHook)
 {
   struct Requester sleepRequester;
   struct FileRequester* pFileRequest;
+
 
   // Allocate data structure for the ASL requester
   if(!(pFileRequest = (struct FileRequester*)
@@ -59,11 +60,11 @@ struct FileRequester* showMultiFileSelector(struct Window* pParentWindow,
                         ASLFR_Window, (ULONG) pParentWindow,
                         ASLFR_RejectIcons, TRUE,
                         ASLFR_DoMultiSelect, TRUE,
-                        // ASLFR_IntuiMsgFunc, (ULONG)&aslHook,
+                        ASLFR_IntuiMsgFunc, (ULONG)pIntuiMsgHook,
                         TAG_DONE)))
   {
     // Data struct allocation failed
-    return;
+    return NULL;
   }
 
   // Block the window that this requester is tied to

@@ -165,6 +165,25 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
   appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
 }
 
+
+void __ASM__ __SAVE_DS__ IntuiMsgFunc(__REG__(a0, struct Hook *pHook),
+                                      __REG__(a2, struct FileRequester *pRequester),
+                                      __REG__(a1, struct IntuiMessage *pMsg))
+{
+  Application* pApp = (Application*)pHook->h_Data;
+
+  switch (pMsg->Class)
+  {
+    // One of the windows has been resized
+    case IDCMP_NEWSIZE:
+    {
+      DoMethod(pApp->pWinObject, WM_RETHINK);
+      break;
+    }
+  }
+}
+
+
 ///
 /// Helper implementation
 struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
@@ -311,7 +330,7 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
     WA_PubScreen, pApp->pPubScreen,
     WA_AutoAdjust, TRUE,
     WA_NewLookMenus, TRUE,
-    WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
+    WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP|IDCMP_NEWSIZE,
     WINDOW_Layout, pMainWindowLayout,
     WINDOW_NewMenu, mainWindowNewMenu,
     WINDOW_AppPort, pApp->pAppWindowPort,
@@ -931,6 +950,7 @@ static void handleGadgets(Application* pApp, ULONG result)
   }
 }
 
+struct Hook m_IntuiMsgHook;
 
 static void handleMenu(Application* pApp, ULONG result)
 {
@@ -958,8 +978,13 @@ static void handleMenu(Application* pApp, ULONG result)
 
       case MENU_PROJECT_ADD_FILES:
       {
+        m_IntuiMsgHook.h_Entry = (ULONG (* )())IntuiMsgFunc;
+        m_IntuiMsgHook.h_SubEntry = NULL;
+        m_IntuiMsgHook.h_Data = pApp;
+
         if((pFileReq = showMultiFileSelector(pApp->pIntuiWindow,
-                                             "Select files to rename")))
+                                             "Select files to rename",
+                                             &m_IntuiMsgHook)))
         {
           appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
           freeMultiFileSelector(pFileReq);
