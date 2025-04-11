@@ -543,7 +543,8 @@ void notifyUserAboutSkippedFiles(Application* pApp)
 {
   if(containsSkippedNotifications(pApp->pNotifications))
   {
-    if(!showEasyRequest(pApp->pIntuiWindow,
+    if(!showEasyRequest(pApp->pWinObject, 
+                        pApp->pIntuiWindow,
                         "MultiRename",
                         "Ok|Show errors",
                         "Failed to add some of the input files"))
@@ -565,7 +566,8 @@ void startRename(Application* pApp)
   fileCount = countFileNodes(pApp->pFiles);
   if(fileCount == 0)
   {
-    showEasyRequest(pApp->pIntuiWindow,
+    showEasyRequest(pApp->pWinObject, 
+                    pApp->pIntuiWindow,
                     "MultiRename",
                     "Ok",
                     "No files to rename.");
@@ -574,7 +576,8 @@ void startRename(Application* pApp)
 
   if(!(pTokenCounts = createTokenCounts(fileCount)))
   {
-      showEasyRequest(pApp->pIntuiWindow,
+      showEasyRequest(pApp->pWinObject, 
+                      pApp->pIntuiWindow,
                       "MultiRename",
                       "Ok",
                       "Aborted: Failed to pre-process / create tokens.");
@@ -588,7 +591,8 @@ void startRename(Application* pApp)
     pFileNode = (FileNode*)pNode;
     if(pFileNode->TokenOccurrenceNumber > 1)
     {
-        showEasyRequest(pApp->pIntuiWindow,
+        showEasyRequest(pApp->pWinObject, 
+                        pApp->pIntuiWindow,
                         "MultiRename",
                         "Abort",
                         "Can't rename: Duplicate names.");
@@ -599,17 +603,19 @@ void startRename(Application* pApp)
 
   if(renameFiles(pApp->pFiles, pApp->pNotifications))
   {
-    showEasyRequest(pApp->pIntuiWindow,
+    showEasyRequest(pApp->pWinObject, 
+                    pApp->pIntuiWindow,
                     "MultiRename",
                     "Ok",
                     "Finished renaming.");
   }
   else
   {
-    if(!showEasyRequest(pApp->pIntuiWindow,
-      "MultiRename",
-      "Ok|Show errors",
-      "Failed to rename some of the input files"))
+    if(!showEasyRequest(pApp->pWinObject, 
+                        pApp->pIntuiWindow,
+                        "MultiRename",
+                        "Ok|Show errors",
+                        "Failed to rename some of the input files"))
     {
       printNotifications(pApp->pNotifications);
     }
@@ -892,7 +898,8 @@ static void handleGadgets(Application* pApp, ULONG result)
       }
       else
       {
-        showEasyRequest(pApp->pIntuiWindow,
+        showEasyRequest(pApp->pWinObject, 
+                        pApp->pIntuiWindow,
                         "MultiRename: Select name part",
                         "Ok",
                         "This tool is only available if you have " \
@@ -956,7 +963,8 @@ static void handleGadgets(Application* pApp, ULONG result)
       }
       else
       {
-        showEasyRequest(pApp->pIntuiWindow,
+        showEasyRequest(pApp->pWinObject, 
+                        pApp->pIntuiWindow,
                         "MultiRename: Select extension part",
                         "Ok",
                         "This tool is only available if you have " \
@@ -1018,7 +1026,11 @@ static void handleMenu(Application* pApp, ULONG result)
 
       case MENU_PROJECT_ABOUT:
       {
-        showEasyRequest(pApp->pIntuiWindow, "MultiRename", "Ok", pApp->pAboutMessage);
+        showEasyRequest(pApp->pWinObject,
+                        pApp->pIntuiWindow,
+                        "MultiRename",
+                        "Ok",
+                        pApp->pAboutMessage);
         break;
       }
 

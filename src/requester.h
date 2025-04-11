@@ -9,7 +9,8 @@
  * The parent window is blocked and a wait mouse curser is set to it
  * until the user presses a button of the requester.
  **/
-long showEasyRequest(struct Window* pWindow,
+long showEasyRequest(Object* pWinObject,
+                     struct Window* pWindow,
                      char* pTitle,
                      char* pButtonTexts,
                      char* pMessage);
