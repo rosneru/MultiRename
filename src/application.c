@@ -890,6 +890,14 @@ static void handleGadgets(Application* pApp, ULONG result)
                               pFileNode->OriginalName,
                               pFileNode->OriginalNameLen);
       }
+      else
+      {
+        showEasyRequest(pApp->pIntuiWindow,
+                        "MultiRename: Select name part",
+                        "Ok",
+                        "This tool is only available if you have " \
+                        "files in the processing list.");
+      }
       break;
     }
     case GID_BTN_NAME_DATE:
@@ -945,6 +953,15 @@ static void handleGadgets(Application* pApp, ULONG result)
                                 + pFileNode->OriginalNameLen 
                                 + 1,
                               pFileNode->OriginalExtLen);
+      }
+      else
+      {
+        showEasyRequest(pApp->pIntuiWindow,
+                        "MultiRename: Select extension part",
+                        "Ok",
+                        "This tool is only available if you have " \
+                        "files in the processing list and if at least " \
+                        "one of them has an extension like '.iff'.");
       }
       break;
     }
@@ -1115,7 +1132,7 @@ Object* createLayout(void)
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_PART] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_PART,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"[N#-#] Part",
+        GA_Text, (ULONG)"[N#-#] Part...",
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_TIME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_TIME,
@@ -1148,7 +1165,7 @@ Object* createLayout(void)
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_PART] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_PART,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[E#-#] Part",
+      GA_Text, (ULONG)"[E#-#] Part...",
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_COUNTER,
