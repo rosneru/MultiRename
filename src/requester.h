@@ -10,6 +10,7 @@
  * until the user presses a button of the requester.
  **/
 long showEasyRequest(struct Window* pWindow,
+                     char* pTitle,
                      char* pButtonTexts,
                      char* pMessage);
 

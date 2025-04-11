@@ -11,6 +11,7 @@
 #include "requester.h"
 
 long showEasyRequest(struct Window* pWindow,
+                     char* pTitle,
                      char* pButtonTexts,
                      char* pMessage)
 {
@@ -20,7 +21,7 @@ long showEasyRequest(struct Window* pWindow,
   {
     sizeof(struct EasyStruct),
     0,
-    "MultiRename",
+    pTitle,
     NULL,
     NULL
   };

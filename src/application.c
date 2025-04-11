@@ -544,6 +544,7 @@ void notifyUserAboutSkippedFiles(Application* pApp)
   if(containsSkippedNotifications(pApp->pNotifications))
   {
     if(!showEasyRequest(pApp->pIntuiWindow,
+                        "MultiRename",
                         "Ok|Show errors",
                         "Failed to add some of the input files"))
     {
@@ -565,6 +566,7 @@ void startRename(Application* pApp)
   if(fileCount == 0)
   {
     showEasyRequest(pApp->pIntuiWindow,
+                    "MultiRename",
                     "Ok",
                     "No files to rename.");
     return;
@@ -573,6 +575,7 @@ void startRename(Application* pApp)
   if(!(pTokenCounts = createTokenCounts(fileCount)))
   {
       showEasyRequest(pApp->pIntuiWindow,
+                      "MultiRename",
                       "Ok",
                       "Aborted: Failed to pre-process / create tokens.");
       return;
@@ -586,6 +589,7 @@ void startRename(Application* pApp)
     if(pFileNode->TokenOccurrenceNumber > 1)
     {
         showEasyRequest(pApp->pIntuiWindow,
+                        "MultiRename",
                         "Abort",
                         "Can't rename: Duplicate names.");
         freeTokenCounts(pTokenCounts);
@@ -596,12 +600,14 @@ void startRename(Application* pApp)
   if(renameFiles(pApp->pFiles, pApp->pNotifications))
   {
     showEasyRequest(pApp->pIntuiWindow,
+                    "MultiRename",
                     "Ok",
                     "Finished renaming.");
   }
   else
   {
     if(!showEasyRequest(pApp->pIntuiWindow,
+      "MultiRename",
       "Ok|Show errors",
       "Failed to rename some of the input files"))
     {
@@ -995,7 +1001,7 @@ static void handleMenu(Application* pApp, ULONG result)
 
       case MENU_PROJECT_ABOUT:
       {
-        showEasyRequest(pApp->pIntuiWindow, "Ok", pApp->pAboutMessage);
+        showEasyRequest(pApp->pIntuiWindow, "MultiRename", "Ok", pApp->pAboutMessage);
         break;
       }
 
