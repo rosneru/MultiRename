@@ -27,6 +27,15 @@ long showEasyRequest(Object* pWinObject,
   ULONG code, result;
   long selected = -1;
 
+  //
+  // Instead of just calling `EasyRequestArgs(...) the EasyRequest is
+  // built manually. This low-level approach allows better control of
+  // the requests behavior. For example it gives access to the
+  // requesters event loop where Intuition messages can be received. In
+  // this way it can be detected if e.g. the requester parent window has
+  // been resized; and it can be repainted.
+  //
+
   struct EasyStruct easyStruct =
   {
     sizeof(struct EasyStruct),
@@ -38,7 +47,7 @@ long showEasyRequest(Object* pWinObject,
 
   if(!(pRequesterWindow = BuildEasyRequestArgs(pWindow, &easyStruct, 0, NULL)))
   {
-    return 0;
+    return -1;
   }
   
   // Block the window that this requester is tied to
@@ -67,33 +76,6 @@ long showEasyRequest(Object* pWinObject,
           }
         }
       }
-      // struct IntuiMessage* pMsg;
-      // while ((pMsg = GT_GetIMsg(pActiveWindow->UserPort)) != NULL)
-      // {
-      //   switch (pMsg->Class)
-      //   {
-      //     // One of the windows has been resized
-      //     case IDCMP_NEWSIZE:
-      //       for(size_t i = 0; i < m_pAllWindowsVector->size(); i++)
-      //       {
-      //         if((*m_pAllWindowsVector)[i]->getIntuiWindow() == pMsg->IDCMPWindow)
-      //         {
-      //           // Re-paint the resized window
-      //           (*m_pAllWindowsVector)[i]->performResize();
-      //           break;
-      //         }
-      //       }
-      //       break;
-
-      //     // One of the windows must be refreshed
-      //     case IDCMP_REFRESHWINDOW:
-      //       GT_BeginRefresh(pMsg->IDCMPWindow);
-      //       GT_EndRefresh(pMsg->IDCMPWindow, TRUE);
-      //       break;
-      //   }
-
-      //   GT_ReplyIMsg(pMsg);
-      // }
     }
 
     if (flags & requestWindowFlags)
@@ -113,24 +95,47 @@ long showEasyRequest(Object* pWinObject,
   return selected;
 }
 
-struct FileRequester* showMultiFileSelector(struct Window* pParentWindow,
-                                            STRPTR pHeaderText,
-                                            struct Hook* pIntuiMsgHook)
+
+void __ASM__ __SAVE_DS__ IntuiMsgFunc(__REG__(a0, struct Hook *pHook),
+                                      __REG__(a2, struct FileRequester *pRequester),
+                                      __REG__(a1, struct IntuiMessage *pMsg))
+{
+  Object* pWinObject = (Object*)pHook->h_Data;
+
+  switch (pMsg->Class)
+  {
+    // One of the windows has been resized
+    case IDCMP_NEWSIZE:
+    {
+      DoMethod(pWinObject, WM_RETHINK);
+      break;
+    }
+  }
+}
+
+struct Hook m_IntuiMsgHook;
+
+struct FileRequester* showMultiFileSelector(Object* pWinObject,
+                                            struct Window* pParentWindow,
+                                            STRPTR pTitle)
 {
   struct Requester sleepRequester;
   struct FileRequester* pFileRequest;
 
+  m_IntuiMsgHook.h_Entry = (ULONG (* )())IntuiMsgFunc;
+  m_IntuiMsgHook.h_SubEntry = NULL;
+  m_IntuiMsgHook.h_Data = pWinObject;
 
   // Allocate data structure for the ASL requester
   if(!(pFileRequest = (struct FileRequester*)
     AllocAslRequestTags(ASL_FileRequest,
-                        ASLFR_TitleText, (ULONG) pHeaderText,
+                        ASLFR_TitleText, (ULONG) pTitle,
                         // ASLFR_InitialDrawer, (ULONG) initialPath.c_str(),
                         // ASLFR_InitialFile, (ULONG) initialFile.c_str(),
                         ASLFR_Window, (ULONG) pParentWindow,
                         ASLFR_RejectIcons, TRUE,
                         ASLFR_DoMultiSelect, TRUE,
-                        ASLFR_IntuiMsgFunc, (ULONG)pIntuiMsgHook,
+                        ASLFR_IntuiMsgFunc, (ULONG)&m_IntuiMsgHook,
                         TAG_DONE)))
   {
     // Data struct allocation failed

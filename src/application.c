@@ -154,35 +154,6 @@ enum gadids
 static Object* m_ppGadgets[MAXGADGETS];
 struct Hook m_AppHook;
 
-///
-/// Hook implementations
-
-void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
-                                    __REG__(a2, Object *pWindow),
-                                    __REG__(a1, struct AppMessage *pMsg))
-{
-  Application* pApp = (Application*)pHook->h_Data;
-  appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
-}
-
-
-void __ASM__ __SAVE_DS__ IntuiMsgFunc(__REG__(a0, struct Hook *pHook),
-                                      __REG__(a2, struct FileRequester *pRequester),
-                                      __REG__(a1, struct IntuiMessage *pMsg))
-{
-  Application* pApp = (Application*)pHook->h_Data;
-
-  switch (pMsg->Class)
-  {
-    // One of the windows has been resized
-    case IDCMP_NEWSIZE:
-    {
-      DoMethod(pApp->pWinObject, WM_RETHINK);
-      break;
-    }
-  }
-}
-
 
 ///
 /// Helper implementation
@@ -255,6 +226,22 @@ STRPTR createAboutMessage()
   
   return pAboutMsg;
 }
+
+/**
+ * In `createMainWindow` this function is set to a hook to be called by
+ * Intuition/BOOPSI when app messages are received. These messages can
+ * contain some WbArgs, e.g. files that have been dragged to app window.
+ * This function adds these WbArgs/files to the processing list.
+ */
+void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
+                                    __REG__(a2, Object *pWindow),
+                                    __REG__(a1, struct AppMessage *pMsg))
+{
+  Application* pApp = (Application*)pHook->h_Data;
+  appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
+}
+
+
 
 Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
 {
@@ -981,7 +968,7 @@ static void handleGadgets(Application* pApp, ULONG result)
   }
 }
 
-struct Hook m_IntuiMsgHook;
+
 
 static void handleMenu(Application* pApp, ULONG result)
 {
@@ -1009,13 +996,9 @@ static void handleMenu(Application* pApp, ULONG result)
 
       case MENU_PROJECT_ADD_FILES:
       {
-        m_IntuiMsgHook.h_Entry = (ULONG (* )())IntuiMsgFunc;
-        m_IntuiMsgHook.h_SubEntry = NULL;
-        m_IntuiMsgHook.h_Data = pApp;
-
-        if((pFileReq = showMultiFileSelector(pApp->pIntuiWindow,
-                                             "Select files to rename",
-                                             &m_IntuiMsgHook)))
+        if((pFileReq = showMultiFileSelector(pApp->pWinObject,
+                                             pApp->pIntuiWindow,
+                                             "Select files to rename")))
         {
           appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
           freeMultiFileSelector(pFileReq);
