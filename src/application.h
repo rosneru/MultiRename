@@ -33,6 +33,8 @@ typedef struct Application
   BOOL IsExitRequested;
   char WindowTitle[MAX_PATH_LEN + 32];
   char ScratchBuf[SCRATCH_BUF_SIZE + 1];
+  long NameGadgetBufferPos;
+  long ExtGadgetBufferPos;
 } Application;
 
 Application* createApplication(int argc, char **argv);

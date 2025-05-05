@@ -2,11 +2,11 @@
 #include "string_tools.h"
 
 
-int appendString(STRPTR pDest,
-                 ULONG destSize,
-                 ULONG* pNewDestLen,
-                 STRPTR pSrc,
-                 ULONG numChars)
+BOOL appendString(STRPTR pDest,
+                  ULONG destSize,
+                  ULONG* pNewDestLen,
+                  STRPTR pSrc,
+                  ULONG numChars)
 {
   ULONG remainingDestSize, srcLen, currentDestLen;
 
@@ -54,4 +54,31 @@ int appendString(STRPTR pDest,
 
     return FALSE;
   }
+}
+
+int insertString(const STRPTR pSrcStr,
+                 STRPTR pStrToInsert,
+                 ULONG insertPos,
+                 STRPTR pDestBuf,
+                 ULONG destBufSize)
+{
+  if(!pStrToInsert || !pDestBuf || !pSrcStr)
+  {
+    return -1;
+  }
+
+  // Start with a clean target buffer
+  strcpy(pDestBuf, "");
+
+  // Apply the beginning until the insert position
+  strncat(pDestBuf, pSrcStr, insertPos);
+  pDestBuf[insertPos] = '\0';
+
+  // Apply the 'string to insert'
+  strcat(pDestBuf, pStrToInsert);
+
+  // Apply the end, after the insert position
+  strcat(pDestBuf, pSrcStr + insertPos);
+
+  return (int)(insertPos + strlen(pStrToInsert));
 }

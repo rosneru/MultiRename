@@ -5,10 +5,10 @@
 #include "range_mask.h"
 
 
-BOOL createRangeMaskString(RangeMask* pRangeMask, char* pResultStrBuf)
+BOOL createRangeMaskString(RangeMask* pRangeMask, char* pDestBuf)
 {
   char insertCmd;
-  if(!pRangeMask || !pResultStrBuf)
+  if(!pRangeMask || !pDestBuf)
   {
     return FALSE;
   }
@@ -25,29 +25,29 @@ BOOL createRangeMaskString(RangeMask* pRangeMask, char* pResultStrBuf)
       return FALSE;
   }
 
-  sprintf(pResultStrBuf, "[%c%d-%d]", insertCmd,
-                                      pRangeMask->RangeFrom,
-                                      pRangeMask->RangeTo);
+  sprintf(pDestBuf, "[%c%d-%d]", insertCmd,
+                                 pRangeMask->RangeFrom,
+                                 pRangeMask->RangeTo);
 
   return TRUE;
 }
 
 int insertRangeMaskString(RangeMask* pRangeMask,
                           STRPTR pDestBuf,
-                          ULONG resultBufSize,
+                          ULONG destBufSize,
                           const STRPTR pSrcStr,
                           UBYTE insertPos)
 {
   char commandPartBuf[MAX_RANGE_STRING_LEN + 1];
 
-  if(!pRangeMask || !pDestBuf || ! pSrcStr || (insertPos < 0)
+  if(!pRangeMask || !pDestBuf || ! pSrcStr
   || (pRangeMask->RangeFrom > MAX_NAME_LEN) || (pRangeMask->RangeTo > MAX_NAME_LEN) 
   || (pRangeMask->RangeFrom > pRangeMask->RangeTo))
   {
     return -1;
   }
 
-  if((strlen(pSrcStr) + MAX_RANGE_STRING_LEN) > resultBufSize)
+  if((strlen(pSrcStr) + MAX_RANGE_STRING_LEN) > destBufSize)
   {
     return -1;
   }

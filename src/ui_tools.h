@@ -19,4 +19,21 @@ void appendTextToStrGadget(struct Window* pIntuiWindow,
                            STRPTR pScratchBuf,
                            ULONG scratchBufSize);
 
+/**
+ * 
+ */
+int insertTextToStrGadget(struct Window* pIntuiWindow,
+                          Object* pStrGadget,
+                          STRPTR pStrToInsert,
+                          ULONG insertPos,
+                          STRPTR pScratchBuf,
+                          ULONG scratchBufSize);
+
+/**
+ * Get the current buffer position of given string gadget `pStrGadget`.
+ * Retuns -1 if buffer pos could not be retrieved.
+ */
+long getStrGadgetBufferPos(Object* pStrGadget);
+
+
 #endif

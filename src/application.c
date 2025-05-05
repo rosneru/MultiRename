@@ -360,6 +360,9 @@ Application* createApplication(int argc, char **argv)
                   {
                     if((pApp->pAboutMessage = createAboutMessage()))
                     {
+                      // Mark the buffer positions as invalid
+                      pApp->NameGadgetBufferPos = -1;
+                      pApp->ExtGadgetBufferPos = -1;
                       return pApp;
                     }
                     else
@@ -801,7 +804,7 @@ BOOL updateNewNames(Application* pApp)
 
 BOOL applySelectedRange(Application* pApp)
 {
-  long bufferPos;
+  long bufferPos = -1;
   STRPTR pText;
   Object *pStrGadget;
 
@@ -813,6 +816,7 @@ BOOL applySelectedRange(Application* pApp)
         return FALSE;
       }
       pStrGadget = m_ppGadgets[GID_STR_NAME];
+      bufferPos = pApp->NameGadgetBufferPos;
       break;
     case RRT_EXTENSION:
       if(!GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG*)&pText))
@@ -820,12 +824,17 @@ BOOL applySelectedRange(Application* pApp)
         return FALSE;
       }
       pStrGadget = m_ppGadgets[GID_STR_EXTENSION];
+      bufferPos = pApp->ExtGadgetBufferPos;
       break;
     default:
       return FALSE;
   }
 
-  bufferPos = strlen(pText);
+  if(bufferPos == -1)
+  {
+    bufferPos = strlen(pText);
+  }
+
   if(0 > (bufferPos = insertRangeMaskString(&pApp->RangeMask,
                                             pApp->ScratchBuf,
                                             SCRATCH_BUF_SIZE,
@@ -863,16 +872,20 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_NAME:
     {
-      appendTextToStrGadget(pApp->pIntuiWindow,
-                            m_ppGadgets[GID_STR_NAME],
-                            "[N]",
-                            pApp->ScratchBuf,
-                            SCRATCH_BUF_SIZE); 
+      pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
+      pApp->NameGadgetBufferPos = insertTextToStrGadget(pApp->pIntuiWindow,
+                                                        m_ppGadgets[GID_STR_NAME],
+                                                        "[N]",
+                                                        pApp->NameGadgetBufferPos,
+                                                        pApp->ScratchBuf,
+                                                        SCRATCH_BUF_SIZE);
+
       updateNewNames(pApp);
       break;
     }
     case GID_BTN_NAME_PART:
     {
+      pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
       if((pFileNode = getLongestOldNameNode(pApp->pFiles)))
       {
         pApp->RangeMask.RequestedRangeType = RRT_NAME;
@@ -1063,7 +1076,7 @@ void intuiEventLoop(Application* pApp)
     }
 
     // If the range select window was closed with ACCEPTED state apply
-    // its result (selected range) and updfate the new names column.
+    // its result (selected range) and update the new names column.
     if(pApp->pRangeSelectWindow->WindowState == RSW_STATE_ACCEPTED)
     {
       pApp->pRangeSelectWindow->WindowState = RSW_STATE_IDLE;

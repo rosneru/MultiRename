@@ -17,10 +17,25 @@
  *
  * Returns TRUE if truncation was done, otherwise FALSE.
  */
-int appendString(STRPTR pDest,
-                 ULONG destSize,
-                 ULONG* pNewDestLen,
-                 STRPTR pSrc,
-                 ULONG numChars);
+BOOL appendString(STRPTR pDest,
+                  ULONG destSize,
+                  ULONG* pNewDestLen,
+                  STRPTR pSrc,
+                  ULONG numChars);
 
+/**
+ * Fill given `pDestBuf` with `pSrcStr` with `pStrToInsert` inserted at
+ * `insertPos`.
+ *
+ * NOTE: You must ensure that `pDestBuf` is big enough for `pSrcStr` +
+ * `pStrToInsert`
+ *
+ * \returns New buffer pos in `pDestBuf` at the inserted mask string or
+ * -1 on error.
+ */
+int insertString(const STRPTR pSrcStr,
+                 STRPTR pStrToInsert,
+                 ULONG insertPos,
+                 STRPTR pDestBuf,
+                 ULONG destBufSize);
 #endif
