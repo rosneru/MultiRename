@@ -846,11 +846,22 @@ BOOL applySelectedRange(Application* pApp)
     return FALSE;
   }
 
+  // First, set the new text into string gadget
+  SetGadgetAttrs((struct Gadget *) pStrGadget,
+                 pApp->pIntuiWindow,
+                 NULL,
+                 STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
+                 TAG_DONE);
+
+  // And then set the buffer pos to insert position
+  //
+  //(Because setting both in one `SetGadgetAttrs` call doesn't work, as
+  // `STRINGA_TextVal` always overwrites the buffer pos to the end of
+  // line.)
   SetGadgetAttrs((struct Gadget *) pStrGadget,
                  pApp->pIntuiWindow,
                  NULL,
                  STRINGA_BufferPos, (ULONG) bufferPos,
-                 STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
                  TAG_DONE);
 
   return TRUE;
@@ -873,6 +884,7 @@ static void handleGadgets(Application* pApp, ULONG result)
     case GID_BTN_NAME:
     {
       pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
+printf("pApp->NameGadgetBufferPos = %d\n", pApp->NameGadgetBufferPos);
       pApp->NameGadgetBufferPos = insertTextToStrGadget(pApp->pIntuiWindow,
                                                         m_ppGadgets[GID_STR_NAME],
                                                         "[N]",

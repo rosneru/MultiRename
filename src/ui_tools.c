@@ -21,7 +21,6 @@ void appendTextToStrGadget(struct Window* pIntuiWindow,
                            ULONG scratchBufSize)
 {
   STRPTR pCurrentText;
-  long bufferPos;
   ULONG remainingBufSize;
   
   if(!GetAttr(STRINGA_TextVal, pStrGadget, (ULONG*)&pCurrentText))
@@ -30,7 +29,6 @@ void appendTextToStrGadget(struct Window* pIntuiWindow,
     return;
   }
 
-  bufferPos = strlen(pCurrentText);
   strncpy(pScratchBuf, pCurrentText, scratchBufSize);
   pScratchBuf[scratchBufSize-1] = '\0';
   remainingBufSize = scratchBufSize - strlen(pScratchBuf);
@@ -40,7 +38,6 @@ void appendTextToStrGadget(struct Window* pIntuiWindow,
   SetGadgetAttrs((struct Gadget *) pStrGadget,
                   pIntuiWindow,
                   NULL,
-                  STRINGA_BufferPos, (ULONG) bufferPos,
                   STRINGA_TextVal, (ULONG) pScratchBuf,
                   TAG_DONE);
 }
@@ -55,10 +52,20 @@ int insertTextToStrGadget(struct Window* pIntuiWindow,
   STRPTR pCurrentText;
   long bufferPos = -1;
 
+  if(!pIntuiWindow || !pStrGadget || !pStrToInsert || !pScratchBuf)
+  {
+    return -1;
+  }
+
   if(!GetAttr(STRINGA_TextVal, pStrGadget, (ULONG*)&pCurrentText))
   {
     printf("Got no STRINGA_TextVal in `insertTextToStrGadget()`\n");
-    return;
+    return -1;
+  }
+
+  if(strlen(pCurrentText) + strlen(pStrToInsert) + 1 > scratchBufSize)
+  {
+    return -1;
   }
 
   if(0 > (bufferPos = insertString(pCurrentText,
@@ -72,11 +79,22 @@ int insertTextToStrGadget(struct Window* pIntuiWindow,
     return FALSE;
   }
 
+  // First, set the new text into string gadget
+  SetGadgetAttrs((struct Gadget *) pStrGadget,
+                 pIntuiWindow,
+                 NULL,
+                 STRINGA_TextVal, (ULONG) pScratchBuf,
+                 TAG_DONE);
+
+  // And then set the buffer pos to insert position
+  //
+  //(Because setting both in one `SetGadgetAttrs` call doesn't work, as
+  // `STRINGA_TextVal` always overwrites the buffer pos to the end of
+  // line.)
   SetGadgetAttrs((struct Gadget *) pStrGadget,
                  pIntuiWindow,
                  NULL,
                  STRINGA_BufferPos, (ULONG) bufferPos,
-                 STRINGA_TextVal, (ULONG) pScratchBuf,
                  TAG_DONE);
 
   return bufferPos;
