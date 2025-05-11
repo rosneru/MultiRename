@@ -867,6 +867,35 @@ BOOL applySelectedRange(Application* pApp)
   return TRUE;
 }
 
+void insertCommandToStrGadget(Application* pApp,
+                              ULONG strGadgetId,
+                              STRPTR pCommandStr)
+{
+  pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
+  pApp->ExtGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_EXTENSION]);
+
+  if(strGadgetId == GID_STR_NAME)
+  {
+    pApp->NameGadgetBufferPos = insertTextToStrGadget(pApp->pIntuiWindow,
+                                                      m_ppGadgets[GID_STR_NAME],
+                                                      pCommandStr,
+                                                      pApp->NameGadgetBufferPos,
+                                                      pApp->ScratchBuf,
+                                                      SCRATCH_BUF_SIZE);
+  }
+  else if(strGadgetId == GID_STR_EXTENSION)
+  {
+    pApp->NameGadgetBufferPos = insertTextToStrGadget(pApp->pIntuiWindow,
+                                                      m_ppGadgets[GID_STR_EXTENSION],
+                                                      pCommandStr,
+                                                      pApp->ExtGadgetBufferPos,
+                                                      pApp->ScratchBuf,
+                                                      SCRATCH_BUF_SIZE);
+  }
+
+  updateNewNames(pApp);
+}
+
 static void handleGadgets(Application* pApp, ULONG result)
 {
   FileNode* pFileNode;
@@ -883,21 +912,13 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_NAME:
     {
-      pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
-printf("pApp->NameGadgetBufferPos = %d\n", pApp->NameGadgetBufferPos);
-      pApp->NameGadgetBufferPos = insertTextToStrGadget(pApp->pIntuiWindow,
-                                                        m_ppGadgets[GID_STR_NAME],
-                                                        "[N]",
-                                                        pApp->NameGadgetBufferPos,
-                                                        pApp->ScratchBuf,
-                                                        SCRATCH_BUF_SIZE);
-
-      updateNewNames(pApp);
+      insertCommandToStrGadget(pApp, GID_STR_NAME, "[N]");
       break;
     }
     case GID_BTN_NAME_PART:
     {
       pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
+      pApp->ExtGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_EXTENSION]);
       if((pFileNode = getLongestOldNameNode(pApp->pFiles)))
       {
         pApp->RangeMask.RequestedRangeType = RRT_NAME;
@@ -921,46 +942,28 @@ printf("pApp->NameGadgetBufferPos = %d\n", pApp->NameGadgetBufferPos);
     }
     case GID_BTN_NAME_DATE:
     {
-      appendTextToStrGadget(pApp->pIntuiWindow,
-                            m_ppGadgets[GID_STR_NAME],
-                            "[YMD]",
-                            pApp->ScratchBuf,
-                            SCRATCH_BUF_SIZE); 
-      updateNewNames(pApp);
+      insertCommandToStrGadget(pApp, GID_STR_NAME, "[YMD]");
       break;
     }
     case GID_BTN_NAME_TIME:
     {
-      appendTextToStrGadget(pApp->pIntuiWindow,
-                            m_ppGadgets[GID_STR_NAME],
-                            "[hms]",
-                            pApp->ScratchBuf,
-                            SCRATCH_BUF_SIZE); 
-      updateNewNames(pApp);
+      insertCommandToStrGadget(pApp, GID_STR_NAME, "[hms]");
       break;
     }
     case GID_BTN_NAME_COUNTER:
     {
-      appendTextToStrGadget(pApp->pIntuiWindow,
-                            m_ppGadgets[GID_STR_NAME],
-                            "[C]",
-                            pApp->ScratchBuf,
-                            SCRATCH_BUF_SIZE); 
-      updateNewNames(pApp);
+      insertCommandToStrGadget(pApp, GID_STR_NAME, "[C]");
       break;
     }
     case GID_BTN_EXTENSION:
     {
-      appendTextToStrGadget(pApp->pIntuiWindow,
-                            m_ppGadgets[GID_STR_EXTENSION],
-                            "[E]",
-                            pApp->ScratchBuf,
-                            SCRATCH_BUF_SIZE); 
-      updateNewNames(pApp);
+      insertCommandToStrGadget(pApp, GID_STR_EXTENSION, "[E]");
       break;
     }
     case GID_BTN_EXTENSION_PART:
     {
+      pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
+      pApp->ExtGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_EXTENSION]);
       if((pFileNode = getLongestOldExtNode(pApp->pFiles)))
       {
         pApp->RangeMask.RequestedRangeType = RRT_EXTENSION;
@@ -983,6 +986,11 @@ printf("pApp->NameGadgetBufferPos = %d\n", pApp->NameGadgetBufferPos);
                         "files in the processing list and if at least " \
                         "one of them has an extension like '.iff'.");
       }
+      break;
+    }
+    case GID_BTN_EXTENSION_COUNTER:
+    {
+      insertCommandToStrGadget(pApp, GID_STR_EXTENSION, "[C]");
       break;
     }
     case GID_BTN_START:
