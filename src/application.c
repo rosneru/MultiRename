@@ -591,6 +591,16 @@ void startRename(Application* pApp)
     }
   }
 
+  // Detach list from ListBrowser. Must be done before the actual
+  // rename starts because `renameFiles` changes the list (removes the
+  // successfully renamed files)
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+  pApp->pIntuiWindow, 
+  NULL,
+  LISTBROWSER_Labels, ~0,
+  TAG_DONE);
+
+  // Perform the rename
   if(renameFiles(pApp->pFiles, pApp->pNotifications))
   {
     showEasyRequest(pApp->pWinObject, 
@@ -611,6 +621,14 @@ void startRename(Application* pApp)
     }
   }
 
+  // Re-attach files node list to ListBrowser to display the resulting
+  // list. For a complete successful rename process this should be
+  // empty.
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                 pApp->pIntuiWindow, NULL,
+                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                 LISTBROWSER_AutoFit, TRUE,
+                 TAG_DONE);
 
   freeTokenCounts(pTokenCounts);
 }

@@ -19,6 +19,7 @@ TokenCount *findTokenCount(ULONG searchToken,
 
 ///
 /// Public function implementations
+static BOOL alreadyRemoved = FALSE;
 
 BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications)
 {
@@ -41,6 +42,12 @@ BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications)
   {
     pFileNode = (FileNode*)pNode;
     Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
+
+    if(!alreadyRemoved)
+    {
+      Remove(pNode);
+      alreadyRemoved = TRUE;
+    }
   }
 
   return TRUE;
