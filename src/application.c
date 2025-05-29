@@ -601,7 +601,11 @@ void startRename(Application* pApp)
   TAG_DONE);
 
   // Perform the rename
-  if(renameFiles(pApp->pFiles, pApp->pNotifications))
+  if(renameFiles(pApp->pFiles,
+                 pApp->pNotifications,
+                 pApp->pParsedArgs->AreIconsSkipped,
+                 pApp->pParsedArgs->pTempPathBuf, // // Is bigger than `pApp->TempBuf`
+                 TEMP_PATH_BUF_SIZE))
   {
     showEasyRequest(pApp->pWinObject, 
                     pApp->pIntuiWindow,
@@ -655,15 +659,15 @@ void appendFilesByWbArgs(Application* pApp, struct WBArg *pArgs, ULONG numArgs)
   {
     pFileName = pArgs[i].wa_Name;
     if(NameFromLock(pArgs[i].wa_Lock,
-                    pApp->pParsedArgs->pScratchPathBuf,
+                    pApp->pParsedArgs->pTempPathBuf,
                     MAX_PATH_LEN))
     {
       // Now scratch buf contains the name of the directory of the file
       // So next the fileName is appended to the buf
-      AddPart(pApp->pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
+      AddPart(pApp->pParsedArgs->pTempPathBuf, pFileName, MAX_PATH_LEN);
 
       appendFileNode(pApp->pFiles,
-                     pApp->pParsedArgs->pScratchPathBuf,
+                     pApp->pParsedArgs->pTempPathBuf,
                      pApp->pLocale,
                      pApp->pNotifications);
     }
@@ -854,8 +858,8 @@ BOOL applySelectedRange(Application* pApp)
   }
 
   if(0 > (bufferPos = insertRangeMaskString(&pApp->RangeMask,
-                                            pApp->ScratchBuf,
-                                            SCRATCH_BUF_SIZE,
+                                            pApp->TempBuf,
+                                            TEMP_BUF_SIZE,
                                             pText,
                                             bufferPos)))
   {
@@ -868,7 +872,7 @@ BOOL applySelectedRange(Application* pApp)
   SetGadgetAttrs((struct Gadget *) pStrGadget,
                  pApp->pIntuiWindow,
                  NULL,
-                 STRINGA_TextVal, (ULONG) pApp->ScratchBuf,
+                 STRINGA_TextVal, (ULONG) pApp->TempBuf,
                  TAG_DONE);
 
   // And then set the buffer pos to insert position
@@ -898,8 +902,8 @@ void insertCommandToStrGadget(Application* pApp,
                                                       m_ppGadgets[GID_STR_NAME],
                                                       pCommandStr,
                                                       pApp->NameGadgetBufferPos,
-                                                      pApp->ScratchBuf,
-                                                      SCRATCH_BUF_SIZE);
+                                                      pApp->TempBuf,
+                                                      TEMP_BUF_SIZE);
   }
   else if(strGadgetId == GID_STR_EXTENSION)
   {
@@ -907,8 +911,8 @@ void insertCommandToStrGadget(Application* pApp,
                                                       m_ppGadgets[GID_STR_EXTENSION],
                                                       pCommandStr,
                                                       pApp->ExtGadgetBufferPos,
-                                                      pApp->ScratchBuf,
-                                                      SCRATCH_BUF_SIZE);
+                                                      pApp->TempBuf,
+                                                      TEMP_BUF_SIZE);
   }
 
   updateNewNames(pApp);

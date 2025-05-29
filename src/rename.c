@@ -21,12 +21,17 @@ TokenCount *findTokenCount(ULONG searchToken,
 /// Public function implementations
 static BOOL alreadyRemoved = FALSE;
 
-BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications)
+BOOL renameFiles(FileNodes* pFilesList,
+                 struct List* pNotifications,
+                 BOOL doSkipIcons,
+                 STRPTR pTempBuf,
+                 ULONG tempBufSize)
 {
   struct Node* pNode;
   FileNode* pFileNode;
+  BPTR pLock;
 
-  if (!pFiles || !pFiles->pList || !pNotifications)
+  if (!pFilesList || !pFilesList->pList || !pNotifications)
   {
     return FALSE;
   }
@@ -34,14 +39,21 @@ BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications)
   // TODO
   // 1. How to get th lock of files directory?. DONE.
   // 2. Change dir to files directory
-  Printf("Entering directory '%s'\n", pFiles->DirPath);
+  Printf("Entering directory '%s'\n", pFilesList->DirPath);
   
   // 3. Call Rename() in loop below.
   // 3.1. Add errors to notifications
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for(pNode = pFilesList->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
     Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
+
+
+    // TODO: Continue
+    // if(!doSkipIcons)
+    // {
+    //   pLock = Lock()
+    // }
 
     if(!alreadyRemoved)
     {

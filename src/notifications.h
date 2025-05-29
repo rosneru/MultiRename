@@ -22,7 +22,7 @@ void freeNotificationList(struct List* pList);
 
 void addNotification(struct List* pList,
                      NotificationNodeType type,
-                     STRPTR pItemText);
+                     STRPTR pItem1Text);
 
 void clearNotifications(struct List* pList);
 void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptType);

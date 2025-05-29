@@ -18,7 +18,11 @@ typedef struct
  * Returns TRUE on success, and FALSE on error together with a detailed
  * notification of on which files the rename process idid fail 
  */
-BOOL renameFiles(FileNodes* pFiles, struct List* pNotifications);
+BOOL renameFiles(FileNodes* pFiles,
+                 struct List* pNotifications,
+                 BOOL doSkipIcons,
+                 STRPTR pTempBuf,
+                 ULONG tempBufSize);
 
 
 /**

@@ -111,7 +111,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
     {
       if((lock = lockFromLongName(*ppFiles)))
       {
-        if(NameFromLock(lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
+        if(NameFromLock(lock, pParsedArgs->pTempPathBuf, MAX_PATH_LEN))
         {
           if(!getFilesDirLock(pFiles))
           {
@@ -119,7 +119,7 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
           }
 
           appendFileNode(pFiles,
-                         pParsedArgs->pScratchPathBuf,
+                         pParsedArgs->pTempPathBuf,
                          pLocale,
                          pNotifications);
         }
@@ -206,16 +206,16 @@ void readWorkbenchArgs(ParsedArgs* pParsedArgs,
       else
       {
         pFileName = pWbArg[i].wa_Name;
-        if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pScratchPathBuf, MAX_PATH_LEN))
+        if(NameFromLock(pWbArg[i].wa_Lock, pParsedArgs->pTempPathBuf, MAX_PATH_LEN))
         {
           if(!getFilesDirLock(pFiles))
           {
             setFilesDirLock(pFiles, DupLock(pWbArg[i].wa_Lock));
           }
 
-          AddPart(pParsedArgs->pScratchPathBuf, pFileName, MAX_PATH_LEN);
+          AddPart(pParsedArgs->pTempPathBuf, pFileName, MAX_PATH_LEN);
           appendFileNode(pFiles,
-                         pParsedArgs->pScratchPathBuf,
+                         pParsedArgs->pTempPathBuf,
                          pLocale,
                          pNotifications);
         }

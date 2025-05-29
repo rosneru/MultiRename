@@ -14,7 +14,7 @@
 #include "range_mask.h"
 #include "range_select_window.h"
 
-#define SCRATCH_BUF_SIZE 1024
+#define TEMP_BUF_SIZE 1024
 
 typedef struct Application
 {
@@ -32,7 +32,7 @@ typedef struct Application
   ULONG SigMask;
   BOOL IsExitRequested;
   char WindowTitle[MAX_PATH_LEN + 32];
-  char ScratchBuf[SCRATCH_BUF_SIZE + 1];
+  char TempBuf[TEMP_BUF_SIZE + 1];
   long NameGadgetBufferPos;
   long ExtGadgetBufferPos;
 } Application;
