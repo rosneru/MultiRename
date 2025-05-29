@@ -601,25 +601,17 @@ void startRename(Application* pApp)
   TAG_DONE);
 
   // Perform the rename
-  if(renameFiles(pApp->pFiles,
-                 pApp->pNotifications,
-                 pApp->pParsedArgs->AreIconsSkipped,
-                 pApp->pParsedArgs->pTempPathBuf, // // Is bigger than `pApp->TempBuf`
-                 TEMP_PATH_BUF_SIZE))
+  if(!renameFiles(pApp->pFiles,
+                  pApp->pNotifications,
+                  pApp->pParsedArgs->AreIconsSkipped,
+                  pApp->pParsedArgs->pTempPathBuf, // // Is bigger than `pApp->TempBuf`
+                  TEMP_PATH_BUF_SIZE))
   {
-    showEasyRequest(pApp->pWinObject, 
-                    pApp->pIntuiWindow,
-                    "MultiRename",
-                    "Ok",
-                    "Finished renaming.");
-  }
-  else
-  {
-    if(!showEasyRequest(pApp->pWinObject, 
-                        pApp->pIntuiWindow,
-                        "MultiRename",
-                        "Ok|Show errors",
-                        "Failed to rename some of the input files"))
+    if(1 == showEasyRequest(pApp->pWinObject, 
+                            pApp->pIntuiWindow,
+                            "MultiRename",
+                            "Ok|Show errors",
+                            "Failed to rename some of the input files"))
     {
       printNotifications(pApp->pNotifications);
     }
