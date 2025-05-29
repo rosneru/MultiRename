@@ -6,6 +6,8 @@
   #include <proto/exec.h>
 #endif
 
+#include <string.h>
+
 #include "rename.h"
 
 /// Forwards / private function declarations
@@ -48,12 +50,20 @@ BOOL renameFiles(FileNodes* pFilesList,
     pFileNode = (FileNode*)pNode;
     Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
 
-
-    // TODO: Continue
-    // if(!doSkipIcons)
-    // {
-    //   pLock = Lock()
-    // }
+    if(!doSkipIcons)
+    {
+      // Check if the file has an icon (.info file)
+      // NOTE: `pTempBuf` is way bigger (PATH BUF SIZE) than a 
+      // "file name" + ".info" ever can be, so no size check is required
+      strcpy(pTempBuf, pFileNode->OriginalName);
+      strcat(pTempBuf, ".info");
+      Printf("**Trying to lock '%s'**\n", pTempBuf);
+      if((pLock = Lock(pTempBuf, SHARED_LOCK)))
+      {
+        Printf("  ALSO RENAMING '%s' ==> '%s'\n", pTempBuf, pTempBuf);
+        UnLock(pLock);
+      }
+    }
 
     if(!alreadyRemoved)
     {
