@@ -20,9 +20,7 @@ typedef struct
  */
 BOOL renameFiles(FileNodes* pFiles,
                  struct List* pNotifications,
-                 BOOL doSkipIcons,
-                 STRPTR pTempBuf,
-                 ULONG tempBufSize);
+                 BOOL doSkipIcons);
 
 
 /**

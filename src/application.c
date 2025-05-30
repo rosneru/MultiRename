@@ -552,6 +552,7 @@ void startRename(Application* pApp)
   TokenCount* pTokenCounts;
   struct Node* pNode;
   FileNode* pFileNode;
+  BPTR pFormerDirLock = 0L;
 
   fileCount = countFileNodes(pApp->pFiles);
   if(fileCount == 0)
@@ -600,12 +601,12 @@ void startRename(Application* pApp)
   LISTBROWSER_Labels, ~0,
   TAG_DONE);
 
-  // Perform the rename
+  // Change to files directorty, perform the rename and change back to
+  // former directory
+  pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
   if(!renameFiles(pApp->pFiles,
                   pApp->pNotifications,
-                  pApp->pParsedArgs->AreIconsSkipped,
-                  pApp->pParsedArgs->pTempPathBuf, // // Is bigger than `pApp->TempBuf`
-                  TEMP_PATH_BUF_SIZE))
+                  pApp->pParsedArgs->AreIconsSkipped))
   {
     if(1 == showEasyRequest(pApp->pWinObject, 
                             pApp->pIntuiWindow,
@@ -616,6 +617,7 @@ void startRename(Application* pApp)
       printNotifications(pApp->pNotifications);
     }
   }
+  CurrentDir(pFormerDirLock);
 
   // Re-attach files node list to ListBrowser to display the resulting
   // list. For a complete successful rename process this should be

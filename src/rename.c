@@ -25,13 +25,13 @@ static BOOL alreadyRemoved = FALSE;
 
 BOOL renameFiles(FileNodes* pFilesList,
                  struct List* pNotifications,
-                 BOOL doSkipIcons,
-                 STRPTR pTempBuf,
-                 ULONG tempBufSize)
+                 BOOL doSkipIcons)
 {
   struct Node* pNode;
   FileNode* pFileNode;
   BPTR pLock;
+  char oldIconName[128];  // Safe size, more than max file name length of 107
+  char newIconName[128];
 
   if (!pFilesList || !pFilesList->pList || !pNotifications)
   {
@@ -53,14 +53,15 @@ BOOL renameFiles(FileNodes* pFilesList,
     if(!doSkipIcons)
     {
       // Check if the file has an icon (.info file)
-      // NOTE: `pTempBuf` is way bigger (PATH BUF SIZE) than a 
+      // NOTE: `oldIconName` is bigger (PATH BUF SIZE) than a 
       // "file name" + ".info" ever can be, so no size check is required
-      strcpy(pTempBuf, pFileNode->OriginalName);
-      strcat(pTempBuf, ".info");
-      Printf("**Trying to lock '%s'**\n", pTempBuf);
-      if((pLock = Lock(pTempBuf, SHARED_LOCK)))
+      strcpy(oldIconName, pFileNode->OriginalName);
+      strcat(oldIconName, ".info");
+      strcpy(newIconName, pFileNode->NewName);
+      strcat(newIconName, ".info");
+      if((pLock = Lock(oldIconName, SHARED_LOCK)))
       {
-        Printf("  ALSO RENAMING '%s' ==> '%s'\n", pTempBuf, pTempBuf);
+        Printf("  Found icon, reanming it: '%s' ==> '%s'\n", oldIconName, newIconName);
         UnLock(pLock);
       }
     }
