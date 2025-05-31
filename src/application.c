@@ -55,6 +55,7 @@
 #include "rename.h"
 #include "rename_algorithm.h"
 #include "requester.h"
+#include "string_tools.h"
 #include "ui_tools.h"
 #include "application.h"
 
@@ -553,6 +554,9 @@ void startRename(Application* pApp)
   struct Node* pNode;
   FileNode* pFileNode;
   BPTR pFormerDirLock = 0L;
+  BOOL AlreadyAskedToProceed = FALSE;
+  STRPTR pFileNameExtensionDot = NULL;
+  ULONG fileNameExtensionDotIdx;
 
   fileCount = countFileNodes(pApp->pFiles);
   if(fileCount == 0)
@@ -567,12 +571,12 @@ void startRename(Application* pApp)
 
   if(!(pTokenCounts = createTokenCounts(fileCount)))
   {
-      showEasyRequest(pApp->pWinObject, 
-                      pApp->pIntuiWindow,
-                      "MultiRename",
-                      "Ok",
-                      "Aborted: Failed to pre-process / create tokens.");
-      return;
+    showEasyRequest(pApp->pWinObject, 
+                    pApp->pIntuiWindow,
+                    "MultiRename",
+                    "Cancel",
+                    "Error, failed to pre-process / create tokens!");
+    return;
   }
 
   fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
@@ -582,13 +586,73 @@ void startRename(Application* pApp)
     pFileNode = (FileNode*)pNode;
     if(pFileNode->TokenOccurrenceNumber > 1)
     {
-        showEasyRequest(pApp->pWinObject, 
-                        pApp->pIntuiWindow,
-                        "MultiRename",
-                        "Abort",
-                        "Can't rename: Duplicate names.");
-        freeTokenCounts(pTokenCounts);
-        return;
+      if(!AlreadyAskedToProceed)
+      {
+        // Construct and display the `double occurrence` error message.
+        // Use a 2k temporary buffer that is big enough for the 136 bytes
+        // message text + max. 107 bytes file name.
+        sprintf(pApp->pParsedArgs->pTempPathBuf,
+                "Warning, duplicate names! Proceed anyway?\n" \
+                "%s\n\n" \
+                "NOTE: Proceed will auto rename duplicate files to \n" \
+                "  name (2).ext\n" \
+                "  name (3).ext\n" \
+                "and so on.",
+                pFileNode->NewName);
+  
+        if(!showEasyRequest(pApp->pWinObject, 
+                            pApp->pIntuiWindow,
+                            "MultiRename",
+                            "Proceed|Cancel",
+                            pApp->pParsedArgs->pTempPathBuf))
+        {
+          // User clicked on `Cancel`
+          freeTokenCounts(pTokenCounts);
+          return;
+        }
+
+        AlreadyAskedToProceed = TRUE;
+      }
+
+      // Prepare the number text, for example `(2)`, etc.
+      sprintf(pApp->pParsedArgs->pTempPathBuf, " (%d)", pFileNode->TokenOccurrenceNumber);
+
+      // Find the dot '.' in new filename
+      if((pFileNameExtensionDot = strrchr(pFileNode->NewName, '.')))
+      {
+        fileNameExtensionDotIdx = pFileNameExtensionDot - (STRPTR)pFileNode->NewName;
+        if(insertString(pFileNode->NewName,
+                        pApp->pParsedArgs->pTempPathBuf,
+                        fileNameExtensionDotIdx,
+                        pApp->TempBuf,
+                        TEMP_BUF_SIZE) < 0)
+        {
+          showEasyRequest(pApp->pWinObject, 
+                          pApp->pIntuiWindow,
+                          "MultiRename",
+                          "Cancel",
+                          "Error, failed to auto-rename duplicate file!");
+          freeTokenCounts(pTokenCounts);
+          return;
+        }
+        
+        // Check if name length (+ the possible '.info') is allowed by
+        // file system. TODO: Replace MAX_NAME_LEN by proper allowed
+        // length 32 || 107
+        if((strlen(pApp->TempBuf) + 5) > MAX_NAME_LEN)
+        {
+          showEasyRequest(pApp->pWinObject, 
+                          pApp->pIntuiWindow,
+                          "MultiRename",
+                          "Cancel",
+                          "Error, auto-renamed file name would be " \
+                          "too long for file system!");
+          freeTokenCounts(pTokenCounts);
+          return;
+        }
+
+        strcpy(pFileNode->NewName, pApp->TempBuf);
+      }
     }
   }
 
