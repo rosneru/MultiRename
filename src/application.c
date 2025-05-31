@@ -1072,7 +1072,17 @@ static void handleMenu(Application* pApp, ULONG result)
         break;
       }
 
+      case MENU_SETTINGS_SKIPICONS:
+      {
+        pApp->pParsedArgs->AreIconsSkipped = (pItem->Flags & CHECKED);
+        break;
+      }
 
+      case MENU_SETTINGS_LONGNAMES:
+      {
+        pApp->pParsedArgs->AreLongNamesAllowed = (pItem->Flags & CHECKED);
+        break;
+      }
     }
 
     // Essential for processing more than one menu selection
