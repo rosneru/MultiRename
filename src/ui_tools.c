@@ -101,7 +101,7 @@ int insertTextToStrGadget(struct Window* pIntuiWindow,
 }
 
 
-long getStrGadgetBufferPos(Object* pStrGadget)
+int getStrGadgetBufferPos(Object* pStrGadget)
 {
   ULONG bufferPos;
 
@@ -117,5 +117,5 @@ long getStrGadgetBufferPos(Object* pStrGadget)
     return -1;
   }
 
-  return bufferPos;
+  return (int)bufferPos;
 }

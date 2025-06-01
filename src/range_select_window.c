@@ -360,7 +360,7 @@ static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel
     resultLength = MAX_NAME_LEN;
   }
 
-  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_INPUT], (ULONG)&pInputText);
+  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_INPUT], (ULONG*)&pInputText);
   strncpy(pRsw->NameBuf, pInputText + fromLevel - 1, resultLength);
   pRsw->NameBuf[resultLength] = '\0';
 

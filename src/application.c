@@ -174,15 +174,15 @@ enum
 struct NewMenu mainWindowNewMenu[] =
 {
   { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
-  {   NM_ITEM,    "New",                  "n", 0,                  0, MENU_PROJECT_NEW},
-  {   NM_ITEM,    "Add files...",         "a", 0,                  0, MENU_PROJECT_ADD_FILES},
+  {   NM_ITEM,    "New",                  "n", 0,                  0, (APTR) MENU_PROJECT_NEW},
+  {   NM_ITEM,    "Add files...",         "a", 0,                  0, (APTR) MENU_PROJECT_ADD_FILES},
   {   NM_ITEM,    NM_BARLABEL,             0 , 0,                  0, NULL},
-  {   NM_ITEM,    "About",                 0 , 0,                  0, MENU_PROJECT_ABOUT},
+  {   NM_ITEM,    "About",                 0 , 0,                  0, (APTR) MENU_PROJECT_ABOUT},
   {   NM_ITEM,    NM_BARLABEL,             0 , 0,                  0, NULL},
-  {   NM_ITEM,    "Quit",                 "q", 0,                  0, MENU_PROJECT_QUIT},
+  {   NM_ITEM,    "Quit",                 "q", 0,                  0, (APTR) MENU_PROJECT_QUIT},
   { NM_TITLE,   "Settings",                0 , 0,                  0, NULL},
-  {   NM_ITEM,    "Allow long filenames",  0 , CHECKIT|MENUTOGGLE, 0, MENU_SETTINGS_LONGNAMES},
-  {   NM_ITEM,    "Skip icons",            0 , CHECKIT|MENUTOGGLE, 0, MENU_SETTINGS_SKIPICONS},
+  {   NM_ITEM,    "Allow long filenames",  0 , CHECKIT|MENUTOGGLE, 0, (APTR) MENU_SETTINGS_LONGNAMES},
+  {   NM_ITEM,    "Skip icons",            0 , CHECKIT|MENUTOGGLE, 0, (APTR) MENU_SETTINGS_SKIPICONS},
   { NM_END, NULL, NULL, 0, 0, NULL}
 };
 
@@ -209,7 +209,7 @@ struct NewMenu* findNewMenuItem(struct NewMenu* pNewMenuArray, ULONG itemId)
 }
 
 
-STRPTR createAboutMessage()
+STRPTR createAboutMessage(void)
 {
   STRPTR pAboutMsg;
   ULONG totalLength = strlen(VERSTAG + 7)
@@ -1086,6 +1086,7 @@ static void handleGadgets(Application* pApp, ULONG result)
 static void handleMenu(Application* pApp, ULONG result)
 {
   struct MenuItem* pItem;
+  APTR pUserData;
   ULONG selection;
   struct FileRequester* pFileReq;
   selection = (result & WMHI_MENUMASK);
@@ -1093,7 +1094,7 @@ static void handleMenu(Application* pApp, ULONG result)
   while (selection != MENUNULL && !pApp->IsExitRequested)
   {
     pItem = ItemAddress(pApp->pIntuiWindow->MenuStrip, selection);
-    APTR pUserData = GTMENUITEM_USERDATA(pItem);
+    pUserData = GTMENUITEM_USERDATA(pItem);
     if(!pUserData)
     {
       continue;

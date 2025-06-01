@@ -35,15 +35,15 @@ long showEasyRequest(Object* pWinObject,
   // this way it can be detected if e.g. the requester parent window has
   // been resized; and it can be repainted.
   //
-
   struct EasyStruct easyStruct =
   {
     sizeof(struct EasyStruct),
     0,
-    pTitle,
-    pMessage,
-    pButtonTexts
   };
+
+  easyStruct.es_Title = pTitle;
+  easyStruct.es_TextFormat = pMessage;
+  easyStruct.es_GadgetFormat = pButtonTexts;
 
   if(!(pRequesterWindow = BuildEasyRequestArgs(pWindow, &easyStruct, 0, NULL)))
   {

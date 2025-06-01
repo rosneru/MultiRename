@@ -33,7 +33,7 @@ int insertTextToStrGadget(struct Window* pIntuiWindow,
  * Get the current buffer position of given string gadget `pStrGadget`.
  * Retuns -1 if buffer pos could not be retrieved.
  */
-long getStrGadgetBufferPos(Object* pStrGadget);
+int getStrGadgetBufferPos(Object* pStrGadget);
 
 
 #endif
