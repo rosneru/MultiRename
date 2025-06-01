@@ -37,12 +37,8 @@ BOOL renameFiles(FileNodes* pFilesList,
   {
     return FALSE;
   }
-
-  // TODO
-  // 1. How to get th lock of files directory?. DONE.
-  // 2. Change dir to files directory
-  Printf("Entering directory '%s'\n", pFilesList->DirPath);
   
+  // TODO
   // 3. Call Rename() in loop below.
   // 3.1. Add errors to notifications
   for(pNode = pFilesList->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -61,16 +57,17 @@ BOOL renameFiles(FileNodes* pFilesList,
       strcat(newIconName, ".info");
       if((pLock = Lock(oldIconName, SHARED_LOCK)))
       {
-        Printf("  Found icon, reanming it: '%s' ==> '%s'\n", oldIconName, newIconName);
+        Printf("  Found icon, renaming it: '%s' ==> '%s'\n", oldIconName, newIconName);
         UnLock(pLock);
       }
     }
 
-    if(!alreadyRemoved)
-    {
+    // if(!alreadyRemoved)
+    // {
+    // TODO: Only on rename success
       Remove(pNode);
-      alreadyRemoved = TRUE;
-    }
+    //   alreadyRemoved = TRUE;
+    // }
   }
 
   return TRUE;

@@ -70,7 +70,7 @@
 ///
 /// Forwards / private function declarations
 
-void startRename(Application* pApp);
+BOOL startRename(Application* pApp);
 
 /**
  * Iterate the given array of WbArgs and (try to) add each file to the
@@ -547,7 +547,7 @@ void notifyUserAboutSkippedFiles(Application* pApp)
   }
 }
 
-void startRename(Application* pApp)
+BOOL startRename(Application* pApp)
 {
   ULONG fileCount;
   TokenCount* pTokenCounts;
@@ -566,7 +566,7 @@ void startRename(Application* pApp)
                     "MultiRename",
                     "Ok",
                     "No files to rename.");
-    return;
+    return FALSE;
   }
 
   if(!(pTokenCounts = createTokenCounts(fileCount)))
@@ -575,8 +575,8 @@ void startRename(Application* pApp)
                     pApp->pIntuiWindow,
                     "MultiRename",
                     "Cancel",
-                    "Error, failed to pre-process / create tokens!");
-    return;
+                    "Error, failed to create file name tokens!");
+    return FALSE;
   }
 
   fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
@@ -608,7 +608,7 @@ void startRename(Application* pApp)
         {
           // User clicked on `Cancel`
           freeTokenCounts(pTokenCounts);
-          return;
+          return FALSE;
         }
 
         AlreadyAskedToProceed = TRUE;
@@ -631,9 +631,9 @@ void startRename(Application* pApp)
                           pApp->pIntuiWindow,
                           "MultiRename",
                           "Cancel",
-                          "Error, failed to auto-rename duplicate file!");
+                          "Error, failed to automatically create name for duplicate file!");
           freeTokenCounts(pTokenCounts);
-          return;
+          return FALSE;
         }
         
         // Check if name length (+ the possible '.info') is allowed by
@@ -648,7 +648,7 @@ void startRename(Application* pApp)
                           "Error, auto-renamed file name would be " \
                           "too long for file system!");
           freeTokenCounts(pTokenCounts);
-          return;
+          return FALSE;
         }
 
         strcpy(pFileNode->NewName, pApp->TempBuf);
@@ -656,43 +656,27 @@ void startRename(Application* pApp)
     }
   }
 
-  // Detach list from ListBrowser. Must be done before the actual
-  // rename starts because `renameFiles` changes the list (removes the
-  // successfully renamed files)
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-  pApp->pIntuiWindow, 
-  NULL,
-  LISTBROWSER_Labels, ~0,
-  TAG_DONE);
-
-  // Change to files directorty, perform the rename and change back to
+  // Change to files directory, perform the rename and change back to
   // former directory
   pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
   if(!renameFiles(pApp->pFiles,
                   pApp->pNotifications,
                   pApp->pParsedArgs->AreIconsSkipped))
   {
-    if(1 == showEasyRequest(pApp->pWinObject, 
-                            pApp->pIntuiWindow,
-                            "MultiRename",
-                            "Ok|Show errors",
-                            "Failed to rename some of the input files"))
+    if(!showEasyRequest(pApp->pWinObject, 
+                        pApp->pIntuiWindow,
+                        "MultiRename",
+                        "Ok|Show errors",
+                        "Failed to rename some of the input files"))
     {
       printNotifications(pApp->pNotifications);
+      return FALSE;
     }
   }
+
   CurrentDir(pFormerDirLock);
-
-  // Re-attach files node list to ListBrowser to display the resulting
-  // list. For a complete successful rename process this should be
-  // empty.
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                 pApp->pIntuiWindow, NULL,
-                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                 LISTBROWSER_AutoFit, TRUE,
-                 TAG_DONE);
-
   freeTokenCounts(pTokenCounts);
+  return TRUE;
 }
 
 void appendFilesByWbArgs(Application* pApp, struct WBArg *pArgs, ULONG numArgs)
@@ -1075,7 +1059,19 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_START:
     {
+      // Detach list from ListBrowser. Must be done because
+      // `startRename()` changes the list (removes the successfully
+      // renamed files)
+      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                     pApp->pIntuiWindow, 
+                     NULL,
+                     LISTBROWSER_Labels, ~0,
+                     TAG_DONE);
+
       startRename(pApp);
+      applyNewFiles(pApp);  // Re-attach files node list to ListBrowser
+                            // to display the errorous files.
+
       break;
     }
   }
