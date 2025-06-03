@@ -777,9 +777,41 @@ BOOL updateNewNames(Application* pApp)
   FileNode* pFileNode;
   LONG counterStart, counterStep, counterPlacesId, counterPlacesValue;
   STRPTR pTextOk = "Ok";
-  STRPTR pTextTruncated = "Trunc";
+  STRPTR pTruncatedLongNoIcons = "> 107";
+  STRPTR pTruncatedLong = "> 102";
+  STRPTR pTruncatedShortNoIcons = "> 32";
+  STRPTR pTruncatedShort = "> 27";
+  STRPTR pTextTruncated = NULL;
   STRPTR pTextCommandError = "Cmd";
   STRPTR pStateText;
+  long maxAllowedNameLength;
+
+  if(pApp->pParsedArgs->AreLongNamesAllowed)
+  {
+    if(pApp->pParsedArgs->AreIconsSkipped)
+    {
+      maxAllowedNameLength = 107;
+      pTextTruncated = pTruncatedLongNoIcons;
+    }
+    else
+    {
+      maxAllowedNameLength = 102; // 107 - 5 bytes for '.info'
+      pTextTruncated = pTruncatedLong;
+    }
+  }
+  else
+  {
+    if(pApp->pParsedArgs->AreIconsSkipped)
+    {
+      maxAllowedNameLength = 32;
+      pTextTruncated = pTruncatedShortNoIcons;
+    }
+    else
+    {
+      maxAllowedNameLength = 27; // 32 - 5 bytes for '.info'
+      pTextTruncated = pTruncatedShort;
+    }
+  }
 
   // Detach list from ListBrowser. Must be done before changing the list.
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
@@ -800,6 +832,7 @@ BOOL updateNewNames(Application* pApp)
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
   if(createNewNames(pApp->pFiles,
+                    maxAllowedNameLength,
                     pName,
                     pExt,
                     counterStart,
@@ -1077,8 +1110,6 @@ static void handleGadgets(Application* pApp, ULONG result)
   }
 }
 
-
-
 static void handleMenu(Application* pApp, ULONG result)
 {
   struct MenuItem* pItem;
@@ -1136,12 +1167,19 @@ static void handleMenu(Application* pApp, ULONG result)
       case MENU_SETTINGS_SKIPICONS:
       {
         pApp->pParsedArgs->AreIconsSkipped = (pItem->Flags & CHECKED);
+
+        // Because skipping icons affects on the allowed new name length
+        // (5 bytes more allowed because of the missing ".info")
+        updateNewNames(pApp);
         break;
       }
 
       case MENU_SETTINGS_LONGNAMES:
       {
         pApp->pParsedArgs->AreLongNamesAllowed = (pItem->Flags & CHECKED);
+
+        // Because it directly affects the allowed new name length
+        updateNewNames(pApp);
         break;
       }
     }

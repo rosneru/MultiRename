@@ -13,6 +13,7 @@
  *
  */
 BOOL createNewNames(FileNodes* pFiles,
+                    ULONG maxAllowedNameLength,
                     STRPTR pNameMask,
                     STRPTR pExtMask,
                     LONG counterStart,

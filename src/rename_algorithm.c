@@ -34,6 +34,7 @@ void createNewNameToken(FileNode* pFileNode);
 /// Public function implementations
 
 BOOL createNewNames(FileNodes* pFiles,
+                    ULONG maxAllowedNameLength,
                     STRPTR pNameMask,
                     STRPTR pExtMask,
                     LONG counterStart,
@@ -78,8 +79,8 @@ BOOL createNewNames(FileNodes* pFiles,
   {
     pFileNode = (FileNode*)pNode;
     applyActions(pFileNode,
-                 MAX_NAME_LEN + 1,      // buffer *is* one bigger than the
-                 &parser.ActionList,    // max name len for the trailing '\0'
+                 maxAllowedNameLength + 1,  // buffer *is* one bigger than the
+                 &parser.ActionList,        // max name len for the trailing '\0'
                  pMask,
                  &counter);
 
