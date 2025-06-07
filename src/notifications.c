@@ -126,22 +126,6 @@ void printNotifications(struct List* pList)
     printf("\n");
   }
 
-  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_INFO_FILE)))
-  {
-    printf("Skipped %u input file(s) because of they are .info files "
-           "which are not supported:\n", count);
-
-    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
-    {
-      if(pNode->ln_Type == NNT_SKIPPED_INFO_FILE)
-      {
-        printf("  %s\n", pNode->ln_Name);
-      }
-    }
-
-    printf("\n");
-  }
-
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
   {
     printf("Skipped %u input file(s) because of over long / "
@@ -211,11 +195,6 @@ void printNotifications(struct List* pList)
 BOOL containsSkippedNotifications(struct List* pList)
 {
   if(0 < getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG))
-  {
-    return TRUE;
-  }
-
-  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_INFO_FILE))
   {
     return TRUE;
   }

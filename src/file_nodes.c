@@ -75,10 +75,6 @@ struct Node* createFileNode(struct Locale* pLocale,
     && pFileName[nameLen-4] == 'i'
     && pFileName[nameLen-5] == '.')
     {
-      // It is an .info file. Skipping it..
-      addNotification(pNotifications,
-                      NNT_SKIPPED_INFO_FILE,
-                      pFileName);
       return NULL;
     }
   }
