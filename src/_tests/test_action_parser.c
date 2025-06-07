@@ -13,6 +13,8 @@
 #define LONG_MAX 2147483647
 #endif
 
+#define MAX_NAME_LEN 107
+
 
 /// Forwards
 
@@ -87,7 +89,7 @@ int main(void)
   printFileListOriginalName(&files);
 
   // test_name_2
-  if(createNewNames(&files, "Abc - [N]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "Abc - [N]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_name_2: 'Abc - [N]', '[E]'");
   }
@@ -97,7 +99,7 @@ int main(void)
   }
 
   // test_name_4
-  if(createNewNames(&files, "Aa[N]Bb", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "Aa[N]Bb", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_name_4: 'Aa[N]Bb', '[E]'");
   }
@@ -107,7 +109,7 @@ int main(void)
   }
 
   // test_name_5
-  if(createNewNames(&files, "", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_name_5 (Create empty names): '', '[E]'");
   }
@@ -117,7 +119,7 @@ int main(void)
   }
 
   // test_name_6
-  if(createNewNames(&files, "Abc - [N", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "Abc - [N", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_name_6: Error because unclosed name cmd: 'Abc - [N', '[E]'");
   }
@@ -127,7 +129,7 @@ int main(void)
   }
 
   // test_name_7
-  if(createNewNames(&files, "Abc - [N]]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "Abc - [N]]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_name_7: Error because double closed name cmd: 'Abc - [N', '[E]'");
   }
@@ -137,7 +139,7 @@ int main(void)
   }
 
   // test_name_part_1
-  if(createNewNames(&files, "[N4-6]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "[N4-6]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_name_part_1: '[N4-6]', '[E]'");
   }
@@ -147,7 +149,7 @@ int main(void)
   }
 
   // test_counter_mixed_2
-  if(createNewNames(&files, "[N4-6] New[C] [N8-29]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "[N4-6] New[C] [N8-29]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_counter_mixed_2: '[N4-6] New[C] [N8-29]', '[E]'");
   }
@@ -157,7 +159,7 @@ int main(void)
   }
 
   // test_SegmentationFault_resulting_name_too_long
-  if(createNewNames(&files, "[N][N][N][N][N]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "[N][N][N][N][N]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_SegmentationFault_resulting_name_too_long: '[N][N][N][N][N]', '[E]'");
   }
@@ -167,7 +169,7 @@ int main(void)
   }
 
   // test_date_1
-  if(createNewNames(&files, "[YMD]-[hms]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "[YMD]-[hms]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_date_1: '[YMD]-[hms]', '[E]'");
   }
@@ -177,7 +179,7 @@ int main(void)
   }
 
   // test_date_2
-  if(createNewNames(&files, "[Y]-[M]-[D] - [hms]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "[Y]-[M]-[D] - [hms]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_date_2: '[Y]-[M]-[D] - [hms]', '[E]'");
   }
@@ -187,7 +189,7 @@ int main(void)
   }
 
   // test_date_3
-  if(createNewNames(&files, "[YYY]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "[YYY]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_date_3: '[YYY]', '[E]'");
   }
@@ -197,7 +199,7 @@ int main(void)
   }
 
   // test_date_4
-  if(createNewNames(&files, "[Y][Y][Y]", "[E]", 1, 1, 1))
+  if(createNewNames(&files, MAX_NAME_LEN, "[Y][Y][Y]", "[E]", 1, 1, 1))
   {
     printFileList(&files, "test_date_4: '[Y][Y][Y]', '[E]'");
   }
