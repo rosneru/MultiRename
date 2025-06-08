@@ -8,7 +8,6 @@
   #include <proto/exec.h>
 #endif
 
-#include <stdio.h>
 #include <string.h>
 
 #include "notifications.h"
@@ -108,85 +107,85 @@ void printNotifications(struct List* pList)
 
   if((pNode = findFirstNotificationByType(pList, NNT_SELECTED_PATH_INFO)))
   {
-    printf("Selected path is '%s'\n\n", pNode->ln_Name);
+    Printf("Selected path is '%s'\n\n", pNode->ln_Name);
   }
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH)))
   {
-    printf("Skipped %u input file(s) because of wrong paths:\n", count);
+    Printf("Skipped %lu input file(s) because of wrong paths:\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if(pNode->ln_Type == NNT_SKIPPED_WRONG_PATH)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
   {
-    printf("Skipped %u input file(s) because of over long / "
+    Printf("Skipped %lu input file(s) because of over long / "
            "truncated paths:\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if(pNode->ln_Type == NNT_SKIPPED_PATH_TOO_LONG)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_DATETIMEPARTS)))
   {
-    printf("Skipped %u input file(s) because their date stamp couldn't "
+    Printf("Skipped %lu input file(s) because their date stamp couldn't "
            "be split into parts:\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
   {
-    printf("Skipped %u input file(s) because they couldn't be "
+    Printf("Skipped %lu input file(s) because they couldn't be "
            "examined:\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
   {
-    printf("Failed to lock %u input file(s) / dir(s):\n", count);
+    Printf("Failed to lock %lu input file(s) / dir(s):\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
 
