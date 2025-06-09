@@ -12,8 +12,7 @@
  * So, in my setup the ARexx field for the MultiRename button goes like this:
  *   DOpus5:ARexx/MultiRename-starter.dopus5 {Qp} {Qs}
  *
- * From the flags below the ARexx field select only:
- *  - Output to window
+ * From the flags below the ARexx field only select:
  *  - Rescan source
  *
  * and leave the others
@@ -25,10 +24,11 @@
  *  - Recursive dirs
  *  - Reload each file
  *  - Resan dest
+ *  - Output to window
  *  - Run asynchronously
  *  - Window close button
  *  - Window on Workbench
- * Unchecked.
+ * unchecked.
  *
  * Uwe Rosner, 07.06.2025
  */
@@ -79,16 +79,17 @@ end
 files = ''
 max_idx = src_selected_files.count - 1
 do i = 0 to max_idx
-  files = files'"'src_selected_files.i'" '
+  files = files'"'files_path'"'src_selected_files.i'" '
 end
-
-/*
-cmd = multi_rename_location files multi_rename_args
-dopus request cmd
-*/
 
 Address Command multi_rename_location files multi_rename_args
 
-syntax:;ioerr:                          /* In case of error, jump here */
+/* Completely re-read the path into the lister.
+   Just to refresh seemed not to be enough. */
+'LISTER READ' src_handle.0 '"'files_path'"'
+
+
+syntax:;ioerr:                        /* In case of error, jump here */
+
 EXIT
 
