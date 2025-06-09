@@ -13,7 +13,7 @@
  *   DOpus5:ARexx/MultiRename-starter.dopus5 {Qp} {Qs}
  *
  * From the flags below the ARexx field only select:
- *  - Rescan source
+ *  - Output to window
  *
  * and leave the others
  *  - CD destination
@@ -23,8 +23,8 @@
  *  - Output to reader
  *  - Recursive dirs
  *  - Reload each file
- *  - Resan dest
- *  - Output to window
+ *  - Rescan dest
+ *  - Rescan source
  *  - Run asynchronously
  *  - Window close button
  *  - Window on Workbench
@@ -34,15 +34,20 @@
  */
 
 multi_rename_location = 'SYS:Tools/MultiRename'
-multi_rename_args = 'LONGNAMES PUBSCREEN DOPUS.1 '
+multi_rename_args = 'LONGNAMES PUBSCREEN='
 
 options results
 options failat 99
 signal on syntax;signal on ioerr
 
 parse arg dopus_port dopus_screen
-dopus_port = Strip(dopus_port, "B", '" ')
 
+/* Append the parsed, stripped PUBSCREEN name from args to the argument
+   string for MultiRename */
+multi_rename_args = multi_rename_args||Strip(dopus_screen)
+
+/* Strip the DOpus port from args */
+dopus_port = Strip(dopus_port, "B", '" ')
 if ~Show("P", dopus_port) then do
   say dopus_port "is not a valid port."
   exit
@@ -79,7 +84,7 @@ end
 files = ''
 max_idx = src_selected_files.count - 1
 do i = 0 to max_idx
-  files = files'"'files_path'"'src_selected_files.i'" '
+  files = files'"'files_path''src_selected_files.i'" '
 end
 
 Address Command multi_rename_location files multi_rename_args
