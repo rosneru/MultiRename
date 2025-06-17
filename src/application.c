@@ -318,7 +318,12 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
     WA_PubScreen, pApp->pPubScreen,
     WA_AutoAdjust, TRUE,
     WA_NewLookMenus, TRUE,
-    WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP|IDCMP_NEWSIZE,
+    WA_IDCMP, IDCMP_CLOSEWINDOW
+            | IDCMP_GADGETUP
+            | IDCMP_NEWSIZE
+            | IDCMP_MOUSEBUTTONS
+            | IDCMP_ACTIVEWINDOW
+            | IDCMP_INACTIVEWINDOW,
     WINDOW_Layout, pMainWindowLayout,
     WINDOW_NewMenu, mainWindowNewMenu,
     WINDOW_AppPort, pApp->pAppWindowPort,
@@ -1092,19 +1097,21 @@ static void handleGadgets(Application* pApp, ULONG result)
     }
     case GID_BTN_START:
     {
-      // Detach list from ListBrowser. Must be done because
-      // `startRename()` changes the list (removes the successfully
-      // renamed files)
-      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                     pApp->pIntuiWindow, 
-                     NULL,
-                     LISTBROWSER_Labels, ~0,
-                     TAG_DONE);
-
-      startRename(pApp);
-      applyNewFiles(pApp);  // Re-attach files node list to ListBrowser
-                            // to display the errorous files.
-
+      if(updateNewNames(pApp))
+      {
+          // Detach list from ListBrowser. Must be done because
+          // `startRename()` changes the list (removes the successfully
+          // renamed files)
+          SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+          pApp->pIntuiWindow, 
+          NULL,
+          LISTBROWSER_Labels, ~0,
+          TAG_DONE);
+          
+          startRename(pApp);
+          applyNewFiles(pApp);  // Re-attach files node list to ListBrowser
+          // to display the errorous files.
+      }
       break;
     }
   }
@@ -1216,6 +1223,17 @@ void intuiEventLoop(Application* pApp)
           break;
         case WMHI_MENUPICK:
           handleMenu(pApp, result);
+          break;
+        case WMHI_MOUSEBUTTONS:
+          printf("COde = %d\n");
+          if(code == SELECTDOWN || code == MENUDOWN)
+          {
+            updateNewNames(pApp);
+          }
+          break;
+        case WMHI_ACTIVE:
+        case WMHI_INACTIVE:
+          updateNewNames(pApp);
           break;
       }
     }
