@@ -1225,7 +1225,6 @@ void intuiEventLoop(Application* pApp)
           handleMenu(pApp, result);
           break;
         case WMHI_MOUSEBUTTONS:
-          printf("COde = %d\n");
           if(code == SELECTDOWN || code == MENUDOWN)
           {
             updateNewNames(pApp);
@@ -1283,7 +1282,7 @@ Object* createLayout(void)
     LAYOUT_AddChild, m_ppGadgets[GID_STR_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_NAME,
       GA_RelVerify, TRUE,
-      STRINGA_TextVal, (ULONG)"[N]",
+      STRINGA_TextVal, (ULONG)"[C] - [N]",
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
