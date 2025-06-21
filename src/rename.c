@@ -21,7 +21,6 @@ TokenCount *findTokenCount(ULONG searchToken,
 
 ///
 /// Public function implementations
-static BOOL alreadyRemoved = FALSE;
 
 BOOL renameFiles(FileNodes* pFilesList,
                  struct List* pNotifications,
@@ -44,7 +43,6 @@ BOOL renameFiles(FileNodes* pFilesList,
   for(pNode = pFilesList->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
-    Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
 
     if(!doSkipIcons)
     {
@@ -55,19 +53,26 @@ BOOL renameFiles(FileNodes* pFilesList,
       strcat(oldIconName, ".info");
       strcpy(newIconName, pFileNode->NewName);
       strcat(newIconName, ".info");
-      if((pLock = Lock(oldIconName, SHARED_LOCK)))
+      if((pLock = Lock(oldIconName, EXCLUSIVE_LOCK)))
       {
-        Printf("  Found icon, renaming it: '%s' ==> '%s'\n", oldIconName, newIconName);
         UnLock(pLock);
+        // Printf("  Found icon, renaming it: '%s' ==> '%s'\n", oldIconName, newIconName);
+        if(!Rename(oldIconName, newIconName))
+        {
+          PrintFault(IoErr(), newIconName);
+        }
       }
     }
 
-    // if(!alreadyRemoved)
-    // {
-    // TODO: Only on rename success
+    // Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
+    if(Rename(pFileNode->OriginalName, pFileNode->NewName))
+    {
       Remove(pNode);
-    //   alreadyRemoved = TRUE;
-    // }
+    }
+    else
+    {
+      PrintFault(IoErr(), pFileNode->NewName);
+    }
   }
 
   return TRUE;

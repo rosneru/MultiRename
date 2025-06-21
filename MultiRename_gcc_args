@@ -1,4 +1,4 @@
-MultiRename_gcc testdata/My_1st_file_is_older_than.md testdata/my_2nd_one_and_more_than.txt testdata/My_3rd_attempt.doc SKIPICONS
+MultiRename_gcc testdata/My_1st_file_is_older_than.md testdata/my_2nd_one_and_more_than.txt testdata/My_3rd_attempt.doc LONGNAMES
 
 
 
