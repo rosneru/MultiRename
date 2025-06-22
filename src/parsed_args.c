@@ -138,6 +138,12 @@ void readCommandLineArgs(ParsedArgs* pParsedArgs,
 
         UnLock(lock);
       }
+      else
+      {
+        addNotification(pNotifications,
+                        NNT_SKIPPED_FAILED_LOCK,
+                        *ppFiles);
+      }
 
       ppFiles++;
     }

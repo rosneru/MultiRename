@@ -175,7 +175,7 @@ void printNotifications(struct List* pList)
 
   if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
   {
-    Printf("Failed to lock %lu input file(s) / dir(s):\n", count);
+    Printf("Failed to add (lock) %lu input file(s) / dir(s):\n", count);
 
     for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
