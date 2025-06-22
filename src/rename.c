@@ -21,7 +21,7 @@ TokenCount *findTokenCount(ULONG searchToken,
 
 ///
 /// Public function implementations
-
+#define ERR_MSG_BUF_SIZE 512
 BOOL renameFiles(FileNodes* pFilesList,
                  struct List* pNotifications,
                  BOOL doSkipIcons)
@@ -29,26 +29,26 @@ BOOL renameFiles(FileNodes* pFilesList,
   struct Node* pNode;
   FileNode* pFileNode;
   BPTR pLock;
+  BOOL wasCompletelySuccessful = TRUE;
   char oldIconName[128];  // Safe size, more than max file name length of 107
   char newIconName[128];
+  char errMsgBuf[ERR_MSG_BUF_SIZE];
 
   if (!pFilesList || !pFilesList->pList || !pNotifications)
   {
     return FALSE;
   }
   
-  // TODO
-  // 3. Call Rename() in loop below.
-  // 3.1. Add errors to notifications
+
   for(pNode = pFilesList->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode*)pNode;
 
     if(!doSkipIcons)
     {
-      // Check if the file has an icon (.info file)
-      // NOTE: `oldIconName` is bigger (PATH BUF SIZE) than a 
-      // "file name" + ".info" ever can be, so no size check is required
+      // Check if the file has an icon (.info file) NOTE: `oldIconName`
+      // is bigger (PATH BUF SIZE) than a "file name" + ".info" ever can
+      // be, so no size check is required
       strcpy(oldIconName, pFileNode->OriginalName);
       strcat(oldIconName, ".info");
       strcpy(newIconName, pFileNode->NewName);
@@ -59,7 +59,11 @@ BOOL renameFiles(FileNodes* pFilesList,
         // Printf("  Found icon, renaming it: '%s' ==> '%s'\n", oldIconName, newIconName);
         if(!Rename(oldIconName, newIconName))
         {
-          PrintFault(IoErr(), newIconName);
+          Fault(IoErr(), newIconName, errMsgBuf, ERR_MSG_BUF_SIZE);
+          addNotification(pNotifications,
+                          NNT_RENAME_FAILED,
+                          errMsgBuf);
+          wasCompletelySuccessful = FALSE;
         }
       }
     }
@@ -71,11 +75,15 @@ BOOL renameFiles(FileNodes* pFilesList,
     }
     else
     {
-      PrintFault(IoErr(), pFileNode->NewName);
+      Fault(IoErr(), pFileNode->NewName, errMsgBuf, ERR_MSG_BUF_SIZE);
+      addNotification(pNotifications,
+                      NNT_RENAME_FAILED,
+                      errMsgBuf);
+      wasCompletelySuccessful = FALSE;
     }
   }
 
-  return TRUE;
+  return wasCompletelySuccessful;
 }
 
 

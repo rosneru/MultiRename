@@ -13,6 +13,7 @@ typedef enum NotificationNodeType
   NNT_SKIPPED_FAILED_DATETIMEPARTS,
   NNT_SKIPPED_FAILED_EXAMINE,
   NNT_SKIPPED_FAILED_LOCK,
+  NNT_RENAME_FAILED,
 } NotificationNodeType;
 
 

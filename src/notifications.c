@@ -188,6 +188,20 @@ void printNotifications(struct List* pList)
     PutStr("\n");
   }
 
+  if(0 < (count = getNotificationCountByType(pList, NNT_RENAME_FAILED)))
+  {
+    Printf("Rename failed for %lu new file names:\n", count);
+
+    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      if(pNode->ln_Type == NNT_RENAME_FAILED)
+      {
+        Printf("  %s\n", pNode->ln_Name);
+      }
+    }
+
+    PutStr("\n");
+  }
 
 }
 
