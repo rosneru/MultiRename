@@ -746,7 +746,7 @@ void applyNewFiles(Application* pApp)
     {
       if((lock = lockFromLongName(pFirstPath)))
       {
-        if(!setFilesDirLock(pApp->pFiles, ParentDir(lock)))
+        if(!setFilesDirLock(pApp->pFiles, lock))
         {
           addNotification(pApp->pNotifications,
                           NNT_SKIPPED_PATH_TOO_LONG,

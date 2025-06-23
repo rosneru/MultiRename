@@ -68,7 +68,7 @@ BOOL renameFiles(FileNodes* pFilesList,
       }
     }
 
-    // Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
+    Printf("RENAME '%s' ==> '%s'\n", pFileNode->OriginalName, pFileNode->NewName);
     if(Rename(pFileNode->OriginalName, pFileNode->NewName))
     {
       Remove(pNode);

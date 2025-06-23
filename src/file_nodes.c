@@ -60,12 +60,13 @@ struct Node* createFileNode(struct Locale* pLocale,
                             STRPTR pFileName,
                             struct List* pNotifications)
 {
-  STRPTR pPathEnd, pNameStart, pLastDotPosition;
+  STRPTR pNameStart, pLastDotPosition;
   ULONG pathLen, nameLen;
   struct Node *pNode;
   FileNode* pFileNode;
   D_S(struct FileInfoBlock, pFib);  // See explanation of D_S macro above.
 
+  // Skip Workbench icons (.info files)
   nameLen = strlen(pFileName);
   if(nameLen > 4)
   {
@@ -77,6 +78,12 @@ struct Node* createFileNode(struct Locale* pLocale,
     {
       return NULL;
     }
+  }
+
+  // Remove trailing slash (to allow also directories to be processed)
+  if(pFileName[nameLen-1] == '/')
+  {
+    pFileName[nameLen-1] = '\0';
   }
 
   if(DOSFALSE == Examine(pLock, pFib))
@@ -106,10 +113,8 @@ struct Node* createFileNode(struct Locale* pLocale,
   {
     pFileNode = (FileNode*) pNode;
 
-    // Separate path (to pFileNode->Path) and file name (to pNameStart)
-    pPathEnd = PathPart(pFileName);
-    pNameStart = FilePart(pFileName);
-    pathLen = pPathEnd - pFileName + 1;
+    // Get path and file name of given file
+    pathLen = PathPart(pFileName) - pFileName;
     if(pathLen > MAX_PATH_LEN)
     {
       // TODO: Notify truncation
@@ -119,22 +124,22 @@ struct Node* createFileNode(struct Locale* pLocale,
     strncpy(pFileNode->Path, pFileName, pathLen);
     pFileNode->Path[pathLen] = '\0';
 
+    pNameStart = FilePart(pFileName);
     strcpy(pFileNode->OriginalName, pNameStart);
-    strcpy(pFileNode->NewName, pNameStart);
+
     if((pLastDotPosition = strrchr(pNameStart, '.')))
     {
       pFileNode->OriginalNameLen = pLastDotPosition - pNameStart;
       pFileNode->OriginalExtLen = strlen(pFileNode->OriginalName
-                                          + pFileNode->OriginalNameLen
-                                          + 1); // +1 for the dot '.'
+        + pFileNode->OriginalNameLen
+        + 1); // +1 for the dot '.'
     }
     else
     {
       pFileNode->OriginalNameLen = strlen(pNameStart);
       pFileNode->OriginalExtLen = 0;
     }
-
-
+      
     if(!fillDateTimeParts(pLocale, &pFib->fib_Date, &pFileNode->OriginalDate))
     {
       FreeListBrowserNode(pNode);
