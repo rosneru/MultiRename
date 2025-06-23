@@ -862,7 +862,7 @@ BOOL updateNewNames(Application* pApp)
       SetListBrowserNodeAttrs(pNode,
                               LBNA_Column, 0,
                                 LBNCA_Text, pStateText,
-                              LBNA_Column, 2,
+                              LBNA_Column, 3,
                                 LBNCA_Text, pFileNode->NewName,
                               TAG_DONE);
     }
@@ -877,7 +877,7 @@ BOOL updateNewNames(Application* pApp)
       SetListBrowserNodeAttrs(pNode,
                               LBNA_Column, 0,
                                 LBNCA_Text, pTextCommandError,
-                              LBNA_Column, 2,
+                              LBNA_Column, 3,
                                 LBNCA_Text, "<Error!>",
                               TAG_DONE);
 
@@ -1260,16 +1260,19 @@ Object* createLayout(void)
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
 
-  m_pColumnInfo = AllocLBColumnInfo(3,
+  m_pColumnInfo = AllocLBColumnInfo(4,
                                     LBCIA_Column, 0,
                                       LBCIA_Sortable, FALSE,
                                       LBCIA_Title, "State",
                                     LBCIA_Column, 1,
+                                      LBCIA_Sortable, FALSE,
+                                      LBCIA_Title, "Type",
+                                    LBCIA_Column, 2,
                                       LBCIA_AutoSort, TRUE,
                                       LBCIA_SortArrow, TRUE,
                                       LBCIA_SortDirection, LBMSORT_FORWARD,
                                       LBCIA_Title, "Old name",
-                                    LBCIA_Column, 2,
+                                    LBCIA_Column, 3,
                                       LBCIA_Sortable, FALSE,
                                       LBCIA_Title, "New name",
                                     TAG_DONE);

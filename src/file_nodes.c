@@ -60,7 +60,8 @@ struct Node* createFileNode(struct Locale* pLocale,
                             STRPTR pFileName,
                             struct List* pNotifications)
 {
-  STRPTR pNameStart, pLastDotPosition;
+  STRPTR pNameStart, pLastDotPosition, pSizeValue;
+  char sizeBuf[4];
   ULONG pathLen, nameLen;
   struct Node *pNode;
   FileNode* pFileNode;
@@ -94,8 +95,23 @@ struct Node* createFileNode(struct Locale* pLocale,
     return NULL;
   }
 
+  if(pFib->fib_DirEntryType < 0)
+  {
+    pSizeValue = "";
+  }
+  else if(pFib->fib_DirEntryType > 0)
+  {
+    pSizeValue = "DIR";
+  }
+  else
+  {
+    addNotification(pNotifications,
+                    NNT_SKIPPED_LINKS_NOT_SUPPORTED,
+                    pFileName);
+    return NULL;
+  }
 
-  if ((pNode = AllocListBrowserNode(3, 
+  if ((pNode = AllocListBrowserNode(4, 
                                     LBNA_NodeSize, sizeof(FileNode),
                                     LBNA_Column, 0,
                                       LBNCA_CopyText, FALSE,
@@ -106,6 +122,10 @@ struct Node* createFileNode(struct Locale* pLocale,
                                       LBNCA_Editable, FALSE,
                                       LBNCA_MaxChars, MAX_NAME_LEN,
                                     LBNA_Column, 2,
+                                      LBNCA_CopyText, FALSE,
+                                      LBNCA_Editable, FALSE,
+                                      LBNCA_MaxChars, MAX_NAME_LEN,
+                                    LBNA_Column, 3,
                                       LBNCA_CopyText, FALSE,
                                       LBNCA_Editable, FALSE,
                                       LBNCA_MaxChars, MAX_NAME_LEN,
@@ -153,8 +173,10 @@ struct Node* createFileNode(struct Locale* pLocale,
                             LBNA_Column, 0,
                               LBNCA_Text, " ",
                             LBNA_Column, 1,
-                              LBNCA_Text, pFileNode->OriginalName,
+                              LBNCA_Text, pSizeValue,
                             LBNA_Column, 2,
+                              LBNCA_Text, pFileNode->OriginalName,
+                            LBNA_Column, 3,
                               LBNCA_Text, pFileNode->NewName,
                             TAG_DONE);
     return pNode;
