@@ -400,7 +400,9 @@ BOOL appendFileNode(FileNodes* pFiles,
   {
     addNotification(pNotifications,
                     NNT_SKIPPED_DUPLICATE,
-                    pFileFullPath);
+                    ((FileNode*)pNode)->OriginalName);
+    // TODO freeFileNode;
+    return FALSE;
   }
   
   if((pWorkingPath = getFirstFilePath(pFiles))
