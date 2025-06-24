@@ -88,6 +88,13 @@ BOOL appendFileNode(FileNodes* pFiles,
                     struct List* pNotifications);
 
 /**
+ * Returns TRUE if given `pFiles` list cpntains a node whose field
+ * `OriginalName` is the same name as in given node `pNodeToCheck`
+ */
+BOOL isOriginalNameNodeAlreadyInFileNodesList(FileNodes* pFiles,
+                                              FileNode* pNodeToCheck);
+
+/**
  * Return the path of the first FileNode in list or NULL if there
  * is none.
  */

@@ -14,6 +14,7 @@ typedef struct FileNode
   char OriginalName[MAX_NAME_LEN + 1]; // Max length + \0 termination
   ULONG OriginalNameLen;
   ULONG OriginalExtLen;
+  ULONG OriginalNameToken;
   DateTimeParts OriginalDate;
   char NewName[MAX_NAME_LEN + 1];
   ULONG NewNameFullLen;

@@ -4,6 +4,11 @@
 #include <exec/types.h>
 
 /**
+ * Calculate and return a Token (numeric representation of the string)
+ */
+ULONG createStringToken(const char* pStr, ULONG strLength);
+
+/**
  * Appends numChars of string `pSrc` to destination buffer `pDest` and
  * takes care of the size of the destination buffer, `destSize`. So, it
  * doesn't write beyond the destination buffer borders. Instead it

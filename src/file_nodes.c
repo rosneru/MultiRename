@@ -21,6 +21,8 @@
 
 #include "notifications.h"
 #include "file_tools.h"
+#include "string_tools.h"
+
 #include "file_nodes.h"
 
 
@@ -168,6 +170,9 @@ struct Node* createFileNode(struct Locale* pLocale,
                       pFileName);
       return NULL;
     }
+
+    pFileNode->OriginalNameToken = createStringToken(pFileNode->OriginalName,
+                                                    pFileNode->OriginalNameLen);
 
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 0,
@@ -376,6 +381,8 @@ BOOL appendFileNode(FileNodes* pFiles,
     return FALSE;
   }
 
+
+
   if(!(pLock = lockFromLongName(pFileFullPath)))
   {
     addNotification(pNotifications,
@@ -389,6 +396,13 @@ BOOL appendFileNode(FileNodes* pFiles,
     return FALSE;
   }
 
+  if(isOriginalNameNodeAlreadyInFileNodesList(pFiles, (FileNode*)pNode))
+  {
+    addNotification(pNotifications,
+                    NNT_SKIPPED_DUPLICATE,
+                    pFileFullPath);
+  }
+  
   if((pWorkingPath = getFirstFilePath(pFiles))
   && (strcmp(((FileNode*)pNode)->Path, pWorkingPath) != 0))
   {
@@ -406,6 +420,22 @@ BOOL appendFileNode(FileNodes* pFiles,
   return TRUE;
 }
 
+BOOL isOriginalNameNodeAlreadyInFileNodesList(FileNodes* pFiles, FileNode* pNodeToCheck)
+{
+  struct Node* pNode;
+  
+  // Check if a node with the file name of the newly created node 
+  // already is in the list (true if the tokens match).
+  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  {
+    if(((FileNode*)pNode)->OriginalNameToken == pNodeToCheck->OriginalNameToken)
+    {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
 
 STRPTR getFirstFilePath(FileNodes* pFiles)
 {

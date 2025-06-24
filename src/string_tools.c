@@ -1,12 +1,25 @@
 #include <string.h>
 #include "string_tools.h"
 
+ULONG createStringToken(const char* pStr, ULONG strLength)
+{
+  ULONG i, token = 0;
+  const char *pItemText;
 
-BOOL appendString(STRPTR pDest,
-                  ULONG destSize,
-                  ULONG* pNewDestLen,
-                  STRPTR pSrc,
-                  ULONG numChars)
+  if(!pStr || strLength == 0)
+  {
+    return 0;
+  }
+
+  for (i = 0; i < strLength; i++)
+  {
+    token += 2 * token + *(pItemText++);
+  }
+
+  return token;
+}
+
+BOOL appendString(STRPTR pDest, ULONG destSize, ULONG* pNewDestLen, STRPTR pSrc, ULONG numChars)
 {
   ULONG remainingDestSize, srcLen, currentDestLen;
 
