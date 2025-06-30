@@ -4,7 +4,6 @@
 ULONG createStringToken(const char* pStr, ULONG strLength)
 {
   ULONG i, token = 0;
-  const char *pItemText;
 
   if(!pStr || strLength == 0)
   {
@@ -13,7 +12,7 @@ ULONG createStringToken(const char* pStr, ULONG strLength)
 
   for (i = 0; i < strLength; i++)
   {
-    token += 2 * token + *(pItemText++);
+    token += 2 * token + *(pStr++);
   }
 
   return token;
