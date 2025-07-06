@@ -254,6 +254,16 @@ BOOL containsSkippedNotifications(struct List* pList)
     return TRUE;
   }
 
+  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_DUPLICATE))
+  {
+    return TRUE;
+  }
+
+  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_LINKS_NOT_SUPPORTED))
+  {
+    return TRUE;
+  }
+
   return FALSE;
 }
 
