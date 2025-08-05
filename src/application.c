@@ -163,7 +163,7 @@ struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECK
 
 enum
 { 
-  MENU_PROJECT_NEW,
+  MENU_PROJECT_NEW = 1,
   MENU_PROJECT_ADD_FILES,
   MENU_PROJECT_ABOUT,
   MENU_PROJECT_QUIT,
@@ -1129,9 +1129,10 @@ static void handleMenu(Application* pApp, ULONG result)
   {
     pItem = ItemAddress(pApp->pIntuiWindow->MenuStrip, selection);
     pUserData = GTMENUITEM_USERDATA(pItem);
+
     if(!pUserData)
     {
-      continue;
+      break;
     }
 
     switch((ULONG)pUserData)
@@ -1141,7 +1142,7 @@ static void handleMenu(Application* pApp, ULONG result)
         // TODO: Reset files and filedir lock
         break;
       }
-
+      
       case MENU_PROJECT_ADD_FILES:
       {
         if((pFileReq = showMultiFileSelector(pApp->pWinObject,
