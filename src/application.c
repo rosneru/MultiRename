@@ -531,8 +531,13 @@ void updateMainWindowTitle(Application* pApp)
     strcpy(pApp->WindowTitle, "MultiRename in [");
     strcat(pApp->WindowTitle, getFilesDirPath(pApp->pFiles));
     strcat(pApp->WindowTitle, "]");
-    SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
   }
+  else
+  {
+    strcpy(pApp->WindowTitle, "MultiRename");
+  }
+  
+  SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
 }
 
 void notifyUserAboutSkippedFiles(Application* pApp)
@@ -1139,7 +1144,33 @@ static void handleMenu(Application* pApp, ULONG result)
     {
       case MENU_PROJECT_NEW:
       {
-        // TODO: Reset files and filedir lock
+        // Detach list from ListBrowser. Must be done before changing the list.
+        SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+        pApp->pIntuiWindow, 
+        NULL,
+        LISTBROWSER_Labels, ~0,
+        TAG_DONE);
+
+        // Reset files and filedir lock
+        freeFileNodes(pApp->pFiles);
+
+        // Create a new, empty filenodes list
+        if((pApp->pFiles = createFileNodes()))
+        {
+          // Attach changed list to ListBrowser.
+          SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                          pApp->pIntuiWindow, 
+                          NULL,
+                          LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                          TAG_DONE);
+        }
+        else
+        {
+          PutStr("Failed to re-create the files list.\n");
+          disposeApplication(pApp);
+        }
+
+        updateMainWindowTitle(pApp);
         break;
       }
       
