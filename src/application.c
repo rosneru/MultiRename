@@ -103,6 +103,12 @@ BOOL applySelectedRange(Application* pApp);
 void updateMainWindowTitle(Application* pApp);
 
 /**
+ * Enables or disables the main windows buttons depending on the state
+ * of `pApp->IsRenameDone`.
+ */
+void updateWindowEnabledState(Application* pApp);
+
+/**
  * Calculates the new names in the processing list / ListBrowser.
  * NOTE: De- and attaches the list browser labels.
  */
@@ -540,6 +546,11 @@ void updateMainWindowTitle(Application* pApp)
   SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
 }
 
+void updateWindowEnabledState(Application* pApp)
+{
+  // TODO Continue
+}
+
 void notifyUserAboutSkippedFiles(Application* pApp)
 {
   if(containsSkippedNotifications(pApp->pNotifications))
@@ -564,7 +575,8 @@ BOOL startRename(Application* pApp)
   struct Node* pNode;
   FileNode* pFileNode;
   BPTR pFormerDirLock = 0L;
-  BOOL AlreadyAskedToProceed = FALSE;
+  BOOL hasAlreadyAskedToProceed = FALSE;
+  BOOL didRenameSucceed = FALSE;
   STRPTR pFileNameExtensionDot = NULL;
   ULONG fileNameExtensionDotIdx;
 
@@ -596,7 +608,7 @@ BOOL startRename(Application* pApp)
     pFileNode = (FileNode*)pNode;
     if(pFileNode->TokenOccurrenceNumber > 1)
     {
-      if(!AlreadyAskedToProceed)
+      if(!hasAlreadyAskedToProceed)
       {
         // Construct and display the `double occurrence` error message.
         // Use a 2k temporary buffer that is big enough for the 136 bytes
@@ -621,7 +633,7 @@ BOOL startRename(Application* pApp)
           return FALSE;
         }
 
-        AlreadyAskedToProceed = TRUE;
+        hasAlreadyAskedToProceed = TRUE;
       }
 
       // Prepare the number text, for example `(2)`, etc.
@@ -669,9 +681,9 @@ BOOL startRename(Application* pApp)
   // Change to files directory, perform the rename and change back to
   // former directory
   pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
-  if(!renameFiles(pApp->pFiles,
-                  pApp->pNotifications,
-                  pApp->pParsedArgs->AreIconsSkipped))
+  if(!(didRenameSucceed = renameFiles(pApp->pFiles,
+                                     pApp->pNotifications,
+                                     pApp->pParsedArgs->AreIconsSkipped)))
   {
     if(!showEasyRequest(pApp->pWinObject, 
                         pApp->pIntuiWindow,
@@ -683,10 +695,11 @@ BOOL startRename(Application* pApp)
       return FALSE;
     }
   }
-
+  
+  pApp->IsRenameDone = TRUE;
   CurrentDir(pFormerDirLock);
   freeTokenCounts(pTokenCounts);
-  return TRUE;
+  return didRenameSucceed;
 }
 
 void appendFilesByWbArgs(Application* pApp, struct WBArg *pArgs, ULONG numArgs)
@@ -776,6 +789,7 @@ void applyNewFiles(Application* pApp)
 
   updateNewNames(pApp);
   updateMainWindowTitle(pApp);
+  updateWindowEnabledState(pApp);
   notifyUserAboutSkippedFiles(pApp);
 }
 
@@ -1115,7 +1129,7 @@ static void handleGadgets(Application* pApp, ULONG result)
           
           startRename(pApp);
           applyNewFiles(pApp);  // Re-attach files node list to ListBrowser
-          // to display the errorous files.
+                                // to display the errorous files.
       }
       break;
     }
