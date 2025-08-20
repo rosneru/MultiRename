@@ -546,9 +546,27 @@ void updateMainWindowTitle(Application* pApp)
   SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
 }
 
+/// will be created in `createLayout()`
+Object *pMainLayout = NULL;
+
 void updateWindowEnabledState(Application* pApp)
 {
-  // TODO Continue
+
+  if(!pApp || !pMainLayout)
+  {
+    return;
+  }
+
+  // SetAttrs(pApp->pWinObject,
+  // )
+
+  SetGadgetAttrs((struct Gadget *) pMainLayout,
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  GA_DISABLED, (ULONG)pApp->IsRenameDone,
+                  TAG_DONE);
+
+  RethinkLayout((struct Gadget *) pMainLayout, pApp->pIntuiWindow, NULL, TRUE);
 }
 
 void notifyUserAboutSkippedFiles(Application* pApp)
@@ -1302,7 +1320,7 @@ void intuiEventLoop(Application* pApp)
 
 Object* createLayout(void)
 {
-  Object *pMainLayout = NULL, *pTopParentHLayout = NULL, 
+  Object *pTopParentHLayout = NULL, 
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
 
