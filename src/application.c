@@ -103,10 +103,9 @@ BOOL applySelectedRange(Application* pApp);
 void updateMainWindowTitle(Application* pApp);
 
 /**
- * Enables or disables the main windows buttons depending on the state
- * of `pApp->IsRenameDone`.
+ * Enables or disables the main windows gadgets depending on the state
  */
-void updateWindowEnabledState(Application* pApp);
+void setAllGadgetsEnabledState(Application* pApp, BOOL enable);
 
 /**
  * Calculates the new names in the processing list / ListBrowser.
@@ -546,27 +545,25 @@ void updateMainWindowTitle(Application* pApp)
   SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
 }
 
-/// will be created in `createLayout()`
-Object *pMainLayout = NULL;
-
-void updateWindowEnabledState(Application* pApp)
+void setAllGadgetsEnabledState(Application* pApp, BOOL enable)
 {
+  ULONG gadgetId = 1;
 
-  if(!pApp || !pMainLayout)
+  if(!pApp)
   {
     return;
   }
 
-  // SetAttrs(pApp->pWinObject,
-  // )
+  for(gadgetId = 1; gadgetId < MAXGADGETS; gadgetId++)
+  {
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[gadgetId],
+                    pApp->pIntuiWindow, 
+                    NULL,
+                    GA_DISABLED, enable,
+                    TAG_DONE);
+  }
 
-  SetGadgetAttrs((struct Gadget *) pMainLayout,
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  GA_DISABLED, (ULONG)pApp->IsRenameDone,
-                  TAG_DONE);
-
-  RethinkLayout((struct Gadget *) pMainLayout, pApp->pIntuiWindow, NULL, TRUE);
+  // RethinkLayout((struct Gadget *) pMainLayout, pApp->pIntuiWindow, NULL, FALSE);
 }
 
 void notifyUserAboutSkippedFiles(Application* pApp)
@@ -807,7 +804,7 @@ void applyNewFiles(Application* pApp)
 
   updateNewNames(pApp);
   updateMainWindowTitle(pApp);
-  updateWindowEnabledState(pApp);
+  setAllGadgetsEnabledState(pApp, pApp->IsRenameDone);
   notifyUserAboutSkippedFiles(pApp);
 }
 
@@ -1320,7 +1317,7 @@ void intuiEventLoop(Application* pApp)
 
 Object* createLayout(void)
 {
-  Object *pTopParentHLayout = NULL, 
+  Object *pMainLayout = NULL, *pTopParentHLayout = NULL, 
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
 
