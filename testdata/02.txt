@@ -1,2 +1,0 @@
-This is for testing if rename skips on errors (here: by duplicate name)
-
