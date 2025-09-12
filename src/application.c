@@ -105,7 +105,7 @@ void updateMainWindowTitle(Application* pApp);
 /**
  * Enables or disables the main windows gadgets depending on the state
  */
-void setAllGadgetsEnabledState(Application* pApp, BOOL enable);
+void setAllGadgetsDisabledState(Application* pApp, BOOL disable);
 
 /**
  * Calculates the new names in the processing list / ListBrowser.
@@ -545,7 +545,7 @@ void updateMainWindowTitle(Application* pApp)
   SetWindowTitles(pApp->pIntuiWindow, pApp->WindowTitle, (UBYTE *)~0);
 }
 
-void setAllGadgetsEnabledState(Application* pApp, BOOL enable)
+void setAllGadgetsDisabledState(Application* pApp, BOOL disable)
 {
   ULONG gadgetId = 1;
 
@@ -556,14 +556,19 @@ void setAllGadgetsEnabledState(Application* pApp, BOOL enable)
 
   for(gadgetId = 1; gadgetId < MAXGADGETS; gadgetId++)
   {
+    if(gadgetId == GID_BTN_START && !disable && !pApp->IsStartAllowed)
+    {
+      // Skip enabling of the start button if it is not allowed to be
+      // enabled.
+      continue;
+    }
+
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[gadgetId],
                     pApp->pIntuiWindow, 
                     NULL,
-                    GA_DISABLED, enable,
+                    GA_DISABLED, disable,
                     TAG_DONE);
   }
-
-  // RethinkLayout((struct Gadget *) pMainLayout, pApp->pIntuiWindow, NULL, FALSE);
 }
 
 void notifyUserAboutSkippedFiles(Application* pApp)
@@ -804,7 +809,7 @@ void applyNewFiles(Application* pApp)
 
   updateNewNames(pApp);
   updateMainWindowTitle(pApp);
-  setAllGadgetsEnabledState(pApp, pApp->IsRenameDone);
+  setAllGadgetsDisabledState(pApp, pApp->IsRenameDone);
   notifyUserAboutSkippedFiles(pApp);
 }
 
@@ -929,10 +934,11 @@ BOOL updateNewNames(Application* pApp)
 
   // De-/activate Start button depending if all names were updated
   // successfully
+  pApp->IsStartAllowed = wasUpdatedSuccessfully;
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
                   pApp->pIntuiWindow, 
                   NULL,
-                  GA_DISABLED, !wasUpdatedSuccessfully,
+                  GA_DISABLED, !pApp->IsStartAllowed,
                   TAG_DONE);
 
   return wasUpdatedSuccessfully;
