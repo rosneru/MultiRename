@@ -214,6 +214,104 @@ struct NewMenu* findNewMenuItem(struct NewMenu* pNewMenuArray, ULONG itemId)
 }
 
 
+struct MenuItem* findMenuItem(
+  struct Menu* pMenu,
+  APTR pUserDataToFind,
+  WORD* pFoundMenuNumber)
+{
+  if(!pMenu || !pUserDataToFind || !pFoundMenuNumber)
+  {
+    return NULL;
+  }
+
+  *pFoundMenuNumber = 0;
+
+  struct MenuItem* pItem = pMenu->FirstItem;
+  if(!pItem)
+  {
+    return NULL;
+  }
+
+  int iMenu = 0;
+  int iItem = 0;
+
+  do
+  {
+    do
+    {
+      APTR pUserData = GTMENUITEM_USERDATA(pItem);
+      if(pUserData == pUserDataToFind)
+      {
+        *pFoundMenuNumber = FULLMENUNUM(iMenu, iItem, 0);
+        return pItem;
+      }
+
+      pItem = pItem->NextItem;
+      iItem++;
+    }
+    while(pItem != NULL);
+
+    pMenu = pMenu->NextMenu;
+    if(pMenu != NULL)
+    {
+      pItem = pMenu->FirstItem;
+      iItem = 0;
+      iMenu++;
+    }
+  }
+  while(pItem != NULL);
+
+  return NULL;
+}
+
+
+void disableMenuItem(struct Window* pWindow, APTR pUserDataMenuBaseItemToDisable)
+{
+  if(!pWindow || !pWindow->MenuStrip || !pUserDataMenuBaseItemToDisable)
+  {
+    return;
+  }
+
+  WORD menuNumber = 0;
+  struct MenuItem* pFoundItem = findMenuItem(
+    pWindow->MenuStrip,
+    pUserDataMenuBaseItemToDisable,
+    menuNumber
+  );
+
+  printf("pFoundItem == %p\n", pFoundItem);
+  if(!pFoundItem)
+  {
+    return;
+  }
+
+  OffMenu(pWindow, menuNumber);
+}
+
+
+void enableMenuItem(struct Window* pWindow, APTR pUserDataMenuBaseItemToEnable)
+{
+  if(!pWindow || !pWindow->MenuStrip || !pUserDataMenuBaseItemToEnable)
+  {
+    return;
+  }
+
+  WORD menuNumber = 0;
+  struct MenuItem* pFoundItem = findMenuItem(
+    pWindow->MenuStrip,
+    pUserDataMenuBaseItemToEnable,
+    menuNumber
+  );
+
+  if(!pFoundItem)
+  {
+    return;
+  }
+
+  OnMenu(pWindow, menuNumber);
+}
+
+
 STRPTR createAboutMessage(void)
 {
   STRPTR pAboutMsg;
@@ -569,6 +667,8 @@ void setAllGadgetsDisabledState(Application* pApp, BOOL disable)
                     GA_DISABLED, disable,
                     TAG_DONE);
   }
+
+  disableMenuItem(pApp->pIntuiWindow, MENU_PROJECT_ADD_FILES);
 }
 
 void notifyUserAboutSkippedFiles(Application* pApp)

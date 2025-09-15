@@ -1,7 +1,7 @@
 {
   "C_Cpp.intelliSenseEngineFallback": "enabled",
   "editor.rulers": [
-    72
+    80
   ],
   "cSpell.enabled": true,
   "cSpell.diagnosticLevel": "Hint",
