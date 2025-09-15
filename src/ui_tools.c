@@ -14,7 +14,7 @@
 #include "ui_tools.h"
 
 
-void appendTextToStrGadget(struct Window* pIntuiWindow,
+BOOL appendTextToStrGadget(struct Window* pIntuiWindow,
                            Object* pStrGadget,
                            STRPTR pTextToAppend,
                            STRPTR pScratchBuf,
@@ -25,8 +25,7 @@ void appendTextToStrGadget(struct Window* pIntuiWindow,
   
   if(!GetAttr(STRINGA_TextVal, pStrGadget, (ULONG*)&pCurrentText))
   {
-    printf("Got no STRINGA_TextVal in `appendTextToStrGadget`\n");
-    return;
+    return FALSE;
   }
 
   strncpy(pScratchBuf, pCurrentText, scratchBufSize);
@@ -36,10 +35,12 @@ void appendTextToStrGadget(struct Window* pIntuiWindow,
   pScratchBuf[scratchBufSize-1] = '\0';
 
   SetGadgetAttrs((struct Gadget *) pStrGadget,
-                  pIntuiWindow,
-                  NULL,
-                  STRINGA_TextVal, (ULONG) pScratchBuf,
-                  TAG_DONE);
+                 pIntuiWindow,
+                 NULL,
+                 STRINGA_TextVal, (ULONG) pScratchBuf,
+                 TAG_DONE);
+
+  return TRUE;
 }
 
 int insertTextToStrGadget(struct Window* pIntuiWindow,
@@ -59,7 +60,6 @@ int insertTextToStrGadget(struct Window* pIntuiWindow,
 
   if(!GetAttr(STRINGA_TextVal, pStrGadget, (ULONG*)&pCurrentText))
   {
-    printf("Got no STRINGA_TextVal in `insertTextToStrGadget()`\n");
     return -1;
   }
 
@@ -75,8 +75,7 @@ int insertTextToStrGadget(struct Window* pIntuiWindow,
                                    scratchBufSize)))
   {
     // TODO: Notify user
-    printf("insertTextToStrGadget() failed.\n");
-    return FALSE;
+    return -1;
   }
 
   // First, set the new text into string gadget

@@ -596,7 +596,7 @@ BOOL startRename(Application* pApp)
   FileNode* pFileNode;
   BPTR pFormerDirLock = 0L;
   BOOL hasAlreadyAskedToProceed = FALSE;
-  BOOL didRenameSucceed = FALSE;
+  BOOL renameSucceeded = FALSE;
   STRPTR pFileNameExtensionDot = NULL;
   ULONG fileNameExtensionDotIdx;
 
@@ -673,7 +673,8 @@ BOOL startRename(Application* pApp)
                           pApp->pIntuiWindow,
                           "MultiRename",
                           "Cancel",
-                          "Error, failed to automatically create name for duplicate file!");
+                            "Error, failed to automatically create "
+                            "name for duplicate file!");
           freeTokenCounts(pTokenCounts);
           return FALSE;
         }
@@ -701,9 +702,13 @@ BOOL startRename(Application* pApp)
   // Change to files directory, perform the rename and change back to
   // former directory
   pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
-  if(!(didRenameSucceed = renameFiles(pApp->pFiles,
-                                     pApp->pNotifications,
-                                     pApp->pParsedArgs->AreIconsSkipped)))
+  renameSucceeded = renameFiles(pApp->pFiles,
+                                pApp->pNotifications,
+                                pApp->pParsedArgs->AreIconsSkipped);
+  CurrentDir(pFormerDirLock);
+  freeTokenCounts(pTokenCounts);
+
+  if(!renameSucceeded)
   {
     if(!showEasyRequest(pApp->pWinObject, 
                         pApp->pIntuiWindow,
@@ -717,9 +722,7 @@ BOOL startRename(Application* pApp)
   }
   
   pApp->IsRenameDone = TRUE;
-  CurrentDir(pFormerDirLock);
-  freeTokenCounts(pTokenCounts);
-  return didRenameSucceed;
+  return renameSucceeded;
 }
 
 void appendFilesByWbArgs(Application* pApp, struct WBArg *pArgs, ULONG numArgs)

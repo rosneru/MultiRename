@@ -13,7 +13,7 @@
  * to perform the concatenating there before writing the result to the
  * string gadget again.
  */
-void appendTextToStrGadget(struct Window* pIntuiWindow,
+BOOL appendTextToStrGadget(struct Window* pIntuiWindow,
                            Object* pStrGadget,
                            STRPTR pTextToAppend,
                            STRPTR pScratchBuf,
