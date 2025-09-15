@@ -195,6 +195,11 @@ struct Node* createFileNode(struct Locale* pLocale,
 ///
 /// Public function implementations
 
+void freeFileNode(struct Node* pNode)
+{
+  FreeListBrowserNode(pNode);
+}
+
 FileNodes* createFileNodes(void)
 {
   FileNodes* pFiles;
@@ -381,8 +386,6 @@ BOOL appendFileNode(FileNodes* pFiles,
     return FALSE;
   }
 
-
-
   if(!(pLock = lockFromLongName(pFileFullPath)))
   {
     addNotification(pNotifications,
@@ -401,7 +404,7 @@ BOOL appendFileNode(FileNodes* pFiles,
     addNotification(pNotifications,
                     NNT_SKIPPED_DUPLICATE,
                     ((FileNode*)pNode)->OriginalName);
-    // TODO freeFileNode;
+    freeFileNode(pNode);
     return FALSE;
   }
   
@@ -412,7 +415,7 @@ BOOL appendFileNode(FileNodes* pFiles,
     addNotification(pNotifications,
                     NNT_SKIPPED_WRONG_PATH,
                     pFileFullPath);
-    FreeListBrowserNode(pNode);
+    freeFileNode(pNode);
     return FALSE;
   }
 

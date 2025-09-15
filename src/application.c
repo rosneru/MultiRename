@@ -707,6 +707,7 @@ BOOL startRename(Application* pApp)
                                 pApp->pParsedArgs->AreIconsSkipped);
   CurrentDir(pFormerDirLock);
   freeTokenCounts(pTokenCounts);
+  pApp->IsRenameDone = TRUE;
 
   if(!renameSucceeded)
   {
@@ -721,7 +722,6 @@ BOOL startRename(Application* pApp)
     }
   }
   
-  pApp->IsRenameDone = TRUE;
   return renameSucceeded;
 }
 
@@ -937,12 +937,15 @@ BOOL updateNewNames(Application* pApp)
 
   // De-/activate Start button depending if all names were updated
   // successfully
-  pApp->IsStartAllowed = wasUpdatedSuccessfully;
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  GA_DISABLED, !pApp->IsStartAllowed,
-                  TAG_DONE);
+  if(!pApp->IsRenameDone)
+  {
+    pApp->IsStartAllowed = wasUpdatedSuccessfully;
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
+                    pApp->pIntuiWindow, 
+                    NULL,
+                    GA_DISABLED, !pApp->IsStartAllowed,
+                    TAG_DONE);
+  }
 
   return wasUpdatedSuccessfully;
 }

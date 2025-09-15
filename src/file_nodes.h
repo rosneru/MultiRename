@@ -14,6 +14,12 @@ typedef struct FileNodes
   char DirPath[MAX_PATH_LEN + 1];
 } FileNodes;
 
+
+/**
+ * Frees the given FileNode
+ */
+void freeFileNode(struct Node *pNode);
+
 /**
  * Create a list to store `FileNode` items.
  */
