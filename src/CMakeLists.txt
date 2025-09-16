@@ -15,6 +15,7 @@ add_executable (MultiRename_gcc
                 date_tools.c
                 file_tools.c
                 file_nodes.c
+                menu_tools.c
                 main.c
                 notifications.c
                 parsed_args.c

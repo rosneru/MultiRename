@@ -50,6 +50,7 @@
 
 #include "file_nodes.h"
 #include "file_tools.h"
+#include "menu_tools.h"
 #include "notifications.h"
 #include "range_select_window.h"
 #include "rename.h"
@@ -190,125 +191,6 @@ struct NewMenu mainWindowNewMenu[] =
   {   NM_ITEM,    "Skip icons",            0 , CHECKIT|MENUTOGGLE, 0, (APTR) MENU_SETTINGS_SKIPICONS},
   { NM_END, NULL, NULL, 0, 0, NULL}
 };
-
-struct NewMenu* findNewMenuItem(struct NewMenu* pNewMenuArray, ULONG itemId)
-{
-  ULONG i = 0;
-  
-  if(!pNewMenuArray)
-  {
-    return NULL;
-  }
-
-  while(pNewMenuArray[i].nm_Type != NM_END)
-  {
-    if((ULONG)pNewMenuArray[i].nm_UserData == itemId)
-    {
-      return &pNewMenuArray[i];
-    }
-
-    i++;
-  }
-
-  return NULL;
-}
-
-
-struct MenuItem* findMenuItem(
-  struct Menu* pMenu,
-  APTR pUserDataToFind,
-  WORD* pFoundMenuNumber)
-{
-  if(!pMenu || !pUserDataToFind || !pFoundMenuNumber)
-  {
-    return NULL;
-  }
-
-  *pFoundMenuNumber = 0;
-
-  struct MenuItem* pItem = pMenu->FirstItem;
-  if(!pItem)
-  {
-    return NULL;
-  }
-
-  int iMenu = 0;
-  int iItem = 0;
-
-  do
-  {
-    do
-    {
-      APTR pUserData = GTMENUITEM_USERDATA(pItem);
-      if(pUserData == pUserDataToFind)
-      {
-        *pFoundMenuNumber = FULLMENUNUM(iMenu, iItem, 0);
-        return pItem;
-      }
-
-      pItem = pItem->NextItem;
-      iItem++;
-    }
-    while(pItem != NULL);
-
-    pMenu = pMenu->NextMenu;
-    if(pMenu != NULL)
-    {
-      pItem = pMenu->FirstItem;
-      iItem = 0;
-      iMenu++;
-    }
-  }
-  while(pItem != NULL);
-
-  return NULL;
-}
-
-
-void disableMenuItem(struct Window* pWindow, APTR pUserDataMenuBaseItemToDisable)
-{
-  if(!pWindow || !pWindow->MenuStrip || !pUserDataMenuBaseItemToDisable)
-  {
-    return;
-  }
-
-  WORD menuNumber = 0;
-  struct MenuItem* pFoundItem = findMenuItem(
-    pWindow->MenuStrip,
-    pUserDataMenuBaseItemToDisable,
-    &menuNumber
-  );
-
-  if(!pFoundItem)
-  {
-    return;
-  }
-
-  OffMenu(pWindow, menuNumber);
-}
-
-
-void enableMenuItem(struct Window* pWindow, APTR pUserDataMenuBaseItemToEnable)
-{
-  if(!pWindow || !pWindow->MenuStrip || !pUserDataMenuBaseItemToEnable)
-  {
-    return;
-  }
-
-  WORD menuNumber = 0;
-  struct MenuItem* pFoundItem = findMenuItem(
-    pWindow->MenuStrip,
-    pUserDataMenuBaseItemToEnable,
-    &menuNumber
-  );
-
-  if(!pFoundItem)
-  {
-    return;
-  }
-
-  OnMenu(pWindow, menuNumber);
-}
 
 
 STRPTR createAboutMessage(void)
