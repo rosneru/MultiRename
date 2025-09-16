@@ -695,7 +695,7 @@ BOOL startRename(Application* pApp)
                                 pApp->pParsedArgs->AreIconsSkipped);
   CurrentDir(pFormerDirLock);
   freeTokenCounts(pTokenCounts);
-  pApp->IsRenameDone = TRUE;
+  pApp->IsResetNeeded = TRUE;
 
   if(!renameSucceeded)
   {
@@ -800,7 +800,7 @@ void applyNewFiles(Application* pApp)
 
   updateNewNames(pApp);
   updateMainWindowTitle(pApp);
-  setAllGadgetsDisabledState(pApp, pApp->IsRenameDone);
+  setAllGadgetsDisabledState(pApp, pApp->IsResetNeeded);
   notifyUserAboutSkippedFiles(pApp);
 }
 
@@ -925,7 +925,7 @@ BOOL updateNewNames(Application* pApp)
 
   // De-/activate Start button depending if all names were updated
   // successfully
-  if(!pApp->IsRenameDone)
+  if(!pApp->IsResetNeeded)
   {
     pApp->IsStartAllowed = wasUpdatedSuccessfully;
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],

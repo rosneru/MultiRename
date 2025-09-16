@@ -31,7 +31,7 @@ typedef struct Application
   STRPTR pAboutMessage;
   ULONG SigMask;
   BOOL IsExitRequested;
-  BOOL IsRenameDone;
+  BOOL IsResetNeeded;
   BOOL IsStartAllowed;
   char WindowTitle[MAX_PATH_LEN + 32];
   char TempBuf[TEMP_BUF_SIZE + 1];
