@@ -276,10 +276,9 @@ void disableMenuItem(struct Window* pWindow, APTR pUserDataMenuBaseItemToDisable
   struct MenuItem* pFoundItem = findMenuItem(
     pWindow->MenuStrip,
     pUserDataMenuBaseItemToDisable,
-    menuNumber
+    &menuNumber
   );
 
-  printf("pFoundItem == %p\n", pFoundItem);
   if(!pFoundItem)
   {
     return;
@@ -300,7 +299,7 @@ void enableMenuItem(struct Window* pWindow, APTR pUserDataMenuBaseItemToEnable)
   struct MenuItem* pFoundItem = findMenuItem(
     pWindow->MenuStrip,
     pUserDataMenuBaseItemToEnable,
-    menuNumber
+    &menuNumber
   );
 
   if(!pFoundItem)
@@ -668,7 +667,14 @@ void setAllGadgetsDisabledState(Application* pApp, BOOL disable)
                     TAG_DONE);
   }
 
-  disableMenuItem(pApp->pIntuiWindow, MENU_PROJECT_ADD_FILES);
+  if(disable)
+  {
+    disableMenuItem(pApp->pIntuiWindow, MENU_PROJECT_ADD_FILES);
+  }
+  else
+  {
+    enableMenuItem(pApp->pIntuiWindow, MENU_PROJECT_ADD_FILES);
+  }
 }
 
 void notifyUserAboutSkippedFiles(Application* pApp)
