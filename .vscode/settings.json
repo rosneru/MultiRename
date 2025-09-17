@@ -85,7 +85,8 @@
     "parsed_args.h": "c",
     "intuition.h": "c",
     "exec.h": "c",
-    "rename.h": "c"
+    "rename.h": "c",
+    "menu_tools.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

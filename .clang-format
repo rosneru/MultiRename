@@ -1,53 +1,34 @@
-Language: Cpp
-AccessModifierOffset: -4
-AlignAfterOpenBracket: true
-AlignConsecutiveDeclarations: false
-AlignEscapedNewlines: Left
-AlignOperands: true
-AlignTrailingComments: true
-AllowAllParametersOfDeclarationOnNextLine: true
-AllowShortBlocksOnASingleLine: false
+BasedOnStyle: LLVM
+IndentWidth: 2
+UseTab: Never
+ColumnLimit: 80
+
+BreakBeforeBraces: Allman
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
-AlwaysBreakBeforeMultilineStrings: true
-AlwaysBreakTemplateDeclarations: true
+
+AlignAfterOpenBracket: DontAlign
+AlignOperands: false
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+
+BreakBeforeBinaryOperators: NonAssignment
+BreakConstructorInitializersBeforeComma: true
+
+BinPackArguments: false
 BinPackParameters: false
-BreakBeforeBinaryOperators: false
-BreakBeforeBraces: Allman
-BreakBeforeTernaryOperators: true
-BreakConstructorInitializersBeforeComma: false
-ColumnLimit: 72
-CommentPragmas: ''
-ConstructorInitializerAllOnOneLineOrOnePerLine: true
-ConstructorInitializerIndentWidth: 2
-ContinuationIndentWidth: 2
-DerivePointerAlignment: false
-DisableFormat: false
-ExperimentalAutoDetectBinPacking: false
-IndentCaseLabels: false
-IndentWidth: 2
-IndentWrappedFunctionNames: false
-IndentFunctionDeclarationAfterType: false
-MaxEmptyLinesToKeep: 1
-KeepEmptyLinesAtTheStartOfBlocks: false
-NamespaceIndentation: None
-PenaltyBreakBeforeFirstCallParameter: 1
+
+PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyBreakAssignment: 50
 PenaltyBreakComment: 300
 PenaltyBreakString: 1000
-PenaltyBreakFirstLessLess: 120
-PenaltyExcessCharacter: 1
-PenaltyReturnTypeOnItsOwnLine: 1000
-PointerAlignment: Left
-SpaceBeforeAssignmentOperators: true
-SpaceBeforeParens: ControlStatements
-SpaceInEmptyParentheses: false
-SpacesBeforeTrailingComments: 1
-SpacesInAngles: false
-SpacesInCStyleCastParentheses: false
-SpacesInContainerLiterals: true
+
+SortIncludes: false
+IncludeBlocks: Preserve
+
 SpacesInParentheses: false
-Cpp11BracedListStyle: true
-Standard: Cpp11  
-TabWidth: 2
-UseTab: Never
+SpaceBeforeParens: ControlStatements
+SpaceBeforeAssignmentOperators: true
+
+Cpp11BracedListStyle: false

@@ -164,8 +164,12 @@ struct Hook m_AppHook;
 
 ///
 /// Helper implementation
+
+// clang-format off
 struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
 struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECKIT|MENUTOGGLE, 0, NULL};
+// clang-format on
+
 
 enum
 { 
@@ -177,6 +181,7 @@ enum
   MENU_SETTINGS_SKIPICONS,
  };
 
+// clang-format off
 struct NewMenu mainWindowNewMenu[] =
 {
   { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
@@ -191,7 +196,7 @@ struct NewMenu mainWindowNewMenu[] =
   {   NM_ITEM,    "Skip icons",            0 , CHECKIT|MENUTOGGLE, 0, (APTR) MENU_SETTINGS_SKIPICONS},
   { NM_END, NULL, NULL, 0, 0, NULL}
 };
-
+// clang-format on
 
 STRPTR createAboutMessage(void)
 {
@@ -288,6 +293,7 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
   m_AppHook.h_SubEntry = NULL;
   m_AppHook.h_Data = pApp;
 
+  // clang-format off
   pWindowObject = NewObject(WINDOW_GetClass(), NULL,
     WINDOW_Position, WPOS_CENTERSCREEN,
     WA_Activate, TRUE,
@@ -314,6 +320,7 @@ Object* createMainWindow(Application* pApp, Object* pMainWindowLayout)
     WINDOW_AppWindow, TRUE,
     WINDOW_AppMsgHook, &m_AppHook,
     TAG_DONE);
+  // clang-format on
 
   return pWindowObject;
 }
@@ -542,11 +549,13 @@ void setAllGadgetsDisabledState(Application* pApp, BOOL disable)
       continue;
     }
 
+    // clang-format off
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[gadgetId],
                     pApp->pIntuiWindow, 
                     NULL,
                     GA_DISABLED, disable,
                     TAG_DONE);
+    // clang-format on
   }
 
   if(disable)
@@ -724,11 +733,13 @@ void appendFilesByWbArgs(Application* pApp, struct WBArg *pArgs, ULONG numArgs)
   }
 
   // Detach list from ListBrowser. Must be done before changing the list.
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
+  // clang-format on
 
   // Iterate the files of the args and append them as FileNode if possible
   for(i = 0; i < numArgs; i++)
@@ -791,11 +802,13 @@ void applyNewFiles(Application* pApp)
     }
 
     // Display the files list in ListBrowser
+    // clang-format off
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                    pApp->pIntuiWindow, NULL,
                    LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
                    LISTBROWSER_AutoFit, TRUE,
                    TAG_DONE);
+    // clang-format on
   }
 
   updateNewNames(pApp);
@@ -849,11 +862,13 @@ BOOL updateNewNames(Application* pApp)
   }
 
   // Detach list from ListBrowser. Must be done before changing the list.
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, ~0,
                   TAG_DONE);
+  // clang-format on
 
   // Read current name and extension masks
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG*)&pName);
@@ -889,12 +904,14 @@ BOOL updateNewNames(Application* pApp)
         pStateText = pTextOk;
       }
 
+      // clang-format off
       SetListBrowserNodeAttrs(pNode,
                               LBNA_Column, 0,
                                 LBNCA_Text, pStateText,
                               LBNA_Column, 3,
                                 LBNCA_Text, pFileNode->NewName,
                               TAG_DONE);
+      // clang-format on
     }
   }
   else
@@ -903,36 +920,41 @@ BOOL updateNewNames(Application* pApp)
     // Set <Error!> for every ListBrowser nodes NewName column.
     for(pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      pFileNode = (FileNode*)pNode;
+      // clang-format off
       SetListBrowserNodeAttrs(pNode,
                               LBNA_Column, 0,
                                 LBNCA_Text, pTextCommandError,
                               LBNA_Column, 3,
                                 LBNCA_Text, "<Error!>",
                               TAG_DONE);
-
+      // clang-format on
     }
 
     wasUpdatedSuccessfully = FALSE;
   }
 
   // Attach changed list to ListBrowser.
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
                   TAG_DONE);
+  // clang-format on
 
   // De-/activate Start button depending if all names were updated
   // successfully
   if(!pApp->IsResetNeeded)
   {
     pApp->IsStartAllowed = wasUpdatedSuccessfully;
+
+    // clang-format off
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
                     pApp->pIntuiWindow, 
                     NULL,
                     GA_DISABLED, !pApp->IsStartAllowed,
                     TAG_DONE);
+    // clang-format on
   }
 
   return wasUpdatedSuccessfully;
@@ -983,22 +1005,26 @@ BOOL applySelectedRange(Application* pApp)
   }
 
   // First, set the new text into string gadget
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) pStrGadget,
                  pApp->pIntuiWindow,
                  NULL,
                  STRINGA_TextVal, (ULONG) pApp->TempBuf,
                  TAG_DONE);
+  // clang-format on
 
   // And then set the buffer pos to insert position
   //
   //(Because setting both in one `SetGadgetAttrs` call doesn't work, as
   // `STRINGA_TextVal` always overwrites the buffer pos to the end of
   // line.)
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) pStrGadget,
                  pApp->pIntuiWindow,
                  NULL,
                  STRINGA_BufferPos, (ULONG) bufferPos,
                  TAG_DONE);
+  // clang-format on
 
   return TRUE;
 }
@@ -1136,11 +1162,14 @@ static void handleGadgets(Application* pApp, ULONG result)
           // Detach list from ListBrowser. Must be done because
           // `startRename()` changes the list (removes the successfully
           // renamed files)
+
+          // clang-format off
           SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-          pApp->pIntuiWindow, 
-          NULL,
-          LISTBROWSER_Labels, ~0,
-          TAG_DONE);
+                         pApp->pIntuiWindow, 
+                         NULL,
+                         LISTBROWSER_Labels, ~0,
+                         TAG_DONE);
+          // clang-format on
           
           startRename(pApp);
           applyNewFiles(pApp);  // Re-attach files node list to ListBrowser
@@ -1174,11 +1203,14 @@ static void handleMenu(Application* pApp, ULONG result)
       case MENU_PROJECT_NEW:
       {
         // Detach list from ListBrowser. Must be done before changing the list.
+
+        // clang-format off
         SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-        pApp->pIntuiWindow, 
-        NULL,
-        LISTBROWSER_Labels, ~0,
-        TAG_DONE);
+                       pApp->pIntuiWindow, 
+                       NULL,
+                       LISTBROWSER_Labels, ~0,
+                       TAG_DONE);
+        // clang-format on
 
         // Reset files and filedir lock
         freeFileNodes(pApp->pFiles);
@@ -1187,11 +1219,14 @@ static void handleMenu(Application* pApp, ULONG result)
         if((pApp->pFiles = createFileNodes()))
         {
           // Attach changed list to ListBrowser.
+
+          // clang-format off
           SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
                           pApp->pIntuiWindow, 
                           NULL,
                           LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
                           TAG_DONE);
+          // clang-format on
         }
         else
         {
@@ -1321,6 +1356,7 @@ Object* createLayout(void)
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
          *pTopVLayoutCnt = NULL;
 
+  // clang-format off
   m_pColumnInfo = AllocLBColumnInfo(4,
                                     LBCIA_Column, 0,
                                       LBCIA_Sortable, FALSE,
@@ -1504,6 +1540,7 @@ Object* createLayout(void)
       CHILD_WeightedHeight, 0,
     TAG_DONE),
   TAG_DONE);
+  // clang-format on
 
   return pMainLayout;
 }
