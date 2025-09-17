@@ -1,34 +1,44 @@
+# Basierend auf LLVM, aber stark angepasst
 BasedOnStyle: LLVM
+
+# Einrückung
 IndentWidth: 2
+ContinuationIndentWidth: 2
 UseTab: Never
+
+# Zeilenlänge
 ColumnLimit: 80
 
+# Klammern-Stil
 BreakBeforeBraces: Allman
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: false
 AllowShortLoopsOnASingleLine: false
 
+# Argumente und Parameter
+BinPackArguments: false
+BinPackParameters: false
 AlignAfterOpenBracket: DontAlign
+PenaltyBreakBeforeFirstCallParameter: 100
+
+# Operatoren und Ausrichtung
+BreakBeforeBinaryOperators: NonAssignment
 AlignOperands: false
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 
-BreakBeforeBinaryOperators: NonAssignment
-BreakConstructorInitializersBeforeComma: true
-
-BinPackArguments: false
-BinPackParameters: false
-
-PenaltyBreakBeforeFirstCallParameter: 100
-PenaltyBreakAssignment: 50
+# Kommentare und Strings
 PenaltyBreakComment: 300
 PenaltyBreakString: 1000
 
-SortIncludes: false
-IncludeBlocks: Preserve
-
+# Leerzeichen
 SpacesInParentheses: false
 SpaceBeforeParens: ControlStatements
 SpaceBeforeAssignmentOperators: true
 
+# Includes
+SortIncludes: false
+IncludeBlocks: Preserve
+
+# Sonstiges
 Cpp11BracedListStyle: false
