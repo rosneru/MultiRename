@@ -202,8 +202,8 @@ struct NewMenu mainWindowNewMenu[] =
 STRPTR createAboutMessage(void)
 {
   STRPTR pAboutMsg;
-  ULONG totalLength = strlen(VERSTAG + 7) + strlen(COPYRIGHT)
-      + strlen(DISTRIBUTION) + 1;
+  ULONG totalLength =
+    strlen(VERSTAG + 7) + strlen(COPYRIGHT) + strlen(DISTRIBUTION) + 1;
 
   if (!(pAboutMsg = AllocVec(totalLength * sizeof(char), MEMF_CLEAR)))
   {
@@ -224,8 +224,8 @@ STRPTR createAboutMessage(void)
  * This function adds these WbArgs/files to the processing list.
  */
 void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
-    __REG__(a2, Object *pWindow),
-    __REG__(a1, struct AppMessage *pMsg))
+  __REG__(a2, Object *pWindow),
+  __REG__(a1, struct AppMessage *pMsg))
 {
   Application *pApp = (Application *)pHook->h_Data;
   appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
@@ -248,8 +248,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
 
   if (pApp->pParsedArgs->AreLongNamesAllowed)
   {
-    if ((pNewMenuItem = findNewMenuItem(
-             mainWindowNewMenu, MENU_SETTINGS_LONGNAMES)))
+    if ((pNewMenuItem =
+            findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_LONGNAMES)))
     {
       pNewMenuItem->nm_Flags |= CHECKED;
     }
@@ -257,8 +257,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
 
   if (pApp->pParsedArgs->AreIconsSkipped)
   {
-    if ((pNewMenuItem = findNewMenuItem(
-             mainWindowNewMenu, MENU_SETTINGS_SKIPICONS)))
+    if ((pNewMenuItem =
+            findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_SKIPICONS)))
     {
       pNewMenuItem->nm_Flags |= CHECKED;
     }
@@ -269,7 +269,7 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
     if (!(pApp->pPubScreen = LockPubScreen(pApp->pParsedArgs->pPubScreenName)))
     {
       Printf("Failed to lock public screen '%s'\n",
-          pApp->pParsedArgs->pPubScreenName);
+        pApp->pParsedArgs->pPubScreenName);
       return NULL;
     }
   }
@@ -288,7 +288,7 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   zoomData[2] = pApp->pPubScreen->Width;
   zoomData[3] = pApp->pPubScreen->Height - screenBarHeight - 1;
 
-  m_AppHook.h_Entry = (ULONG(*)())AppMsgFunc;
+  m_AppHook.h_Entry = (ULONG (*)())AppMsgFunc;
   m_AppHook.h_SubEntry = NULL;
   m_AppHook.h_Data = pApp;
 
@@ -343,10 +343,10 @@ Application *createApplication(int argc, char **argv)
           if ((pApp->pFiles = createFileNodes()))
           {
             if ((pApp->pParsedArgs = createParsedArgs(argc,
-                     argv,
-                     pApp->pFiles,
-                     pApp->pLocale,
-                     pApp->pNotifications)))
+                   argv,
+                   pApp->pFiles,
+                   pApp->pLocale,
+                   pApp->pNotifications)))
             {
               if ((pMainLayout = createLayout()))
               {
@@ -491,8 +491,8 @@ BOOL runApplication(Application *pApp)
     return FALSE;
   }
 
-  if ((pApp->pIntuiWindow = (struct Window *)DoMethod(
-           pApp->pWinObject, WM_OPEN, NULL)))
+  if ((pApp->pIntuiWindow =
+          (struct Window *)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
     applyNewFiles(pApp);
     intuiEventLoop(pApp);
@@ -571,10 +571,10 @@ void notifyUserAboutSkippedFiles(Application *pApp)
   if (containsSkippedNotifications(pApp->pNotifications))
   {
     if (!showEasyRequest(pApp->pWinObject,
-            pApp->pIntuiWindow,
-            "MultiRename",
-            "Ok|Show errors",
-            "Failed to add some of the input files"))
+          pApp->pIntuiWindow,
+          "MultiRename",
+          "Ok|Show errors",
+          "Failed to add some of the input files"))
     {
       printNotifications(pApp->pNotifications);
     }
@@ -599,27 +599,27 @@ BOOL startRename(Application *pApp)
   if (fileCount == 0)
   {
     showEasyRequest(pApp->pWinObject,
-        pApp->pIntuiWindow,
-        "MultiRename",
-        "Ok",
-        "No files to rename.");
+      pApp->pIntuiWindow,
+      "MultiRename",
+      "Ok",
+      "No files to rename.");
     return FALSE;
   }
 
   if (!(pTokenCounts = createTokenCounts(fileCount)))
   {
     showEasyRequest(pApp->pWinObject,
-        pApp->pIntuiWindow,
-        "MultiRename",
-        "Cancel",
-        "Error, failed to create file name tokens!");
+      pApp->pIntuiWindow,
+      "MultiRename",
+      "Cancel",
+      "Error, failed to create file name tokens!");
     return FALSE;
   }
 
   fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
 
   for (pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ;
-       pNode = pNode->ln_Succ)
+    pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode *)pNode;
     if (pFileNode->TokenOccurrenceNumber > 1)
@@ -630,19 +630,19 @@ BOOL startRename(Application *pApp)
         // Use a 2k temporary buffer that is big enough for the 136 bytes
         // message text + max. 107 bytes file name.
         sprintf(pApp->pParsedArgs->pTempPathBuf,
-            "Warning, duplicate names! Proceed anyway?\n"
-            "%s\n\n"
-            "NOTE: Proceed will auto rename duplicate files to \n"
-            "  name (2).ext\n"
-            "  name (3).ext\n"
-            "and so on.",
-            pFileNode->NewName);
+          "Warning, duplicate names! Proceed anyway?\n"
+          "%s\n\n"
+          "NOTE: Proceed will auto rename duplicate files to \n"
+          "  name (2).ext\n"
+          "  name (3).ext\n"
+          "and so on.",
+          pFileNode->NewName);
 
         if (!showEasyRequest(pApp->pWinObject,
-                pApp->pIntuiWindow,
-                "MultiRename",
-                "Proceed|Cancel",
-                pApp->pParsedArgs->pTempPathBuf))
+              pApp->pIntuiWindow,
+              "MultiRename",
+              "Proceed|Cancel",
+              pApp->pParsedArgs->pTempPathBuf))
         {
           // User clicked on `Cancel`
           freeTokenCounts(pTokenCounts);
@@ -654,27 +654,27 @@ BOOL startRename(Application *pApp)
 
       // Prepare the number text, for example `(2)`, etc.
       sprintf(pApp->pParsedArgs->pTempPathBuf,
-          " (%d)",
-          pFileNode->TokenOccurrenceNumber);
+        " (%d)",
+        pFileNode->TokenOccurrenceNumber);
 
       // Find the dot '.' in new filename
       if ((pFileNameExtensionDot = strrchr(pFileNode->NewName, '.')))
       {
-        fileNameExtensionDotIdx = pFileNameExtensionDot
-            - (STRPTR)pFileNode->NewName;
+        fileNameExtensionDotIdx =
+          pFileNameExtensionDot - (STRPTR)pFileNode->NewName;
         if (insertString(pFileNode->NewName,
-                pApp->pParsedArgs->pTempPathBuf,
-                fileNameExtensionDotIdx,
-                pApp->TempBuf,
-                TEMP_BUF_SIZE)
-            < 0)
+              pApp->pParsedArgs->pTempPathBuf,
+              fileNameExtensionDotIdx,
+              pApp->TempBuf,
+              TEMP_BUF_SIZE)
+          < 0)
         {
           showEasyRequest(pApp->pWinObject,
-              pApp->pIntuiWindow,
-              "MultiRename",
-              "Cancel",
-              "Error, failed to automatically create "
-              "name for duplicate file!");
+            pApp->pIntuiWindow,
+            "MultiRename",
+            "Cancel",
+            "Error, failed to automatically create "
+            "name for duplicate file!");
           freeTokenCounts(pTokenCounts);
           return FALSE;
         }
@@ -685,11 +685,11 @@ BOOL startRename(Application *pApp)
         if ((strlen(pApp->TempBuf) + 5) > MAX_NAME_LEN)
         {
           showEasyRequest(pApp->pWinObject,
-              pApp->pIntuiWindow,
-              "MultiRename",
-              "Cancel",
-              "Error, auto-renamed file name would be "
-              "too long for file system!");
+            pApp->pIntuiWindow,
+            "MultiRename",
+            "Cancel",
+            "Error, auto-renamed file name would be "
+            "too long for file system!");
           freeTokenCounts(pTokenCounts);
           return FALSE;
         }
@@ -703,7 +703,7 @@ BOOL startRename(Application *pApp)
   // former directory
   pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
   renameSucceeded = renameFiles(
-      pApp->pFiles, pApp->pNotifications, pApp->pParsedArgs->AreIconsSkipped);
+    pApp->pFiles, pApp->pNotifications, pApp->pParsedArgs->AreIconsSkipped);
   CurrentDir(pFormerDirLock);
   freeTokenCounts(pTokenCounts);
   pApp->IsResetNeeded = TRUE;
@@ -711,10 +711,10 @@ BOOL startRename(Application *pApp)
   if (!renameSucceeded)
   {
     if (!showEasyRequest(pApp->pWinObject,
-            pApp->pIntuiWindow,
-            "MultiRename",
-            "Ok|Show errors",
-            "Failed to rename some of the input files"))
+          pApp->pIntuiWindow,
+          "MultiRename",
+          "Ok|Show errors",
+          "Failed to rename some of the input files"))
     {
       printNotifications(pApp->pNotifications);
       return FALSE;
@@ -748,16 +748,16 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
   {
     pFileName = pArgs[i].wa_Name;
     if (NameFromLock(
-            pArgs[i].wa_Lock, pApp->pParsedArgs->pTempPathBuf, MAX_PATH_LEN))
+          pArgs[i].wa_Lock, pApp->pParsedArgs->pTempPathBuf, MAX_PATH_LEN))
     {
       // Now scratch buf contains the name of the directory of the file
       // So next the fileName is appended to the buf
       AddPart(pApp->pParsedArgs->pTempPathBuf, pFileName, MAX_PATH_LEN);
 
       appendFileNode(pApp->pFiles,
-          pApp->pParsedArgs->pTempPathBuf,
-          pApp->pLocale,
-          pApp->pNotifications);
+        pApp->pParsedArgs->pTempPathBuf,
+        pApp->pLocale,
+        pApp->pNotifications);
     }
     else
     {
@@ -766,7 +766,7 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
         // For the error notification only the file name not the
         // relative path is needed.
         addNotification(
-            pApp->pNotifications, NNT_SKIPPED_PATH_TOO_LONG, pFileName);
+          pApp->pNotifications, NNT_SKIPPED_PATH_TOO_LONG, pFileName);
       }
     }
   }
@@ -789,13 +789,13 @@ void applyNewFiles(Application *pApp)
         if (!setFilesDirLock(pApp->pFiles, lock))
         {
           addNotification(
-              pApp->pNotifications, NNT_SKIPPED_PATH_TOO_LONG, pFirstPath);
+            pApp->pNotifications, NNT_SKIPPED_PATH_TOO_LONG, pFirstPath);
         }
       }
       else
       {
         addNotification(
-            pApp->pNotifications, NNT_SKIPPED_FAILED_LOCK, pFirstPath);
+          pApp->pNotifications, NNT_SKIPPED_FAILED_LOCK, pFirstPath);
       }
     }
 
@@ -871,30 +871,29 @@ BOOL updateNewNames(Application *pApp)
   // Read current name and extension masks
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG *)&pName);
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG *)&pExt);
-  GetAttr(INTEGER_Number,
-      m_ppGadgets[GID_INT_COUNTER_START],
-      (ULONG *)&counterStart);
   GetAttr(
-      INTEGER_Number, m_ppGadgets[GID_INT_COUNTER_STEP], (ULONG *)&counterStep);
+    INTEGER_Number, m_ppGadgets[GID_INT_COUNTER_START], (ULONG *)&counterStart);
+  GetAttr(
+    INTEGER_Number, m_ppGadgets[GID_INT_COUNTER_STEP], (ULONG *)&counterStep);
   GetAttr(CHOOSER_Selected,
-      m_ppGadgets[GID_CHO_COUNTER_PLACES],
-      (ULONG *)&counterPlacesId);
+    m_ppGadgets[GID_CHO_COUNTER_PLACES],
+    (ULONG *)&counterPlacesId);
 
   counterPlacesValue = atoi(m_ppCounterPlaces[counterPlacesId]);
 
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
   if (createNewNames(pApp->pFiles,
-          maxAllowedNameLength,
-          pName,
-          pExt,
-          counterStart,
-          counterStep,
-          counterPlacesValue))
+        maxAllowedNameLength,
+        pName,
+        pExt,
+        counterStart,
+        counterStep,
+        counterPlacesValue))
   {
     // Set the updated NewName text for each ListBrowser node
     for (pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ;
-         pNode = pNode->ln_Succ)
+      pNode = pNode->ln_Succ)
     {
       pFileNode = (FileNode *)pNode;
 
@@ -923,7 +922,7 @@ BOOL updateNewNames(Application *pApp)
     // createNewNames() failed.
     // Set <Error!> for every ListBrowser nodes NewName column.
     for (pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ;
-         pNode = pNode->ln_Succ)
+      pNode = pNode->ln_Succ)
     {
       // clang-format off
       SetListBrowserNodeAttrs(pNode,
@@ -983,7 +982,7 @@ BOOL applySelectedRange(Application *pApp)
     break;
   case RRT_EXTENSION:
     if (!GetAttr(
-            STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG *)&pText))
+          STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG *)&pText))
     {
       return FALSE;
     }
@@ -999,8 +998,7 @@ BOOL applySelectedRange(Application *pApp)
     bufferPos = strlen(pText);
   }
 
-  if (0
-      > (bufferPos = insertRangeMaskString(
+  if (0 > (bufferPos = insertRangeMaskString(
              &pApp->RangeMask, pApp->TempBuf, TEMP_BUF_SIZE, pText, bufferPos)))
   {
     // TODO: Notify user
@@ -1034,29 +1032,29 @@ BOOL applySelectedRange(Application *pApp)
 }
 
 void insertCommandToStrGadget(
-    Application *pApp, ULONG strGadgetId, STRPTR pCommandStr)
+  Application *pApp, ULONG strGadgetId, STRPTR pCommandStr)
 {
   pApp->NameGadgetBufferPos = getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
-  pApp->ExtGadgetBufferPos = getStrGadgetBufferPos(
-      m_ppGadgets[GID_STR_EXTENSION]);
+  pApp->ExtGadgetBufferPos =
+    getStrGadgetBufferPos(m_ppGadgets[GID_STR_EXTENSION]);
 
   if (strGadgetId == GID_STR_NAME)
   {
     pApp->NameGadgetBufferPos = insertTextToStrGadget(pApp->pIntuiWindow,
-        m_ppGadgets[GID_STR_NAME],
-        pCommandStr,
-        pApp->NameGadgetBufferPos,
-        pApp->TempBuf,
-        TEMP_BUF_SIZE);
+      m_ppGadgets[GID_STR_NAME],
+      pCommandStr,
+      pApp->NameGadgetBufferPos,
+      pApp->TempBuf,
+      TEMP_BUF_SIZE);
   }
   else if (strGadgetId == GID_STR_EXTENSION)
   {
     pApp->NameGadgetBufferPos = insertTextToStrGadget(pApp->pIntuiWindow,
-        m_ppGadgets[GID_STR_EXTENSION],
-        pCommandStr,
-        pApp->ExtGadgetBufferPos,
-        pApp->TempBuf,
-        TEMP_BUF_SIZE);
+      m_ppGadgets[GID_STR_EXTENSION],
+      pCommandStr,
+      pApp->ExtGadgetBufferPos,
+      pApp->TempBuf,
+      TEMP_BUF_SIZE);
   }
 
   updateNewNames(pApp);
@@ -1083,28 +1081,28 @@ static void handleGadgets(Application *pApp, ULONG result)
   }
   case GID_BTN_NAME_PART:
   {
-    pApp->NameGadgetBufferPos = getStrGadgetBufferPos(
-        m_ppGadgets[GID_STR_NAME]);
-    pApp->ExtGadgetBufferPos = getStrGadgetBufferPos(
-        m_ppGadgets[GID_STR_EXTENSION]);
+    pApp->NameGadgetBufferPos =
+      getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
+    pApp->ExtGadgetBufferPos =
+      getStrGadgetBufferPos(m_ppGadgets[GID_STR_EXTENSION]);
     if ((pFileNode = getLongestOldNameNode(pApp->pFiles)))
     {
       pApp->RangeMask.RequestedRangeType = RRT_NAME;
       openRangeSelectWindow(pApp->pRangeSelectWindow,
-          pApp->pIntuiWindow,
-          &pApp->SigMask,
-          &pApp->RangeMask,
-          pFileNode->OriginalName,
-          pFileNode->OriginalNameLen);
+        pApp->pIntuiWindow,
+        &pApp->SigMask,
+        &pApp->RangeMask,
+        pFileNode->OriginalName,
+        pFileNode->OriginalNameLen);
     }
     else
     {
       showEasyRequest(pApp->pWinObject,
-          pApp->pIntuiWindow,
-          "MultiRename: Select name part",
-          "Ok",
-          "This tool is only available if you have "
-          "files in the processing list.");
+        pApp->pIntuiWindow,
+        "MultiRename: Select name part",
+        "Ok",
+        "This tool is only available if you have "
+        "files in the processing list.");
     }
     break;
   }
@@ -1130,29 +1128,29 @@ static void handleGadgets(Application *pApp, ULONG result)
   }
   case GID_BTN_EXTENSION_PART:
   {
-    pApp->NameGadgetBufferPos = getStrGadgetBufferPos(
-        m_ppGadgets[GID_STR_NAME]);
-    pApp->ExtGadgetBufferPos = getStrGadgetBufferPos(
-        m_ppGadgets[GID_STR_EXTENSION]);
+    pApp->NameGadgetBufferPos =
+      getStrGadgetBufferPos(m_ppGadgets[GID_STR_NAME]);
+    pApp->ExtGadgetBufferPos =
+      getStrGadgetBufferPos(m_ppGadgets[GID_STR_EXTENSION]);
     if ((pFileNode = getLongestOldExtNode(pApp->pFiles)))
     {
       pApp->RangeMask.RequestedRangeType = RRT_EXTENSION;
       openRangeSelectWindow(pApp->pRangeSelectWindow,
-          pApp->pIntuiWindow,
-          &pApp->SigMask,
-          &pApp->RangeMask,
-          pFileNode->OriginalName + pFileNode->OriginalNameLen + 1,
-          pFileNode->OriginalExtLen);
+        pApp->pIntuiWindow,
+        &pApp->SigMask,
+        &pApp->RangeMask,
+        pFileNode->OriginalName + pFileNode->OriginalNameLen + 1,
+        pFileNode->OriginalExtLen);
     }
     else
     {
       showEasyRequest(pApp->pWinObject,
-          pApp->pIntuiWindow,
-          "MultiRename: Select extension part",
-          "Ok",
-          "This tool is only available if you have "
-          "files in the processing list and if at least "
-          "one of them has an extension like '.iff'.");
+        pApp->pIntuiWindow,
+        "MultiRename: Select extension part",
+        "Ok",
+        "This tool is only available if you have "
+        "files in the processing list and if at least "
+        "one of them has an extension like '.iff'.");
     }
     break;
   }
@@ -1247,7 +1245,7 @@ static void handleMenu(Application *pApp, ULONG result)
     case MENU_PROJECT_ADD_FILES:
     {
       if ((pFileReq = showMultiFileSelector(
-               pApp->pWinObject, pApp->pIntuiWindow, "Select files to rename")))
+             pApp->pWinObject, pApp->pIntuiWindow, "Select files to rename")))
       {
         appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
         freeMultiFileSelector(pFileReq);
@@ -1259,10 +1257,10 @@ static void handleMenu(Application *pApp, ULONG result)
     case MENU_PROJECT_ABOUT:
     {
       showEasyRequest(pApp->pWinObject,
-          pApp->pIntuiWindow,
-          "MultiRename",
-          "Ok",
-          pApp->pAboutMessage);
+        pApp->pIntuiWindow,
+        "MultiRename",
+        "Ok",
+        pApp->pAboutMessage);
       break;
     }
 
