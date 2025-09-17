@@ -288,7 +288,7 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   zoomData[2] = pApp->pPubScreen->Width;
   zoomData[3] = pApp->pPubScreen->Height - screenBarHeight - 1;
 
-  m_AppHook.h_Entry = (ULONG(*)())AppMsgFunc;
+  m_AppHook.h_Entry = (ULONG (*)())AppMsgFunc;
   m_AppHook.h_SubEntry = NULL;
   m_AppHook.h_Data = pApp;
 
@@ -619,7 +619,7 @@ BOOL startRename(Application *pApp)
   fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
 
   for (pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ;
-       pNode = pNode->ln_Succ)
+    pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode *)pNode;
     if (pFileNode->TokenOccurrenceNumber > 1)
@@ -699,8 +699,8 @@ BOOL startRename(Application *pApp)
     }
   }
 
-  // Change to files directory, perform the rename and change back to
-  // former directory
+  // Change to files directory, perform the rename and change back to former
+  // directory
   pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
   renameSucceeded = renameFiles(
     pApp->pFiles, pApp->pNotifications, pApp->pParsedArgs->AreIconsSkipped);
@@ -893,7 +893,7 @@ BOOL updateNewNames(Application *pApp)
   {
     // Set the updated NewName text for each ListBrowser node
     for (pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ;
-         pNode = pNode->ln_Succ)
+      pNode = pNode->ln_Succ)
     {
       pFileNode = (FileNode *)pNode;
 
@@ -922,7 +922,7 @@ BOOL updateNewNames(Application *pApp)
     // createNewNames() failed.
     // Set <Error!> for every ListBrowser nodes NewName column.
     for (pNode = pApp->pFiles->pList->lh_Head; pNode->ln_Succ;
-         pNode = pNode->ln_Succ)
+      pNode = pNode->ln_Succ)
     {
       // clang-format off
       SetListBrowserNodeAttrs(pNode,
