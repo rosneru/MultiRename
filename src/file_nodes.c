@@ -74,9 +74,9 @@ struct Node *createFileNode(struct Locale *pLocale,
   nameLen = strlen(pFileName);
   if (nameLen > 4)
   {
-    if (pFileName[nameLen - 1] == 'o' && pFileName[nameLen - 2] == 'f'
-      && pFileName[nameLen - 3] == 'n' && pFileName[nameLen - 4] == 'i'
-      && pFileName[nameLen - 5] == '.')
+    if (pFileName[nameLen - 1] == 'o' && pFileName[nameLen - 2] == 'f' &&
+      pFileName[nameLen - 3] == 'n' && pFileName[nameLen - 4] == 'i' &&
+      pFileName[nameLen - 5] == '.')
     {
       return NULL;
     }
@@ -150,8 +150,8 @@ struct Node *createFileNode(struct Locale *pLocale,
     if ((pLastDotPosition = strrchr(pNameStart, '.')))
     {
       pFileNode->OriginalNameLen = pLastDotPosition - pNameStart;
-      pFileNode->OriginalExtLen = strlen(pFileNode->OriginalName
-        + pFileNode->OriginalNameLen + 1); // +1 for the dot '.'
+      pFileNode->OriginalExtLen = strlen(pFileNode->OriginalName +
+        pFileNode->OriginalNameLen + 1); // +1 for the dot '.'
     }
     else
     {
@@ -404,8 +404,8 @@ BOOL appendFileNode(FileNodes *pFiles,
     return FALSE;
   }
 
-  if ((pWorkingPath = getFirstFilePath(pFiles))
-    && (strcmp(((FileNode *)pNode)->Path, pWorkingPath) != 0))
+  if ((pWorkingPath = getFirstFilePath(pFiles)) &&
+    (strcmp(((FileNode *)pNode)->Path, pWorkingPath) != 0))
   {
     // This file has a different path as the former ones: skip it
     addNotification(pNotifications, NNT_SKIPPED_WRONG_PATH, pFileFullPath);
@@ -428,8 +428,8 @@ BOOL isOriginalNameNodeAlreadyInFileNodesList(
   // already is in the list (true if the tokens match).
   for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    if (((FileNode *)pNode)->OriginalNameToken
-      == pNodeToCheck->OriginalNameToken)
+    if (((FileNode *)pNode)->OriginalNameToken ==
+      pNodeToCheck->OriginalNameToken)
     {
       return TRUE;
     }

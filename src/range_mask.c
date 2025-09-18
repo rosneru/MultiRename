@@ -41,10 +41,10 @@ int insertRangeMaskString(RangeMask *pRangeMask,
 {
   char commandPartBuf[MAX_RANGE_STRING_LEN + 1];
 
-  if (!pRangeMask || !pDestBuf || !pSrcStr
-    || (pRangeMask->RangeFrom > MAX_NAME_LEN)
-    || (pRangeMask->RangeTo > MAX_NAME_LEN)
-    || (pRangeMask->RangeFrom > pRangeMask->RangeTo))
+  if (!pRangeMask || !pDestBuf || !pSrcStr ||
+    (pRangeMask->RangeFrom > MAX_NAME_LEN) ||
+    (pRangeMask->RangeTo > MAX_NAME_LEN) ||
+    (pRangeMask->RangeFrom > pRangeMask->RangeTo))
   {
     return -1;
   }

@@ -69,9 +69,9 @@ int insertTextToStrGadget(struct Window *pIntuiWindow,
     return -1;
   }
 
-  if (0
-    > (bufferPos = insertString(
-         pCurrentText, pStrToInsert, insertPos, pScratchBuf, scratchBufSize)))
+  if (0 >
+    (bufferPos = insertString(
+       pCurrentText, pStrToInsert, insertPos, pScratchBuf, scratchBufSize)))
   {
     // TODO: Notify user
     return -1;

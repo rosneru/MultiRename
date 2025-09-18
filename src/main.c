@@ -6,15 +6,17 @@
 
 #include <workbench/startup.h>
 
+// clang-format off
 #ifdef __clang__
-#include <clib/alib_protos.h>
-#include <clib/dos_protos.h>
-#include <clib/exec_protos.h>
+  #include <clib/alib_protos.h>
+  #include <clib/dos_protos.h>
+  #include <clib/exec_protos.h>
 #else
-#include <proto/alib.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
+  #include <proto/alib.h>
+  #include <proto/dos.h>
+  #include <proto/exec.h>
 #endif
+// clang-format on
 
 #include "application.h"
 
@@ -96,69 +98,68 @@ void wbmain(struct WBStartup *wb)
 
 BOOL openLibs(void)
 {
-  if (NULL
-    == (IntuitionBase =
+  if (!(IntuitionBase =
           (struct IntuitionBase *)OpenLibrary("intuition.library", 47)))
   {
     PutStr("Failed to open intuition.library v47.\n");
     return FALSE;
   }
 
-  if (NULL == (WindowBase = OpenLibrary("window.class", 47)))
+  if (!(WindowBase = OpenLibrary("window.class", 47)))
   {
     PutStr("Failed to open window.class v47.\n");
     return FALSE;
   }
 
-  if (NULL == (LayoutBase = OpenLibrary("gadgets/layout.gadget", 47)))
+  if (!(LayoutBase = OpenLibrary("gadgets/layout.gadget", 47)))
   {
     PutStr("Failed to open layout.gadget v47.\n");
     return FALSE;
   }
 
-  if (NULL == (BevelBase = OpenLibrary("images/bevel.image", 47)))
+  if (!(BevelBase = OpenLibrary("images/bevel.image", 47)))
   {
     PutStr("Failed to open bevel.image v47.\n");
     return FALSE;
   }
 
-  if (NULL == (ButtonBase = OpenLibrary("gadgets/button.gadget", 47)))
+  if (!(ButtonBase = OpenLibrary("gadgets/button.gadget", 47)))
   {
     PutStr("Failed to open button.gadget v47.\n");
     return FALSE;
   }
 
-  if (NULL == (ChooserBase = OpenLibrary("gadgets/chooser.gadget", 47)))
+  if (!(ChooserBase = OpenLibrary("gadgets/chooser.gadget", 47)))
   {
     PutStr("Failed to open chooser.gadget v47.\n");
     return FALSE;
   }
 
-  if (NULL == (IntegerBase = OpenLibrary("gadgets/integer.gadget", 47)))
+  if (!(IntegerBase = OpenLibrary("gadgets/integer.gadget", 47)))
   {
     PutStr("Failed to open integer.gadget v47.\n");
     return FALSE;
   }
 
-  if (NULL == (ListBrowserBase = OpenLibrary("gadgets/listbrowser.gadget", 47)))
+  if (!(ListBrowserBase = OpenLibrary("gadgets/listbrowser.gadget", 47)))
   {
     PutStr("Failed to open listbrowser.gadget v47.\n");
     return FALSE;
   }
 
-  if (NULL == (LabelBase = OpenLibrary("images/label.image", 47)))
+  if (!(LabelBase = OpenLibrary("images/label.image", 47)))
   {
     PutStr("Failed to open label.image v47.\n");
     return FALSE;
   }
 
-  if (NULL == (SliderBase = OpenLibrary("gadgets/slider.gadget", 47)))
+  if (!(SliderBase = OpenLibrary("gadgets/slider.gadget", 47)))
   {
     PutStr("Failed to open slider.gadget v47.\n");
     return FALSE;
   }
 
-  if (NULL == (StringBase = OpenLibrary("gadgets/string.gadget", 47)))
+  if (!(StringBase = OpenLibrary("gadgets/string.gadget", 47)))
   {
     PutStr("Failed to open string.gadget v47.\n");
     return FALSE;
@@ -169,57 +170,57 @@ BOOL openLibs(void)
 
 void closeLibs(void)
 {
-  if (NULL != StringBase)
+  if (StringBase)
   {
     CloseLibrary(StringBase);
   }
 
-  if (NULL != SliderBase)
+  if (SliderBase)
   {
     CloseLibrary(SliderBase);
   }
 
-  if (NULL != LabelBase)
+  if (LabelBase)
   {
     CloseLibrary(LabelBase);
   }
 
-  if (NULL != ListBrowserBase)
+  if (ListBrowserBase)
   {
     CloseLibrary(ListBrowserBase);
   }
 
-  if (NULL != IntegerBase)
+  if (IntegerBase)
   {
     CloseLibrary(IntegerBase);
   }
 
-  if (NULL != ChooserBase)
+  if (ChooserBase)
   {
     CloseLibrary(ChooserBase);
   }
 
-  if (NULL != ButtonBase)
+  if (ButtonBase)
   {
     CloseLibrary(ButtonBase);
   }
 
-  if (NULL != BevelBase)
+  if (BevelBase)
   {
     CloseLibrary(BevelBase);
   }
 
-  if (NULL != LayoutBase)
+  if (LayoutBase)
   {
     CloseLibrary(LayoutBase);
   }
 
-  if (NULL != WindowBase)
+  if (WindowBase)
   {
     CloseLibrary(WindowBase);
   }
 
-  if (NULL != IntuitionBase)
+  if (IntuitionBase)
   {
     CloseLibrary((struct Library *)IntuitionBase);
   }

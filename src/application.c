@@ -666,8 +666,7 @@ BOOL startRename(Application *pApp)
               pApp->pParsedArgs->pTempPathBuf,
               fileNameExtensionDotIdx,
               pApp->TempBuf,
-              TEMP_BUF_SIZE)
-          < 0)
+              TEMP_BUF_SIZE) < 0)
         {
           showEasyRequest(pApp->pWinObject,
             pApp->pIntuiWindow,

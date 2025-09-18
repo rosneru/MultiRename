@@ -22,10 +22,10 @@ AlignAfterOpenBracket: DontAlign
 PenaltyBreakBeforeFirstCallParameter: 100
 
 # Operatoren und Ausrichtung
-BreakBeforeBinaryOperators: NonAssignment
 AlignOperands: false
 AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
+BreakBeforeBinaryOperators: None
 
 # Kommentare und Strings
 PenaltyBreakComment: 300

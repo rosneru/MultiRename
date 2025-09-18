@@ -126,8 +126,8 @@ void printNotifications(struct List *pList)
     PutStr("\n");
   }
 
-  if (0
-    < (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
+  if (0 <
+    (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
   {
     Printf("Skipped %lu input file(s) because of over long / "
            "truncated paths:\n",
@@ -162,8 +162,8 @@ void printNotifications(struct List *pList)
     PutStr("\n");
   }
 
-  if (0
-    < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
+  if (0 <
+    (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
   {
     Printf("Skipped %lu input file(s) because they couldn't be "
            "examined:\n",

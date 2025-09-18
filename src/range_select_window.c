@@ -117,7 +117,7 @@ RangeSelectWindow *createRangeSelectWindow(void)
     return NULL;
   }
 
-  m_SlidersHook.h_Entry = (ULONG (*)())SlidersMsgFunc;
+  m_SlidersHook.h_Entry = (ULONG(*)())SlidersMsgFunc;
   m_SlidersHook.h_SubEntry = NULL;
   m_SlidersHook.h_Data = pRsw;
 
@@ -324,8 +324,8 @@ BOOL openRangeSelectWindow(RangeSelectWindow *pRsw,
 
 void closeRangeSelectWindow(RangeSelectWindow *pRsw)
 {
-  if (!pRsw || !pRsw->pWinObject || !pRsw->pIntuiWindow
-    || !pRsw->pParentIntuiWindow)
+  if (!pRsw || !pRsw->pWinObject || !pRsw->pIntuiWindow ||
+    !pRsw->pParentIntuiWindow)
   {
     return;
   }
