@@ -14,25 +14,22 @@
 
 /// Forwards / private function declarations
 
-TokenCount *appendTokenCount(ULONG appendToken,
-                             TokenCount* pTokenCounts,
-                             ULONG numTokenCounts);
-TokenCount *findTokenCount(ULONG searchToken,
-                           TokenCount* pTokenCounts,
-                           ULONG numTokenCounts);
+TokenCount *appendTokenCount(
+  ULONG appendToken, TokenCount *pTokenCounts, ULONG numTokenCounts);
+TokenCount *findTokenCount(
+  ULONG searchToken, TokenCount *pTokenCounts, ULONG numTokenCounts);
 
 ///
 /// Public function implementations
 #define ERR_MSG_BUF_SIZE 512
-BOOL renameFiles(FileNodes* pFilesList,
-                 struct List* pNotifications,
-                 BOOL doSkipIcons)
+BOOL renameFiles(
+  FileNodes *pFilesList, struct List *pNotifications, BOOL doSkipIcons)
 {
-  struct Node* pNode;
-  FileNode* pFileNode;
+  struct Node *pNode;
+  FileNode *pFileNode;
   BPTR pLock;
   BOOL wasCompletelySuccessful = TRUE;
-  char oldIconName[128];  // Safe size, more than max file name length of 107
+  char oldIconName[128]; // Safe size, more than max file name length of 107
   char newIconName[128];
   char errMsgBuf[ERR_MSG_BUF_SIZE];
 
@@ -40,13 +37,13 @@ BOOL renameFiles(FileNodes* pFilesList,
   {
     return FALSE;
   }
-  
 
-  for(pNode = pFilesList->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFilesList->pList->lh_Head; pNode->ln_Succ;
+       pNode = pNode->ln_Succ)
   {
-    pFileNode = (FileNode*)pNode;
+    pFileNode = (FileNode *)pNode;
 
-    if(!doSkipIcons)
+    if (!doSkipIcons)
     {
       // Check if the file has an icon (.info file) NOTE: `oldIconName`
       // is bigger (PATH BUF SIZE) than a "file name" + ".info" ever can
@@ -55,31 +52,28 @@ BOOL renameFiles(FileNodes* pFilesList,
       strcat(oldIconName, ".info");
       strcpy(newIconName, pFileNode->NewName);
       strcat(newIconName, ".info");
-      if((pLock = Lock(oldIconName, EXCLUSIVE_LOCK)))
+      if ((pLock = Lock(oldIconName, EXCLUSIVE_LOCK)))
       {
         UnLock(pLock);
-        // Printf("  Found icon, renaming it: '%s' ==> '%s'\n", oldIconName, newIconName);
-        if(!Rename(oldIconName, newIconName))
+        // Printf("  Found icon, renaming it: '%s' ==> '%s'\n", oldIconName,
+        // newIconName);
+        if (!Rename(oldIconName, newIconName))
         {
           Fault(IoErr(), newIconName, errMsgBuf, ERR_MSG_BUF_SIZE);
-          addNotification(pNotifications,
-                          NNT_RENAME_FAILED,
-                          errMsgBuf);
+          addNotification(pNotifications, NNT_RENAME_FAILED, errMsgBuf);
           wasCompletelySuccessful = FALSE;
         }
       }
     }
 
-    if(Rename(pFileNode->OriginalName, pFileNode->NewName))
+    if (Rename(pFileNode->OriginalName, pFileNode->NewName))
     {
       Remove(pNode);
     }
     else
     {
       Fault(IoErr(), pFileNode->NewName, errMsgBuf, ERR_MSG_BUF_SIZE);
-      addNotification(pNotifications,
-                      NNT_RENAME_FAILED,
-                      errMsgBuf);
+      addNotification(pNotifications, NNT_RENAME_FAILED, errMsgBuf);
       wasCompletelySuccessful = FALSE;
     }
   }
@@ -87,17 +81,16 @@ BOOL renameFiles(FileNodes* pFilesList,
   return wasCompletelySuccessful;
 }
 
-
-TokenCount* createTokenCounts(ULONG fileCount)
+TokenCount *createTokenCounts(ULONG fileCount)
 {
-  TokenCount* pTokenCounts;
+  TokenCount *pTokenCounts;
 
-  if(fileCount < 1)
+  if (fileCount < 1)
   {
     return NULL;
   }
 
-  if(!(pTokenCounts = AllocVec(fileCount * sizeof(TokenCount), MEMF_CLEAR)))
+  if (!(pTokenCounts = AllocVec(fileCount * sizeof(TokenCount), MEMF_CLEAR)))
   {
     return NULL;
   }
@@ -105,10 +98,9 @@ TokenCount* createTokenCounts(ULONG fileCount)
   return pTokenCounts;
 }
 
-
-void freeTokenCounts(TokenCount* pTokenCounts)
+void freeTokenCounts(TokenCount *pTokenCounts)
 {
-  if(!pTokenCounts)
+  if (!pTokenCounts)
   {
     return;
   }
@@ -116,50 +108,48 @@ void freeTokenCounts(TokenCount* pTokenCounts)
   FreeVec(pTokenCounts);
 }
 
-void fillTokenOccurrences(FileNodes* pFiles,
-                          TokenCount* pTokenCounts,
-                          ULONG numTokenCounts)
+void fillTokenOccurrences(
+  FileNodes *pFiles, TokenCount *pTokenCounts, ULONG numTokenCounts)
 {
-  struct Node* pNode;
-  FileNode* pFileNode;
-  TokenCount* pTokenCount;
+  struct Node *pNode;
+  FileNode *pFileNode;
+  TokenCount *pTokenCount;
 
   if (!pFiles || !pFiles->pList || !pTokenCounts || numTokenCounts < 1)
   {
     return;
   }
 
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pFileNode = (FileNode*)pNode;
+    pFileNode = (FileNode *)pNode;
 
-    if ((pTokenCount = findTokenCount(pFileNode->NewNameToken,
-                                      pTokenCounts,
-                                      numTokenCounts)))
+    if ((pTokenCount = findTokenCount(
+           pFileNode->NewNameToken, pTokenCounts, numTokenCounts)))
     {
       pTokenCount->Count++;
     }
     else
     {
-      if (!(pTokenCount = appendTokenCount(pFileNode->NewNameToken, pTokenCounts, numTokenCounts)))
+      if (!(pTokenCount = appendTokenCount(
+              pFileNode->NewNameToken, pTokenCounts, numTokenCounts)))
       {
-        Printf("Failed to append token count for item '%10du: %s'\n", pFileNode->NewNameToken,
-                                                                      pFileNode->NewName);
+        Printf("Failed to append token count for item '%10du: %s'\n",
+          pFileNode->NewNameToken,
+          pFileNode->NewName);
         continue;
       }
     }
 
     pFileNode->TokenOccurrenceNumber = pTokenCount->Count;
-
   }
 }
 
 ///
 /// Private function implementations
 
-TokenCount *findTokenCount(ULONG searchToken,
-                           TokenCount* pTokenCounts,
-                           ULONG numTokenCounts)
+TokenCount *findTokenCount(
+  ULONG searchToken, TokenCount *pTokenCounts, ULONG numTokenCounts)
 {
   ULONG i;
   for (i = 0; i < numTokenCounts; i++)
@@ -173,9 +163,8 @@ TokenCount *findTokenCount(ULONG searchToken,
   return NULL;
 }
 
-TokenCount *appendTokenCount(ULONG appendToken,
-                             TokenCount* pTokenCounts,
-                             ULONG numTokenCounts)
+TokenCount *appendTokenCount(
+  ULONG appendToken, TokenCount *pTokenCounts, ULONG numTokenCounts)
 {
   ULONG i;
 

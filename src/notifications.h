@@ -18,24 +18,22 @@ typedef enum NotificationNodeType
   NNT_RENAME_FAILED,
 } NotificationNodeType;
 
+struct List *createNotificationList(void);
+void freeNotificationList(struct List *pList);
 
-struct List* createNotificationList(void);
-void freeNotificationList(struct List* pList);
+void addNotification(
+  struct List *pList, NotificationNodeType type, STRPTR pItem1Text);
 
-void addNotification(struct List* pList,
-                     NotificationNodeType type,
-                     STRPTR pItem1Text);
+void clearNotifications(struct List *pList);
+void clearNotificationsExcept(
+  struct List *pList, NotificationNodeType exceptType);
+void printNotifications(struct List *pList);
 
-void clearNotifications(struct List* pList);
-void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptType);
-void printNotifications(struct List* pList);
+BOOL containsSkippedNotifications(struct List *pList);
 
-BOOL containsSkippedNotifications(struct List* pList);
+struct Node *findFirstNotificationByType(
+  struct List *pList, NotificationNodeType type);
 
-struct Node* findFirstNotificationByType(struct List* pList,
-                                         NotificationNodeType type);
-
-ULONG getNotificationCountByType(struct List* pList,
-                                 NotificationNodeType type);
+ULONG getNotificationCountByType(struct List *pList, NotificationNodeType type);
 
 #endif

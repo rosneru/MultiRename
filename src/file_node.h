@@ -1,11 +1,11 @@
 #ifndef FILE_NODE_H
 #define FILE_NODE_H
 
-#include <exec/nodes.h>
 #include "date_tools.h"
+#include <exec/nodes.h>
 
 #define MAX_PATH_LEN 2048
-#define MAX_NAME_LEN 107    // 107 maximum in FFS, PFS
+#define MAX_NAME_LEN 107 // 107 maximum in FFS, PFS
 
 typedef struct FileNode
 {
@@ -22,6 +22,5 @@ typedef struct FileNode
   ULONG NewNameToken;
   USHORT TokenOccurrenceNumber;
 } FileNode;
-
 
 #endif

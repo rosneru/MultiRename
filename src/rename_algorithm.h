@@ -1,10 +1,10 @@
 #ifndef RENAME_ALGORITHM_H
 #define RENAME_ALGORITHM_H
 
+#include "file_nodes.h"
+#include "rename_counter.h"
 #include <exec/lists.h>
 #include <exec/types.h>
-#include "rename_counter.h"
-#include "file_nodes.h"
 
 /**
  * Iterates the 'pFilesList'. For every FileNode the content of field
@@ -12,12 +12,12 @@
  * parameters `pNameMask`, `pExtMask` and counter settings.
  *
  */
-BOOL createNewNames(FileNodes* pFiles,
-                    ULONG maxAllowedNameLength,
-                    STRPTR pNameMask,
-                    STRPTR pExtMask,
-                    LONG counterStart,
-                    LONG counterInc,
-                    BYTE counterWidth);
+BOOL createNewNames(FileNodes *pFiles,
+  ULONG maxAllowedNameLength,
+  STRPTR pNameMask,
+  STRPTR pExtMask,
+  LONG counterStart,
+  LONG counterInc,
+  BYTE counterWidth);
 
 #endif

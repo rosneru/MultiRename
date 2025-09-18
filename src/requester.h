@@ -16,11 +16,11 @@
  * window object. When such a message arrives it triggers a redraw of
  * the parent window.
  **/
-long showEasyRequest(Object* pWinObject,
-                     struct Window* pWindow,
-                     char* pTitle,
-                     char* pButtonTexts,
-                     char* pMessage);
+long showEasyRequest(Object *pWinObject,
+  struct Window *pWindow,
+  char *pTitle,
+  char *pButtonTexts,
+  char *pMessage);
 
 /**
  * Allows the user to select one or more files to open and returns a
@@ -34,10 +34,9 @@ long showEasyRequest(Object* pWinObject,
  * Intuition window. When such a message arrives it triggers a redraw of
  * the parent window.
  */
-struct FileRequester* showMultiFileSelector(Object* pWinObject,
-                                            struct Window* pParentWindow,
-                                            STRPTR pTitle);
+struct FileRequester *showMultiFileSelector(
+  Object *pWinObject, struct Window *pParentWindow, STRPTR pTitle);
 
-void freeMultiFileSelector(struct FileRequester* pFileRequester);
+void freeMultiFileSelector(struct FileRequester *pFileRequester);
 
 #endif

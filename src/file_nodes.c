@@ -18,15 +18,14 @@
 #endif
 // clang-format on
 
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
-#include "notifications.h"
 #include "file_tools.h"
+#include "notifications.h"
 #include "string_tools.h"
 
 #include "file_nodes.h"
-
 
 /// D_S macro definition
 
@@ -41,10 +40,10 @@
  * storage duration and align the requested object manually within the
  * memory obtained this way. The D_S macro (see below) performs this
  * trick.
- * 
+ *
  * It is used as follows:
  *     `D_S (struct FileInfoBlock, fib);`
- * 
+ *
  * At this point, fib is a pointer to a properly aligned struct
  * FileInfoBlock, e.g. this is equivalent to
  *     `struct FileInfoBlock _tmp;`
@@ -52,66 +51,60 @@
  * Except that the created pointer is properly aligned and can safely be
  * passed into the dos.library.
  */
-#define D_S(type,name) char a_##name[sizeof(type)+3]; \
-                       type *name = (type *)((ULONG)(a_##name+3) & ~3UL)
-
+#define D_S(type, name)                                                        \
+  char a_##name[sizeof(type) + 3];                                             \
+  type *name = (type *)((ULONG)(a_##name + 3) & ~3UL)
 
 ///
 /// Private function implementations
 
-struct Node* createFileNode(struct Locale* pLocale,
-                            BPTR pLock,
-                            STRPTR pFileName,
-                            struct List* pNotifications)
+struct Node *createFileNode(struct Locale *pLocale,
+  BPTR pLock,
+  STRPTR pFileName,
+  struct List *pNotifications)
 {
   STRPTR pNameStart, pLastDotPosition, pSizeValue;
   char sizeBuf[4];
   ULONG pathLen, nameLen;
   struct Node *pNode;
-  FileNode* pFileNode;
-  D_S(struct FileInfoBlock, pFib);  // See explanation of D_S macro above.
+  FileNode *pFileNode;
+  D_S(struct FileInfoBlock, pFib); // See explanation of D_S macro above.
 
   // Skip Workbench icons (.info files)
   nameLen = strlen(pFileName);
-  if(nameLen > 4)
+  if (nameLen > 4)
   {
-    if(pFileName[nameLen-1] == 'o'
-    && pFileName[nameLen-2] == 'f'
-    && pFileName[nameLen-3] == 'n'
-    && pFileName[nameLen-4] == 'i'
-    && pFileName[nameLen-5] == '.')
+    if (pFileName[nameLen - 1] == 'o' && pFileName[nameLen - 2] == 'f'
+      && pFileName[nameLen - 3] == 'n' && pFileName[nameLen - 4] == 'i'
+      && pFileName[nameLen - 5] == '.')
     {
       return NULL;
     }
   }
 
   // Remove trailing slash (to allow also directories to be processed)
-  if(pFileName[nameLen-1] == '/')
+  if (pFileName[nameLen - 1] == '/')
   {
-    pFileName[nameLen-1] = '\0';
+    pFileName[nameLen - 1] = '\0';
   }
 
-  if(DOSFALSE == Examine(pLock, pFib))
+  if (DOSFALSE == Examine(pLock, pFib))
   {
-    addNotification(pNotifications,
-                    NNT_SKIPPED_FAILED_EXAMINE,
-                    pFileName);
+    addNotification(pNotifications, NNT_SKIPPED_FAILED_EXAMINE, pFileName);
     return NULL;
   }
 
-  if(pFib->fib_DirEntryType < 0)
+  if (pFib->fib_DirEntryType < 0)
   {
     pSizeValue = "";
   }
-  else if(pFib->fib_DirEntryType > 0)
+  else if (pFib->fib_DirEntryType > 0)
   {
     pSizeValue = "DIR";
   }
   else
   {
-    addNotification(pNotifications,
-                    NNT_SKIPPED_LINKS_NOT_SUPPORTED,
-                    pFileName);
+    addNotification(pNotifications, NNT_SKIPPED_LINKS_NOT_SUPPORTED, pFileName);
     return NULL;
   }
 
@@ -138,11 +131,11 @@ struct Node* createFileNode(struct Locale* pLocale,
 
   if (pNode)
   {
-    pFileNode = (FileNode*) pNode;
+    pFileNode = (FileNode *)pNode;
 
     // Get path and file name of given file
     pathLen = PathPart(pFileName) - pFileName;
-    if(pathLen > MAX_PATH_LEN)
+    if (pathLen > MAX_PATH_LEN)
     {
       // TODO: Notify truncation
       pathLen = MAX_PATH_LEN;
@@ -154,30 +147,28 @@ struct Node* createFileNode(struct Locale* pLocale,
     pNameStart = FilePart(pFileName);
     strcpy(pFileNode->OriginalName, pNameStart);
 
-    if((pLastDotPosition = strrchr(pNameStart, '.')))
+    if ((pLastDotPosition = strrchr(pNameStart, '.')))
     {
       pFileNode->OriginalNameLen = pLastDotPosition - pNameStart;
       pFileNode->OriginalExtLen = strlen(pFileNode->OriginalName
-        + pFileNode->OriginalNameLen
-        + 1); // +1 for the dot '.'
+        + pFileNode->OriginalNameLen + 1); // +1 for the dot '.'
     }
     else
     {
       pFileNode->OriginalNameLen = strlen(pNameStart);
       pFileNode->OriginalExtLen = 0;
     }
-      
-    if(!fillDateTimeParts(pLocale, &pFib->fib_Date, &pFileNode->OriginalDate))
+
+    if (!fillDateTimeParts(pLocale, &pFib->fib_Date, &pFileNode->OriginalDate))
     {
       FreeListBrowserNode(pNode);
-      addNotification(pNotifications,
-                      NNT_SKIPPED_FAILED_DATETIMEPARTS,
-                      pFileName);
+      addNotification(
+        pNotifications, NNT_SKIPPED_FAILED_DATETIMEPARTS, pFileName);
       return NULL;
     }
 
-    pFileNode->OriginalNameToken = createStringToken(pFileNode->OriginalName,
-                                                    pFileNode->OriginalNameLen);
+    pFileNode->OriginalNameToken =
+      createStringToken(pFileNode->OriginalName, pFileNode->OriginalNameLen);
 
     // clang-format off
     SetListBrowserNodeAttrs(pNode,
@@ -202,20 +193,20 @@ struct Node* createFileNode(struct Locale* pLocale,
 ///
 /// Public function implementations
 
-void freeFileNode(struct Node* pNode)
+void freeFileNode(struct Node *pNode)
 {
   FreeListBrowserNode(pNode);
 }
 
-FileNodes* createFileNodes(void)
+FileNodes *createFileNodes(void)
 {
-  FileNodes* pFiles;
-  if(!(pFiles = AllocVec(sizeof(FileNodes), MEMF_CLEAR)))
+  FileNodes *pFiles;
+  if (!(pFiles = AllocVec(sizeof(FileNodes), MEMF_CLEAR)))
   {
     return NULL;
   }
 
-  if(!(pFiles->pList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
+  if (!(pFiles->pList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
   {
     freeFileNodes(pFiles);
     return NULL;
@@ -225,25 +216,25 @@ FileNodes* createFileNodes(void)
   return pFiles;
 }
 
-void freeFileNodes(FileNodes* pFiles)
+void freeFileNodes(FileNodes *pFiles)
 {
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
+  struct Node *pWorkNode;
+  struct Node *pNextNode;
 
-  if(!pFiles)
+  if (!pFiles)
   {
     return;
   }
 
-  if(pFiles->DirLock)
+  if (pFiles->DirLock)
   {
     UnLock(pFiles->DirLock);
   }
 
-  if(pFiles->pList)
+  if (pFiles->pList)
   {
     pWorkNode = pFiles->pList->lh_Head;
-    while((pNextNode = pWorkNode->ln_Succ))
+    while ((pNextNode = pWorkNode->ln_Succ))
     {
       FreeListBrowserNode(pWorkNode);
       pWorkNode = pNextNode;
@@ -255,15 +246,15 @@ void freeFileNodes(FileNodes* pFiles)
   FreeVec(pFiles);
 }
 
-BPTR getFilesDirLock(FileNodes* pFiles)
+BPTR getFilesDirLock(FileNodes *pFiles)
 {
   return pFiles->DirLock;
 }
 
-BOOL setFilesDirLock(FileNodes* pFiles, BPTR pFilesDirLock)
+BOOL setFilesDirLock(FileNodes *pFiles, BPTR pFilesDirLock)
 {
   BOOL result;
-  if(pFiles->DirLock)
+  if (pFiles->DirLock)
   {
     UnLock(pFiles->DirLock);
   }
@@ -273,40 +264,40 @@ BOOL setFilesDirLock(FileNodes* pFiles, BPTR pFilesDirLock)
   return result;
 }
 
-char* getFilesDirPath(FileNodes* pFiles)
+char *getFilesDirPath(FileNodes *pFiles)
 {
   return pFiles->DirPath;
 }
 
-ULONG countFileNodes(FileNodes* pFiles)
+ULONG countFileNodes(FileNodes *pFiles)
 {
   ULONG count = 0;
-  struct Node* pNode;
+  struct Node *pNode;
 
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-      count++;
+    count++;
   }
 
   return count;
 }
 
-FileNode* getLongestOldNameNode(FileNodes* pFiles)
+FileNode *getLongestOldNameNode(FileNodes *pFiles)
 {
-  struct Node* pNode;
-  FileNode* pFileNode;
-  FileNode* pMaxLengthNode = NULL;
+  struct Node *pNode;
+  FileNode *pFileNode;
+  FileNode *pMaxLengthNode = NULL;
   ULONG maxLength = 0;
 
-  if(!pFiles->pList)
+  if (!pFiles->pList)
   {
     return NULL;
   }
 
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pFileNode = (FileNode*)pNode;
-    if(pFileNode->OriginalNameLen > maxLength)
+    pFileNode = (FileNode *)pNode;
+    if (pFileNode->OriginalNameLen > maxLength)
     {
       maxLength = pFileNode->OriginalNameLen;
       pMaxLengthNode = pFileNode;
@@ -316,22 +307,22 @@ FileNode* getLongestOldNameNode(FileNodes* pFiles)
   return pMaxLengthNode;
 }
 
-FileNode* getLongestOldExtNode(FileNodes* pFiles)
+FileNode *getLongestOldExtNode(FileNodes *pFiles)
 {
-  struct Node* pNode;
-  FileNode* pFileNode;
-  FileNode* pMaxLengthNode = NULL;
+  struct Node *pNode;
+  FileNode *pFileNode;
+  FileNode *pMaxLengthNode = NULL;
   ULONG maxLength = 0;
 
-  if(!pFiles->pList)
+  if (!pFiles->pList)
   {
     return NULL;
   }
 
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pFileNode = (FileNode*)pNode;
-    if(pFileNode->OriginalExtLen > maxLength)
+    pFileNode = (FileNode *)pNode;
+    if (pFileNode->OriginalExtLen > maxLength)
     {
       maxLength = pFileNode->OriginalExtLen;
       pMaxLengthNode = pFileNode;
@@ -341,87 +332,83 @@ FileNode* getLongestOldExtNode(FileNodes* pFiles)
   return pMaxLengthNode;
 }
 
-void printFileListOriginalName(FileNodes* pFiles)
+void printFileListOriginalName(FileNodes *pFiles)
 {
-  struct Node* pNode;
-  FileNode* pFileNode;
+  struct Node *pNode;
+  FileNode *pFileNode;
   printf("** Original file list **\n");
   printf("Name                                   |date\n");
-  printf("=======================================|=======================================\n");
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  printf("=======================================|============================="
+         "==========\n");
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pFileNode = (FileNode*)pNode;
-    printf("%-39s|%s-%s-%s, %s:%s:%s\n", pFileNode->OriginalName,
-                                         pFileNode->OriginalDate.pYear,
-                                         pFileNode->OriginalDate.pMonth,
-                                         pFileNode->OriginalDate.pDay,
-                                         pFileNode->OriginalDate.pHour,
-                                         pFileNode->OriginalDate.pMinute,
-                                         pFileNode->OriginalDate.pSecond);
+    pFileNode = (FileNode *)pNode;
+    printf("%-39s|%s-%s-%s, %s:%s:%s\n",
+      pFileNode->OriginalName,
+      pFileNode->OriginalDate.pYear,
+      pFileNode->OriginalDate.pMonth,
+      pFileNode->OriginalDate.pDay,
+      pFileNode->OriginalDate.pHour,
+      pFileNode->OriginalDate.pMinute,
+      pFileNode->OriginalDate.pSecond);
   }
 
   printf("\n\n");
 }
 
-
-void printFileListNewName(FileNodes* pFiles)
+void printFileListNewName(FileNodes *pFiles)
 {
-  struct Node* pNode;
-  FileNode* pFileNode;
+  struct Node *pNode;
+  FileNode *pFileNode;
   printf("New name list\n");
   printf("=============\n");
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pFileNode = (FileNode*)pNode;
+    pFileNode = (FileNode *)pNode;
     printf("  %s\n", pFileNode->NewName);
   }
 
   printf("\n");
 }
 
-BOOL appendFileNode(FileNodes* pFiles,
-                    STRPTR pFileFullPath,
-                    struct Locale* pLocale,
-                    struct List* pNotifications)
+BOOL appendFileNode(FileNodes *pFiles,
+  STRPTR pFileFullPath,
+  struct Locale *pLocale,
+  struct List *pNotifications)
 {
   BPTR pLock;
   struct Node *pNode;
   STRPTR pWorkingPath;
 
-  if(!pFiles || !pFiles->pList || !pFileFullPath || !pNotifications)
+  if (!pFiles || !pFiles->pList || !pFileFullPath || !pNotifications)
   {
     return FALSE;
   }
 
-  if(!(pLock = lockFromLongName(pFileFullPath)))
+  if (!(pLock = lockFromLongName(pFileFullPath)))
   {
-    addNotification(pNotifications,
-                    NNT_SKIPPED_FAILED_LOCK,
-                    pFileFullPath);
+    addNotification(pNotifications, NNT_SKIPPED_FAILED_LOCK, pFileFullPath);
     return FALSE;
   }
 
-  if(!(pNode = createFileNode(pLocale, pLock, pFileFullPath, pNotifications)))
+  if (!(pNode = createFileNode(pLocale, pLock, pFileFullPath, pNotifications)))
   {
     return FALSE;
   }
 
-  if(isOriginalNameNodeAlreadyInFileNodesList(pFiles, (FileNode*)pNode))
+  if (isOriginalNameNodeAlreadyInFileNodesList(pFiles, (FileNode *)pNode))
   {
-    addNotification(pNotifications,
-                    NNT_SKIPPED_DUPLICATE,
-                    ((FileNode*)pNode)->OriginalName);
+    addNotification(
+      pNotifications, NNT_SKIPPED_DUPLICATE, ((FileNode *)pNode)->OriginalName);
     freeFileNode(pNode);
     return FALSE;
   }
-  
-  if((pWorkingPath = getFirstFilePath(pFiles))
-  && (strcmp(((FileNode*)pNode)->Path, pWorkingPath) != 0))
+
+  if ((pWorkingPath = getFirstFilePath(pFiles))
+    && (strcmp(((FileNode *)pNode)->Path, pWorkingPath) != 0))
   {
     // This file has a different path as the former ones: skip it
-    addNotification(pNotifications,
-                    NNT_SKIPPED_WRONG_PATH,
-                    pFileFullPath);
+    addNotification(pNotifications, NNT_SKIPPED_WRONG_PATH, pFileFullPath);
     freeFileNode(pNode);
     return FALSE;
   }
@@ -432,15 +419,17 @@ BOOL appendFileNode(FileNodes* pFiles,
   return TRUE;
 }
 
-BOOL isOriginalNameNodeAlreadyInFileNodesList(FileNodes* pFiles, FileNode* pNodeToCheck)
+BOOL isOriginalNameNodeAlreadyInFileNodesList(
+  FileNodes *pFiles, FileNode *pNodeToCheck)
 {
-  struct Node* pNode;
-  
-  // Check if a node with the file name of the newly created node 
+  struct Node *pNode;
+
+  // Check if a node with the file name of the newly created node
   // already is in the list (true if the tokens match).
-  for(pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    if(((FileNode*)pNode)->OriginalNameToken == pNodeToCheck->OriginalNameToken)
+    if (((FileNode *)pNode)->OriginalNameToken
+      == pNodeToCheck->OriginalNameToken)
     {
       return TRUE;
     }
@@ -449,14 +438,14 @@ BOOL isOriginalNameNodeAlreadyInFileNodesList(FileNodes* pFiles, FileNode* pNode
   return FALSE;
 }
 
-STRPTR getFirstFilePath(FileNodes* pFiles)
+STRPTR getFirstFilePath(FileNodes *pFiles)
 {
-  if(NULL == pFiles->pList->lh_Head->ln_Succ)
+  if (NULL == pFiles->pList->lh_Head->ln_Succ)
   {
     return NULL;
   }
 
-  return ((FileNode*)pFiles->pList->lh_Head)->Path;
+  return ((FileNode *)pFiles->pList->lh_Head)->Path;
 }
 
 ///

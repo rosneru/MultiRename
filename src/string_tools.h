@@ -6,7 +6,7 @@
 /**
  * Calculate and return a Token (numeric representation of the string)
  */
-ULONG createStringToken(const char* pStr, ULONG strLength);
+ULONG createStringToken(const char *pStr, ULONG strLength);
 
 /**
  * Appends numChars of string `pSrc` to destination buffer `pDest` and
@@ -23,10 +23,10 @@ ULONG createStringToken(const char* pStr, ULONG strLength);
  * Returns TRUE if truncation was done, otherwise FALSE.
  */
 BOOL appendString(STRPTR pDest,
-                  ULONG destSize,
-                  ULONG* pNewDestLen,
-                  STRPTR pSrc,
-                  ULONG numChars);
+  ULONG destSize,
+  ULONG *pNewDestLen,
+  STRPTR pSrc,
+  ULONG numChars);
 
 /**
  * Fill given `pDestBuf` with `pSrcStr` with `pStrToInsert` inserted at
@@ -39,8 +39,8 @@ BOOL appendString(STRPTR pDest,
  * -1 on error.
  */
 int insertString(const STRPTR pSrcStr,
-                 STRPTR pStrToInsert,
-                 ULONG insertPos,
-                 STRPTR pDestBuf,
-                 ULONG destBufSize);
+  STRPTR pStrToInsert,
+  ULONG insertPos,
+  STRPTR pDestBuf,
+  ULONG destBufSize);
 #endif

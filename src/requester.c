@@ -17,14 +17,14 @@
 
 #include "requester.h"
 
-long showEasyRequest(Object* pWinObject,
-                     struct Window* pWindow,
-                     char* pTitle,
-                     char* pButtonTexts,
-                     char* pMessage)
+long showEasyRequest(Object *pWinObject,
+  struct Window *pWindow,
+  char *pTitle,
+  char *pButtonTexts,
+  char *pMessage)
 {
   ULONG requestWindowFlags = 0, activeWindowFlags = 0;
-  struct Window* pRequesterWindow;
+  struct Window *pRequesterWindow;
   struct Requester sleepRequester;
   ULONG code, result;
   long selected = -1;
@@ -37,8 +37,7 @@ long showEasyRequest(Object* pWinObject,
   // this way it can be detected if e.g. the requester parent window has
   // been resized; and it can be repainted.
   //
-  struct EasyStruct easyStruct =
-  {
+  struct EasyStruct easyStruct = {
     sizeof(struct EasyStruct),
     0,
   };
@@ -47,11 +46,11 @@ long showEasyRequest(Object* pWinObject,
   easyStruct.es_TextFormat = pMessage;
   easyStruct.es_GadgetFormat = pButtonTexts;
 
-  if(!(pRequesterWindow = BuildEasyRequestArgs(pWindow, &easyStruct, 0, NULL)))
+  if (!(pRequesterWindow = BuildEasyRequestArgs(pWindow, &easyStruct, 0, NULL)))
   {
     return -1;
   }
-  
+
   // Block the window that this requester is tied to
   InitRequester(&sleepRequester);
   Request(&sleepRequester, pWindow);
@@ -71,11 +70,11 @@ long showEasyRequest(Object* pWinObject,
       {
         switch (result & WMHI_CLASSMASK)
         {
-          case WMHI_NEWSIZE:
-          {
-            DoMethod(pWinObject, WM_RETHINK);
-            break;
-          }
+        case WMHI_NEWSIZE:
+        {
+          DoMethod(pWinObject, WM_RETHINK);
+          break;
+        }
         }
       }
     }
@@ -85,8 +84,7 @@ long showEasyRequest(Object* pWinObject,
       selected = SysReqHandler(pRequesterWindow, NULL, FALSE);
     }
 
-  }
-  while (selected < 0);
+  } while (selected < 0);
 
   FreeSysRequest(pRequesterWindow);
 
@@ -97,34 +95,32 @@ long showEasyRequest(Object* pWinObject,
   return selected;
 }
 
-
 void __ASM__ __SAVE_DS__ IntuiMsgFunc(__REG__(a0, struct Hook *pHook),
-                                      __REG__(a2, struct FileRequester *pRequester),
-                                      __REG__(a1, struct IntuiMessage *pMsg))
+  __REG__(a2, struct FileRequester *pRequester),
+  __REG__(a1, struct IntuiMessage *pMsg))
 {
-  Object* pWinObject = (Object*)pHook->h_Data;
+  Object *pWinObject = (Object *)pHook->h_Data;
 
   switch (pMsg->Class)
   {
-    // One of the windows has been resized
-    case IDCMP_NEWSIZE:
-    {
-      DoMethod(pWinObject, WM_RETHINK);
-      break;
-    }
+  // One of the windows has been resized
+  case IDCMP_NEWSIZE:
+  {
+    DoMethod(pWinObject, WM_RETHINK);
+    break;
+  }
   }
 }
 
 struct Hook m_IntuiMsgHook;
 
-struct FileRequester* showMultiFileSelector(Object* pWinObject,
-                                            struct Window* pParentWindow,
-                                            STRPTR pTitle)
+struct FileRequester *showMultiFileSelector(
+  Object *pWinObject, struct Window *pParentWindow, STRPTR pTitle)
 {
   struct Requester sleepRequester;
-  struct FileRequester* pFileRequest;
+  struct FileRequester *pFileRequest;
 
-  m_IntuiMsgHook.h_Entry = (ULONG (* )())IntuiMsgFunc;
+  m_IntuiMsgHook.h_Entry = (ULONG(*)())IntuiMsgFunc;
   m_IntuiMsgHook.h_SubEntry = NULL;
   m_IntuiMsgHook.h_Data = pWinObject;
 
@@ -132,17 +128,17 @@ struct FileRequester* showMultiFileSelector(Object* pWinObject,
 
   // clang-format off
   pFileRequest = (struct FileRequester*) AllocAslRequestTags(ASL_FileRequest,
-      ASLFR_TitleText, (ULONG) pTitle,
-      // ASLFR_InitialDrawer, (ULONG) initialPath.c_str(),
-      // ASLFR_InitialFile, (ULONG) initialFile.c_str(),
-      ASLFR_Window, (ULONG) pParentWindow,
-      ASLFR_RejectIcons, TRUE,
-      ASLFR_DoMultiSelect, TRUE,
-      ASLFR_IntuiMsgFunc, (ULONG)&m_IntuiMsgHook,
-      TAG_DONE);
+    ASLFR_TitleText, (ULONG) pTitle,
+    // ASLFR_InitialDrawer, (ULONG) initialPath.c_str(),
+    // ASLFR_InitialFile, (ULONG) initialFile.c_str(),
+    ASLFR_Window, (ULONG) pParentWindow,
+    ASLFR_RejectIcons, TRUE,
+    ASLFR_DoMultiSelect, TRUE,
+    ASLFR_IntuiMsgFunc, (ULONG)&m_IntuiMsgHook,
+    TAG_DONE);
   // clang-format on
 
-  if(!pFileRequest)
+  if (!pFileRequest)
   {
     // Data struct allocation failed
     return NULL;
@@ -154,7 +150,7 @@ struct FileRequester* showMultiFileSelector(Object* pWinObject,
   SetWindowPointer(pParentWindow, WA_BusyPointer, TRUE, TAG_DONE);
 
   // Open the file requester and wait until the user selected a file
-  if(AslRequestTags(pFileRequest, TAG_DONE) == FALSE)
+  if (AslRequestTags(pFileRequest, TAG_DONE) == FALSE)
   {
     FreeAslRequest((APTR)pFileRequest);
     pFileRequest = NULL;
@@ -167,9 +163,9 @@ struct FileRequester* showMultiFileSelector(Object* pWinObject,
   return pFileRequest;
 }
 
-void freeMultiFileSelector(struct FileRequester* pFileRequester)
+void freeMultiFileSelector(struct FileRequester *pFileRequester)
 {
-  if(!pFileRequester)
+  if (!pFileRequester)
   {
     return;
   }

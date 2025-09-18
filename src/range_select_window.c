@@ -52,47 +52,46 @@
 
 #include "range_select_window.h"
 
-
 /*
- * Applies fromLevel and toLevel into RangeSelectWindow data struct and 
+ * Applies fromLevel and toLevel into RangeSelectWindow data struct and
  * displays the result string in the string gadget
  */
-static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel);
+static void createResult(
+  RangeSelectWindow *pRsw, ULONG fromLevel, ULONG toLevel);
 
 /**
  * Handle the gadget events for this window. R
  */
-static void handleGadgets(RangeSelectWindow* pThis, ULONG result);
+static void handleGadgets(RangeSelectWindow *pThis, ULONG result);
 
 enum gadids
 {
-    GID_STRING_INPUT = 1
-  , GID_LABEL_LONGEST_ITEM
-  , GID_STRING_RESULT_NAME
-  , GID_STRING_RESULT_MASK
-  , GID_SLI_FROM
-  , GID_SLI_TO
-  , GID_BTN_OK
-  , GID_BTN_CANCEL
-  , MAXGADGETS
+  GID_STRING_INPUT = 1,
+  GID_LABEL_LONGEST_ITEM,
+  GID_STRING_RESULT_NAME,
+  GID_STRING_RESULT_MASK,
+  GID_SLI_FROM,
+  GID_SLI_TO,
+  GID_BTN_OK,
+  GID_BTN_CANCEL,
+  MAXGADGETS
 };
 
-static Object* m_ppGadgets[MAXGADGETS];
+static Object *m_ppGadgets[MAXGADGETS];
 static Object *pMainLayout;
 struct Hook m_SlidersHook;
-
 
 /// Hook implementations
 
 void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
-                                        __REG__(a2, Object *pWindow),
-                                        __REG__(a1, struct Message *pMsg))
+  __REG__(a2, Object *pWindow),
+  __REG__(a1, struct Message *pMsg))
 {
   ULONG fromLevel;
   ULONG toLevel;
-  RangeSelectWindow* pRsw = (RangeSelectWindow*)pHook->h_Data;
+  RangeSelectWindow *pRsw = (RangeSelectWindow *)pHook->h_Data;
 
-  if(!pRsw->pRangeMask)
+  if (!pRsw->pRangeMask)
   {
     return;
   }
@@ -100,7 +99,7 @@ void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
   GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_FROM], &fromLevel);
   GetAttr(SLIDER_Level, m_ppGadgets[GID_SLI_TO], &toLevel);
 
-  if(fromLevel <= toLevel)
+  if (fromLevel <= toLevel)
   {
     createResult(pRsw, fromLevel, toLevel);
   }
@@ -108,17 +107,17 @@ void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
 
 /// Public function implementations
 
-RangeSelectWindow* createRangeSelectWindow(void)
+RangeSelectWindow *createRangeSelectWindow(void)
 {
-  Object* pMainLayout;
+  Object *pMainLayout;
 
-  RangeSelectWindow* pRsw;
-  if(!(pRsw = AllocVec(sizeof(RangeSelectWindow), MEMF_CLEAR)))
+  RangeSelectWindow *pRsw;
+  if (!(pRsw = AllocVec(sizeof(RangeSelectWindow), MEMF_CLEAR)))
   {
     return NULL;
   }
 
-  m_SlidersHook.h_Entry = (ULONG (* )())SlidersMsgFunc;
+  m_SlidersHook.h_Entry = (ULONG (*)())SlidersMsgFunc;
   m_SlidersHook.h_SubEntry = NULL;
   m_SlidersHook.h_Data = pRsw;
 
@@ -207,7 +206,7 @@ RangeSelectWindow* createRangeSelectWindow(void)
   TAG_DONE);
   // clang-format on
 
-  if(!pMainLayout)
+  if (!pMainLayout)
   {
     return NULL;
   }
@@ -233,77 +232,80 @@ RangeSelectWindow* createRangeSelectWindow(void)
 STRPTR pWindowTitleSelectName = "MultiRename: Select name part";
 STRPTR pWindowTitleSelectExtension = "MultiRename: Select extension part";
 
-BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
-                           struct Window* pParentIntuiWin,
-                           ULONG* pParentSigMask,
-                           RangeMask* pRangeMask,
-                           STRPTR pLongestName,
-                           ULONG longestNameLen)
+BOOL openRangeSelectWindow(RangeSelectWindow *pRsw,
+  struct Window *pParentIntuiWin,
+  ULONG *pParentSigMask,
+  RangeMask *pRangeMask,
+  STRPTR pLongestName,
+  ULONG longestNameLen)
 {
   STRPTR pWindowTitle;
 
-  if(!pRsw || !pRsw->pWinObject || !pParentSigMask || !pRangeMask)
+  if (!pRsw || !pRsw->pWinObject || !pParentSigMask || !pRangeMask)
   {
     return FALSE;
   }
 
-  if(pRsw->WindowState == RSW_STATE_IS_OPEN)
+  if (pRsw->WindowState == RSW_STATE_IS_OPEN)
   {
     // Only allow one range select window at a time
     return FALSE;
   }
 
-
+  // clang-format off
   SetAttrs(pRsw->pWinObject,
-           WA_Left, pParentIntuiWin->LeftEdge + 50,
-           WA_Top, pParentIntuiWin->TopEdge + 30,
-           TAG_DONE);
+    WA_Left, pParentIntuiWin->LeftEdge + 50,
+    WA_Top, pParentIntuiWin->TopEdge + 30,
+    TAG_DONE);
+  // clang-format on
 
-  switch(pRangeMask->RequestedRangeType)
+  switch (pRangeMask->RequestedRangeType)
   {
-    case RRT_NAME:
-      pWindowTitle = pWindowTitleSelectName;
+  case RRT_NAME:
+    pWindowTitle = pWindowTitleSelectName;
 
-      // Create a copy of the input string 'pLongestName' with no extension
-      strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
-      break;
-    case RRT_EXTENSION:
-      pWindowTitle = pWindowTitleSelectExtension;
+    // Create a copy of the input string 'pLongestName' with no extension
+    strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
+    break;
+  case RRT_EXTENSION:
+    pWindowTitle = pWindowTitleSelectExtension;
 
-      // Create a copy of the input string 'pLongestName' with no extension
-      strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
-      break;
-    default:
-      return FALSE;
+    // Create a copy of the input string 'pLongestName' with no extension
+    strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
+    break;
+  default:
+    return FALSE;
   }
 
   InitRequester(&pRsw->BlockingReq);
   Request(&pRsw->BlockingReq, pParentIntuiWin);
   SetWindowPointer(pParentIntuiWin, WA_BusyPointer, TRUE, TAG_DONE);
 
-  if(!(pRsw->pIntuiWindow = 
-        (struct Window*) DoMethod(pRsw->pWinObject, WM_OPEN, NULL)))
+  if (!(pRsw->pIntuiWindow =
+          (struct Window *)DoMethod(pRsw->pWinObject, WM_OPEN, NULL)))
   {
     return FALSE;
   }
 
   SetWindowTitles(pRsw->pIntuiWindow, pWindowTitle, (UBYTE *)~0);
 
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_INPUT], pRsw->pIntuiWindow, NULL,
-                 STRINGA_TextVal, (ULONG) pRsw->NameBuf,
-                 TAG_DONE);
+    STRINGA_TextVal, (ULONG) pRsw->NameBuf,
+    TAG_DONE);
 
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_FROM], pRsw->pIntuiWindow, NULL,
-                 SLIDER_Min, 1,
-                 SLIDER_Max, (ULONG)longestNameLen,
-                 SLIDER_Level, 1,
-                 TAG_DONE);
+    SLIDER_Min, 1,
+    SLIDER_Max, (ULONG)longestNameLen,
+    SLIDER_Level, 1,
+    TAG_DONE);
 
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_TO], pRsw->pIntuiWindow, NULL,
-                 SLIDER_Min, 1,
-                 SLIDER_Max, (ULONG)longestNameLen,
-                 SLIDER_Level, (ULONG)longestNameLen,
-                 TAG_DONE);
+      SLIDER_Min, 1,
+      SLIDER_Max, (ULONG)longestNameLen,
+      SLIDER_Level, (ULONG)longestNameLen,
+      TAG_DONE);
+  // clang-format on
 
   pRsw->pRangeMask = pRangeMask;
   pRsw->pParentSigMask = pParentSigMask;
@@ -320,14 +322,13 @@ BOOL openRangeSelectWindow(RangeSelectWindow* pRsw,
   return TRUE;
 }
 
-void closeRangeSelectWindow(RangeSelectWindow* pRsw)
+void closeRangeSelectWindow(RangeSelectWindow *pRsw)
 {
-  if(!pRsw || !pRsw->pWinObject
-  || !pRsw->pIntuiWindow || !pRsw->pParentIntuiWindow)
+  if (!pRsw || !pRsw->pWinObject || !pRsw->pIntuiWindow
+    || !pRsw->pParentIntuiWindow)
   {
     return;
   }
-
 
   // Detach signal mask of this range select window to parent window mask
   *(pRsw->pParentSigMask) &= ~pRsw->SigMask;
@@ -337,32 +338,31 @@ void closeRangeSelectWindow(RangeSelectWindow* pRsw)
 
   SetWindowPointer(pRsw->pParentIntuiWindow, TAG_DONE);
   EndRequest(&pRsw->BlockingReq, pRsw->pParentIntuiWindow);
-
 }
 
-void freeRangeSelectWindow(RangeSelectWindow* pRsw)
+void freeRangeSelectWindow(RangeSelectWindow *pRsw)
 {
-  if(!pRsw)
+  if (!pRsw)
   {
     return;
   }
 
-  if(pRsw->pWinObject)
+  if (pRsw->pWinObject)
   {
     DisposeObject(pRsw->pWinObject);
-    pRsw->pWinObject  = NULL;
+    pRsw->pWinObject = NULL;
   }
 
   FreeVec(pRsw);
 }
 
-
-static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel)
+static void createResult(
+  RangeSelectWindow *pRsw, ULONG fromLevel, ULONG toLevel)
 {
   char commandPartBuf[MAX_RANGE_STRING_LEN + 1];
   STRPTR pInputText;
   ULONG resultLength;
-  if(pRsw == NULL)
+  if (pRsw == NULL)
   {
     return;
   }
@@ -371,58 +371,60 @@ static void createResult(RangeSelectWindow* pRsw, ULONG fromLevel, ULONG toLevel
   pRsw->pRangeMask->RangeTo = toLevel;
 
   resultLength = toLevel - fromLevel + 1;
-  if(resultLength > MAX_NAME_LEN)
+  if (resultLength > MAX_NAME_LEN)
   {
     resultLength = MAX_NAME_LEN;
   }
 
-  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_INPUT], (ULONG*)&pInputText);
+  GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STRING_INPUT], (ULONG *)&pInputText);
   strncpy(pRsw->NameBuf, pInputText + fromLevel - 1, resultLength);
   pRsw->NameBuf[resultLength] = '\0';
 
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_RESULT_NAME], pRsw->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pRsw->NameBuf,
                  TAG_DONE);
+  // clang-format on
 
   createRangeMaskString(pRsw->pRangeMask, commandPartBuf);
 
+  // clang-format off
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STRING_RESULT_MASK], pRsw->pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) commandPartBuf,
                  TAG_DONE);
+  // clang-format on
 }
 
-
-void handleRangeSelectWindowEvents(RangeSelectWindow* pRsw)
+void handleRangeSelectWindowEvents(RangeSelectWindow *pRsw)
 {
   ULONG result;
   ULONG code;
 
-  if(!pRsw || !pRsw->pWinObject 
-  || !pRsw->pIntuiWindow)
+  if (!pRsw || !pRsw->pWinObject || !pRsw->pIntuiWindow)
   {
     return;
   }
 
-  while ((result = DoMethod(pRsw->pWinObject , WM_HANDLEINPUT, &code)))
+  while ((result = DoMethod(pRsw->pWinObject, WM_HANDLEINPUT, &code)))
   {
     switch (result & WMHI_CLASSMASK)
     {
-      case WMHI_CLOSEWINDOW:
-      {
-        closeRangeSelectWindow(pRsw);
-        pRsw->WindowState = RSW_STATE_CANCELLED;
-        break;
-      }
-      case WMHI_GADGETUP:
-      {
-        handleGadgets(pRsw, result);
-        break;
-      }
+    case WMHI_CLOSEWINDOW:
+    {
+      closeRangeSelectWindow(pRsw);
+      pRsw->WindowState = RSW_STATE_CANCELLED;
+      break;
+    }
+    case WMHI_GADGETUP:
+    {
+      handleGadgets(pRsw, result);
+      break;
+    }
     }
   }
 }
 
-static void handleGadgets(RangeSelectWindow* pRsw, ULONG result)
+static void handleGadgets(RangeSelectWindow *pRsw, ULONG result)
 {
   ULONG fromLevel;
   ULONG toLevel;
@@ -432,45 +434,49 @@ static void handleGadgets(RangeSelectWindow* pRsw, ULONG result)
 
   switch ((result & WMHI_GADGETMASK))
   {
-    case GID_SLI_FROM:
+  case GID_SLI_FROM:
+  {
+    if (fromLevel > toLevel)
     {
-      if(fromLevel > toLevel)
-      {
-        fromLevel = toLevel;
+      fromLevel = toLevel;
+
+      // clang-format off
         SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_FROM], pRsw->pIntuiWindow, NULL,
                        SLIDER_Level, (ULONG) fromLevel,
                        TAG_DONE);
-      }
-
-      createResult(pRsw, fromLevel, toLevel);
-      break;
+      // clang-format on
     }
-    case GID_SLI_TO:
+
+    createResult(pRsw, fromLevel, toLevel);
+    break;
+  }
+  case GID_SLI_TO:
+  {
+    if (toLevel < fromLevel)
     {
-      if(toLevel < fromLevel)
-      {
-        toLevel = fromLevel;
+      toLevel = fromLevel;
+
+      // clang-format off
         SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_SLI_TO], pRsw->pIntuiWindow, NULL,
                        SLIDER_Level, (ULONG) toLevel,
                        TAG_DONE);
-      }
-
-      createResult(pRsw, fromLevel, toLevel);
-      break;
-    }
-    case GID_BTN_OK:
-    {
-      pRsw->WindowState = RSW_STATE_ACCEPTED;
-      closeRangeSelectWindow(pRsw);
-      break;
-    }
-    case GID_BTN_CANCEL:
-    {
-      pRsw->WindowState = RSW_STATE_CANCELLED;
-      closeRangeSelectWindow(pRsw);
-      break;
+      // clang-format on
     }
 
-
+    createResult(pRsw, fromLevel, toLevel);
+    break;
+  }
+  case GID_BTN_OK:
+  {
+    pRsw->WindowState = RSW_STATE_ACCEPTED;
+    closeRangeSelectWindow(pRsw);
+    break;
+  }
+  case GID_BTN_CANCEL:
+  {
+    pRsw->WindowState = RSW_STATE_CANCELLED;
+    closeRangeSelectWindow(pRsw);
+    break;
+  }
   }
 }

@@ -19,7 +19,7 @@ typedef enum
   AC_SECOND
 } ActionCommand;
 
-typedef struct 
+typedef struct
 {
   struct Node en_Node;
   ActionCommand Command;
@@ -39,8 +39,7 @@ typedef enum
   PS_NUM_STATES,
 } ParserState;
 
-
-typedef struct 
+typedef struct
 {
   ParserState State;
   struct List ActionList;
@@ -57,19 +56,19 @@ typedef struct
 /**
  * Initialize the parser. Must be done before every parseActions() call.
  */
-void initActionParser(ActionParser* pParser, STRPTR pMask);
+void initActionParser(ActionParser *pParser, STRPTR pMask);
 
 /**
  * Parses the pMask. It creates a number of nodes and adds it to
  * pParser->ActionList. After done with the actions, freeActionNodes()
  * must be called.
  */
-BOOL parseActions(ActionParser* pParser);
+BOOL parseActions(ActionParser *pParser);
 
 /**
  * Frees the memory that was allocated for the ACtionNodes in
  * parseActions().
  */
-void freeActionNodes(struct List* pActionsList);
+void freeActionNodes(struct List *pActionsList);
 
 #endif

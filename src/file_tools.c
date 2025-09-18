@@ -12,17 +12,16 @@
 
 #include "file_tools.h"
 
-
 BPTR lockFromLongName(STRPTR pPath)
 {
   LONG pos = 0;
   BPTR resultLock = 0, lock = 0;
-  BPTR oldLock = -1L;     // Never a valid lock
-  char buffer[108 + 32];  // Long enough for a component and a device name
+  BPTR oldLock = -1L;    // Never a valid lock
+  char buffer[108 + 32]; // Long enough for a component and a device name
 
   do
   {
-    pos = SplitName(pPath,'/', buffer, pos, sizeof(buffer));
+    pos = SplitName(pPath, '/', buffer, pos, sizeof(buffer));
     if (pos < 0)
     {
       // No separator found, call now Lock
@@ -62,5 +61,3 @@ BPTR lockFromLongName(STRPTR pPath)
 
   return resultLock;
 }
- 
-

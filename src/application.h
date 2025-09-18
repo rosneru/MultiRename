@@ -18,16 +18,16 @@
 
 typedef struct Application
 {
-  struct Locale* pLocale;
-  struct MsgPort* pAppWindowPort;
-  struct List* pNotifications;
-  ParsedArgs* pParsedArgs;
-  FileNodes* pFiles;
-  Object* pWinObject;
+  struct Locale *pLocale;
+  struct MsgPort *pAppWindowPort;
+  struct List *pNotifications;
+  ParsedArgs *pParsedArgs;
+  FileNodes *pFiles;
+  Object *pWinObject;
   RangeMask RangeMask;
-  RangeSelectWindow* pRangeSelectWindow;
-  struct Window* pIntuiWindow;
-  struct Screen* pPubScreen;
+  RangeSelectWindow *pRangeSelectWindow;
+  struct Window *pIntuiWindow;
+  struct Screen *pPubScreen;
   STRPTR pAboutMessage;
   ULONG SigMask;
   BOOL IsExitRequested;
@@ -39,9 +39,9 @@ typedef struct Application
   long ExtGadgetBufferPos;
 } Application;
 
-Application* createApplication(int argc, char **argv);
-void disposeApplication(Application* pApp);
+Application *createApplication(int argc, char **argv);
+void disposeApplication(Application *pApp);
 
-BOOL runApplication(Application* pApp);
+BOOL runApplication(Application *pApp);
 
 #endif
