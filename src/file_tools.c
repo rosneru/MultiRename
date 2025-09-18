@@ -1,6 +1,14 @@
 #include <dos/dosextens.h>
-#include <proto/dos.h>
-#include <proto/exec.h>
+
+// clang-format off
+#ifdef __clang__
+  #include <clib/exec_protos.h>
+  #include <clib/dos_protos.h>
+#else
+  #include <proto/dos.h>
+  #include <proto/exec.h>
+#endif
+// clang-format on
 
 #include "file_tools.h"
 

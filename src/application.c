@@ -50,6 +50,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "application.h"
 #include "file_nodes.h"
 #include "file_tools.h"
 #include "menu_tools.h"
@@ -60,7 +61,6 @@
 #include "requester.h"
 #include "string_tools.h"
 #include "ui_tools.h"
-#include "application.h"
 
 /// Defines
 

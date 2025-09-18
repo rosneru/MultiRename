@@ -2,6 +2,7 @@
 #include <gadgets/listbrowser.h>
 #include <libraries/locale.h>
 
+// clang-format off
 #ifdef __clang__
   #include <clib/alib_protos.h>
   #include <clib/dos_protos.h>
@@ -15,6 +16,7 @@
   #include <proto/listbrowser.h>
   #include <proto/locale.h>
 #endif
+// clang-format on
 
 #include <string.h>
 #include <stdio.h>
@@ -113,25 +115,28 @@ struct Node* createFileNode(struct Locale* pLocale,
     return NULL;
   }
 
-  if ((pNode = AllocListBrowserNode(4, 
-                                    LBNA_NodeSize, sizeof(FileNode),
-                                    LBNA_Column, 0,
-                                      LBNCA_CopyText, FALSE,
-                                      LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAX_NAME_LEN,
-                                    LBNA_Column, 1,
-                                      LBNCA_CopyText, FALSE,
-                                      LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAX_NAME_LEN,
-                                    LBNA_Column, 2,
-                                      LBNCA_CopyText, FALSE,
-                                      LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAX_NAME_LEN,
-                                    LBNA_Column, 3,
-                                      LBNCA_CopyText, FALSE,
-                                      LBNCA_Editable, FALSE,
-                                      LBNCA_MaxChars, MAX_NAME_LEN,
-                                    TAG_DONE)))
+  // clang-format off
+  pNode = AllocListBrowserNode(4, LBNA_NodeSize, sizeof(FileNode),
+    LBNA_Column, 0,
+      LBNCA_CopyText, FALSE,
+      LBNCA_Editable, FALSE,
+      LBNCA_MaxChars, MAX_NAME_LEN,
+    LBNA_Column, 1,
+      LBNCA_CopyText, FALSE,
+      LBNCA_Editable, FALSE,
+      LBNCA_MaxChars, MAX_NAME_LEN,
+    LBNA_Column, 2,
+      LBNCA_CopyText, FALSE,
+      LBNCA_Editable, FALSE,
+      LBNCA_MaxChars, MAX_NAME_LEN,
+    LBNA_Column, 3,
+      LBNCA_CopyText, FALSE,
+      LBNCA_Editable, FALSE,
+      LBNCA_MaxChars, MAX_NAME_LEN,
+    TAG_DONE);
+  // clang-format on
+
+  if (pNode)
   {
     pFileNode = (FileNode*) pNode;
 
@@ -174,6 +179,7 @@ struct Node* createFileNode(struct Locale* pLocale,
     pFileNode->OriginalNameToken = createStringToken(pFileNode->OriginalName,
                                                     pFileNode->OriginalNameLen);
 
+    // clang-format off
     SetListBrowserNodeAttrs(pNode,
                             LBNA_Column, 0,
                               LBNCA_Text, " ",
@@ -184,6 +190,7 @@ struct Node* createFileNode(struct Locale* pLocale,
                             LBNA_Column, 3,
                               LBNCA_Text, pFileNode->NewName,
                             TAG_DONE);
+    // clang-format on
     return pNode;
   }
   else

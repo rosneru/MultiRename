@@ -1,6 +1,7 @@
 #include <classes/window.h>
 #include <libraries/asl.h>
 
+// clang-format off
 #ifdef __clang__
   #include <clib/asl_protos.h>
   #include <clib/alib_protos.h>
@@ -12,6 +13,7 @@
   #include <proto/exec.h>
   #include <proto/intuition.h>
 #endif
+// clang-format on
 
 #include "requester.h"
 
@@ -127,16 +129,20 @@ struct FileRequester* showMultiFileSelector(Object* pWinObject,
   m_IntuiMsgHook.h_Data = pWinObject;
 
   // Allocate data structure for the ASL requester
-  if(!(pFileRequest = (struct FileRequester*)
-    AllocAslRequestTags(ASL_FileRequest,
-                        ASLFR_TitleText, (ULONG) pTitle,
-                        // ASLFR_InitialDrawer, (ULONG) initialPath.c_str(),
-                        // ASLFR_InitialFile, (ULONG) initialFile.c_str(),
-                        ASLFR_Window, (ULONG) pParentWindow,
-                        ASLFR_RejectIcons, TRUE,
-                        ASLFR_DoMultiSelect, TRUE,
-                        ASLFR_IntuiMsgFunc, (ULONG)&m_IntuiMsgHook,
-                        TAG_DONE)))
+
+  // clang-format off
+  pFileRequest = (struct FileRequester*) AllocAslRequestTags(ASL_FileRequest,
+      ASLFR_TitleText, (ULONG) pTitle,
+      // ASLFR_InitialDrawer, (ULONG) initialPath.c_str(),
+      // ASLFR_InitialFile, (ULONG) initialFile.c_str(),
+      ASLFR_Window, (ULONG) pParentWindow,
+      ASLFR_RejectIcons, TRUE,
+      ASLFR_DoMultiSelect, TRUE,
+      ASLFR_IntuiMsgFunc, (ULONG)&m_IntuiMsgHook,
+      TAG_DONE);
+  // clang-format on
+
+  if(!pFileRequest)
   {
     // Data struct allocation failed
     return NULL;

@@ -1,10 +1,12 @@
 #include <intuition/gadgetclass.h>
 
+// clang-format off
 #ifdef __clang__
   #include <clib/intuition_protos.h>
 #else
   #include <proto/intuition.h>
 #endif
+// clang-format on
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -34,11 +36,11 @@ BOOL appendTextToStrGadget(struct Window* pIntuiWindow,
   strncat(pScratchBuf, pTextToAppend, remainingBufSize);
   pScratchBuf[scratchBufSize-1] = '\0';
 
-  SetGadgetAttrs((struct Gadget *) pStrGadget,
-                 pIntuiWindow,
-                 NULL,
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) pStrGadget, pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pScratchBuf,
                  TAG_DONE);
+  // clang-format on
 
   return TRUE;
 }
@@ -79,22 +81,24 @@ int insertTextToStrGadget(struct Window* pIntuiWindow,
   }
 
   // First, set the new text into string gadget
-  SetGadgetAttrs((struct Gadget *) pStrGadget,
-                 pIntuiWindow,
-                 NULL,
+
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) pStrGadget, pIntuiWindow, NULL,
                  STRINGA_TextVal, (ULONG) pScratchBuf,
                  TAG_DONE);
+  // clang-format on
 
   // And then set the buffer pos to insert position
   //
   //(Because setting both in one `SetGadgetAttrs` call doesn't work, as
   // `STRINGA_TextVal` always overwrites the buffer pos to the end of
   // line.)
-  SetGadgetAttrs((struct Gadget *) pStrGadget,
-                 pIntuiWindow,
-                 NULL,
+
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) pStrGadget, pIntuiWindow, NULL,
                  STRINGA_BufferPos, (ULONG) bufferPos,
                  TAG_DONE);
+  // clang-format on
 
   return bufferPos;
 }

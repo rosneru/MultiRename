@@ -37,7 +37,7 @@ SpaceBeforeParens: ControlStatements
 SpaceBeforeAssignmentOperators: true
 
 # Includes
-SortIncludes: false
+SortIncludes: true
 IncludeBlocks: Preserve
 
 # Sonstiges

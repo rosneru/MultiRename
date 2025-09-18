@@ -1,3 +1,4 @@
+// clang-format off
 #ifdef __clang__
   #include <clib/dos_protos.h>
   #include <clib/exec_protos.h>
@@ -5,6 +6,7 @@
   #include <proto/dos.h>
   #include <proto/exec.h>
 #endif
+// clang-format on
 
 #include <string.h>
 

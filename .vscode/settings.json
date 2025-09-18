@@ -86,7 +86,10 @@
     "intuition.h": "c",
     "exec.h": "c",
     "rename.h": "c",
-    "menu_tools.h": "c"
+    "menu_tools.h": "c",
+    "file_tools.h": "c",
+    "dos_protos.h": "c",
+    "icon.h": "c"
   },
   "cSpell.enableFiletypes": [
     "cpp", "h"

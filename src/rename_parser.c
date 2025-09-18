@@ -1,4 +1,6 @@
 #include <exec/lists.h>
+
+// clang-format off
 #ifdef __clang__
   #include <clib/alib_protos.h>
   #include <clib/exec_protos.h>
@@ -6,6 +8,7 @@
   #include <proto/alib.h>
   #include <proto/exec.h>
 #endif
+// clang-format on
 
 #include <stdlib.h>
 #include <string.h>

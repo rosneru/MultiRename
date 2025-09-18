@@ -2,11 +2,13 @@
 #include <clib/compiler-specific.h>
 #include <libraries/locale.h>
 
+// clang-format off
 #ifdef __clang__
   #include <clib/locale_protos.h>
 #else
   #include <proto/locale.h>
 #endif
+// clang-format on
 
 #include "date_tools.h"
 
