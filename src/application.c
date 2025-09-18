@@ -626,9 +626,9 @@ BOOL startRename(Application *pApp)
     {
       if (!hasAlreadyAskedToProceed)
       {
-        // Construct and display the `double occurrence` error message.
-        // Use a 2k temporary buffer that is big enough for the 136 bytes
-        // message text + max. 107 bytes file name.
+        // Construct and display the `double occurrence` error message. Use the
+        // already allocated 2k temporary buffer from `ParsedArgs`. It surely is
+        // big enough for the 136 bytes message text + max. 107 bytes file name.
         sprintf(pApp->pParsedArgs->pTempPathBuf,
           "Warning, duplicate names! Proceed anyway?\n"
           "%s\n\n"
