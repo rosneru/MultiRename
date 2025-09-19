@@ -91,9 +91,6 @@
     "dos_protos.h": "c",
     "icon.h": "c"
   },
-  "cSpell.enableFiletypes": [
-    "cpp", "h"
-  ],
   "cSpell.words": [
     "ADIFFVIEW",
     "ASKONWORKBENCH",
@@ -108,4 +105,8 @@
     "smsrd",
     "TABSIZE"
   ],
+  "editor.formatOnSave": true,
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
 }
