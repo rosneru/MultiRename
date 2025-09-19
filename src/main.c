@@ -31,19 +31,19 @@ void closeLibs(void);
 /**
  * There are 2 problems regarding the use of Reaction BOOPSIES:
  *
- * 1) The auto-open code of gcc uses the wrong names for some library
- * bases and then fails to open them:
+ * 1) The auto-open code of gcc uses the wrong names for some library bases and
+ *    then fails to open them:
  *   "window.library" (wrong) instead of "window.class" (right)
  *   "label.gadget" (wrong) instead  of "images/label.image" (right)
  *
- * 2) SAS-C is only able to auto-open the reaction BOOPSIE library bases
- * when linking against the recation.lib, what according the OS
- * developers currently (2024) shouldn't be done fpr new projects.
+ * 2) SAS-C is only able to auto-open the reaction BOOPSIE library bases when
+ *    linking against the reaction.lib, what according the OS developers
+ *    currently (2024) shouldn't be done fpr new projects.
  *
- * To fix both problems, the libraries are manually opened and closed.
- * But first their library base variables must be initialized here.
- * And initialization means NULL must be assigned to the variable names,
- * See: https://eab.abime.net/showpost.php?p=1490638&postcount=1285
+ * To fix both problems, the libraries are manually opened and closed. But first
+ * their library base variables must be initialized here. And initialization
+ * means NULL must be assigned to the variable names, See:
+ * https://eab.abime.net/showpost.php?p=1490638&postcount=1285
  */
 struct IntuitionBase *IntuitionBase = NULL;
 struct Library *WindowBase = NULL;
@@ -67,11 +67,11 @@ int main(int argc, char **argv)
 {
   Application *pApp;
   ULONG result = RETURN_FAIL;
-  if (TRUE == openLibs())
+  if (openLibs())
   {
     if ((pApp = createApplication(argc, argv)))
     {
-      if (TRUE == runApplication(pApp))
+      if (runApplication(pApp))
       {
         result = RETURN_OK;
       }
