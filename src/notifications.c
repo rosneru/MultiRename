@@ -129,8 +129,8 @@ void printNotifications(struct List *pList)
   if (0 <
     (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
   {
-    Printf("Skipped %lu input file(s) because of over long / "
-           "truncated paths:\n",
+    Printf(
+      "Skipped %lu input file(s) because of over long / truncated paths:\n",
       count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -147,8 +147,8 @@ void printNotifications(struct List *pList)
   if (0 < (count = getNotificationCountByType(
              pList, NNT_SKIPPED_FAILED_DATETIMEPARTS)))
   {
-    Printf("Skipped %lu input file(s) because their date stamp couldn't "
-           "be split into parts:\n",
+    Printf("Skipped %lu input file(s) because their date stamp couldn't be "
+           "split into parts:\n",
       count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -165,9 +165,8 @@ void printNotifications(struct List *pList)
   if (0 <
     (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
   {
-    Printf("Skipped %lu input file(s) because they couldn't be "
-           "examined:\n",
-      count);
+    Printf(
+      "Skipped %lu input file(s) because they couldn't be examined:\n", count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -198,9 +197,8 @@ void printNotifications(struct List *pList)
   if (0 < (count = getNotificationCountByType(
              pList, NNT_SKIPPED_LINKS_NOT_SUPPORTED)))
   {
-    Printf("Skipped %lu input file(s) because links are not "
-           "supported:\n",
-      count);
+    Printf(
+      "Skipped %lu input file(s) because links are not supported:\n", count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -215,8 +213,8 @@ void printNotifications(struct List *pList)
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_DUPLICATE)))
   {
-    Printf("Skipped %lu input file(s) because they are already "
-           "in processing list:\n",
+    Printf("Skipped %lu input file(s) because they are already in processing "
+           "list:\n",
       count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
