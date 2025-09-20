@@ -491,6 +491,17 @@ BOOL runApplication(Application *pApp)
     return FALSE;
   }
 
+  // Display the files list in ListBrowser. Even needed when list is empty. See
+  // autodoc listbrowser_gc.doc: LISTBROWSER_Labels
+
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                  pApp->pIntuiWindow, NULL,
+                  LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                  LISTBROWSER_AutoFit, TRUE,
+                  TAG_DONE);
+  // clang-format on
+
   if ((pApp->pIntuiWindow =
           (struct Window *)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
@@ -800,15 +811,6 @@ void applyNewFiles(Application *pApp)
           pApp->pNotifications, NNT_SKIPPED_FAILED_LOCK, pFirstPath);
       }
     }
-
-    // Display the files list in ListBrowser
-    // clang-format off
-    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                   pApp->pIntuiWindow, NULL,
-                   LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                   LISTBROWSER_AutoFit, TRUE,
-                   TAG_DONE);
-    // clang-format on
   }
 
   updateNewNames(pApp);
@@ -945,6 +947,7 @@ BOOL updateNewNames(Application *pApp)
                   pApp->pIntuiWindow, 
                   NULL,
                   LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                  LISTBROWSER_AutoFit, TRUE,
                   TAG_DONE);
   // clang-format on
 
