@@ -726,7 +726,12 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
   ULONG i;
   STRPTR pFileName;
 
-  if (numArgs == 0)
+  if (!pApp || !pArgs || (numArgs == 0))
+  {
+    return;
+  }
+
+  if (pApp->IsResetNeeded)
   {
     return;
   }
