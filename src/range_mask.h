@@ -3,14 +3,13 @@
 
 #include <exec/types.h>
 
-#define MAX_RANGE_STRING_LEN 10     // To allow [N101-106]
+#define MAX_RANGE_STRING_LEN 10 // To allow [N101-106]
 
 typedef enum
 {
-    RRT_NAME = 1
-  , RRT_EXTENSION
+  RRT_NAME = 1,
+  RRT_EXTENSION
 } RequestedRangeType;
-
 
 typedef struct RangeMask
 {
@@ -21,26 +20,26 @@ typedef struct RangeMask
 
 /**
  *
- * Create a range mask string like "[N12-16]" from given `RangeMask`.
- * The created string is written into pResultStrBuf` which must have at
+ * Create a range mask string like "[N12-16]" from `RangeMask`.
+ * The created string is written into pDestBuf` which must have at
  * least a size of MAX_RANGE_STRING_LEN + 1 bytes.
- * 
+ *
  * \returns TRUE on success and FALSE on error.
  */
-BOOL createRangeMaskString(RangeMask* pRangeMask, char* pResultStrBuf);
+BOOL createRangeMaskString(RangeMask *pRangeMask, char *pDestBuf);
 
 /**
- * Create a range mask string like "[N12-16]" from given `RangeMask` and
- * then create /fill given `pResultStrBuf` with given `pSrcStr` with the
- * created mask string inserted at `insertPos`.
+ * Create a range mask string like "[N12-16]" from `RangeMask` and fill
+ * `pDestBuf` with `pSrcStr` with the created mask string inserted at
+ * `insertPos`.
  *
- * \returns new buffer pos in `pResultStrBuf` at the inserted mask
- * string or -1 on error.
+ * \returns New buffer pos in `pDestBuf` at the inserted mask string or
+ * -1 on error.
  */
-int insertRangeMaskString(RangeMask* pRangeMask,
-                          STRPTR pResultStrBuf,
-                          ULONG resultBufSize,
-                          const STRPTR pSrcStr,
-                          UBYTE insertPos);
+int insertRangeMaskString(RangeMask *pRangeMask,
+  STRPTR pDestBuf,
+  ULONG destBufSize,
+  const STRPTR pSrcStr,
+  UBYTE insertPos);
 
 #endif

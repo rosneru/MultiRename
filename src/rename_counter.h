@@ -14,9 +14,8 @@ typedef struct Counter
   char ValueAsStr[COUNTER_MAX_WIDTH + 1];
 } Counter;
 
-
-void initCounter(Counter* pCounter, LONG start, LONG inc, BYTE width);
-void incrementCounter(Counter* pCounter);
-STRPTR getCounterValue(Counter* pCounter);
+void initCounter(Counter *pCounter, LONG start, LONG inc, BYTE width);
+void incrementCounter(Counter *pCounter);
+STRPTR getCounterValue(Counter *pCounter);
 
 #endif

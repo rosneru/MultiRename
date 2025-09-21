@@ -8,34 +8,41 @@
 #include <intuition/intuition.h>
 #include <libraries/locale.h>
 
-#include "file_list.h"
+#include "file_nodes.h"
 #include "notifications.h"
 #include "parsed_args.h"
 #include "range_mask.h"
 #include "range_select_window.h"
 
-#define SCRATCH_BUF_SIZE 1024
+#define TEMP_BUF_SIZE 1024
 
 typedef struct Application
 {
-  struct Locale* pLocale;
-  struct MsgPort* pAppWindowPort;
-  struct List* pNotifications;
-  ParsedArgs* pParsedArgs;
-  struct List* pFiles;
-  Object* pWinObject;
+  struct Locale *pLocale;
+  struct MsgPort *pAppWindowPort;
+  struct List *pNotifications;
+  ParsedArgs *pParsedArgs;
+  FileNodes *pFiles;
+  ULONG FilesCount;
+  Object *pWinObject;
   RangeMask RangeMask;
-  RangeSelectWindow* pRangeSelectWindow;
-  struct Window* pIntuiWindow;
+  RangeSelectWindow *pRangeSelectWindow;
+  struct Window *pIntuiWindow;
+  struct Screen *pPubScreen;
+  STRPTR pAboutMessage;
   ULONG SigMask;
-  char FilesPath[MAX_PATH_LEN + 1];
+  BOOL IsExitRequested;
+  BOOL IsResetNeeded;
+  BOOL IsStartAllowed;
   char WindowTitle[MAX_PATH_LEN + 32];
-  char ScratchBuf[SCRATCH_BUF_SIZE + 1];
+  char TempBuf[TEMP_BUF_SIZE + 1];
+  long NameGadgetBufferPos;
+  long ExtGadgetBufferPos;
 } Application;
 
-Application* createApplication(int argc, char **argv);
-void disposeApplication(Application* pApp);
+Application *createApplication(int argc, char **argv);
+void disposeApplication(Application *pApp);
 
-BOOL runApplication(Application* pApp);
+BOOL runApplication(Application *pApp);
 
 #endif

@@ -1,3 +1,4 @@
+// clang-format off
 #ifdef __clang__
   #include <clib/alib_protos.h>
   #include <clib/exec_protos.h>
@@ -7,17 +8,16 @@
   #include <proto/dos.h>
   #include <proto/exec.h>
 #endif
+// clang-format on
 
-#include <stdio.h>
 #include <string.h>
 
 #include "notifications.h"
 
-
-struct List* createNotificationList(void)
+struct List *createNotificationList(void)
 {
-  struct List* pList;
-  if(!(pList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
+  struct List *pList;
+  if (!(pList = AllocVec(sizeof(struct List), MEMF_CLEAR)))
   {
     return NULL;
   }
@@ -26,9 +26,9 @@ struct List* createNotificationList(void)
   return pList;
 }
 
-void freeNotificationList(struct List* pList)
+void freeNotificationList(struct List *pList)
 {
-  if(!pList)
+  if (!pList)
   {
     return;
   }
@@ -37,52 +37,52 @@ void freeNotificationList(struct List* pList)
   FreeVec(pList);
 }
 
-void addNotification(struct List* pList,
-                     NotificationNodeType type,
-                     STRPTR pItemText)
+void addNotification(
+  struct List *pList, NotificationNodeType type, STRPTR pItemText)
 {
-  struct Node* pNode;
+  struct Node *pNode;
   ULONG textNumChars;
 
-  if(!pList || !pItemText)
+  if (!pList || !pItemText)
   {
     return;
   }
 
-  if((pNode = AllocVec(sizeof(struct Node), MEMF_CLEAR)))
+  if ((pNode = AllocVec(sizeof(struct Node), MEMF_CLEAR)))
   {
     textNumChars = strlen(pItemText);
-    if((pNode->ln_Name = AllocVec(textNumChars + 1, MEMF_CLEAR)))
+    if ((pNode->ln_Name = AllocVec(textNumChars + 1, MEMF_CLEAR)))
     {
       strcpy(pNode->ln_Name, pItemText);
       pNode->ln_Type = type;
 
-      AddTail(pList, (struct Node*)pNode);
+      AddTail(pList, (struct Node *)pNode);
     }
   }
 }
 
-void clearNotifications(struct List* pList)
+void clearNotifications(struct List *pList)
 {
   clearNotificationsExcept(pList, NNT_NONE);
 }
 
-void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptType)
+void clearNotificationsExcept(
+  struct List *pList, NotificationNodeType exceptType)
 {
-  struct Node* pWorkNode;
-  struct Node* pNextNode;
+  struct Node *pWorkNode;
+  struct Node *pNextNode;
 
-  if(!pList)
+  if (!pList)
   {
     return;
   }
 
   pWorkNode = pList->lh_Head;
-  while((pNextNode = pWorkNode->ln_Succ))
+  while ((pNextNode = pWorkNode->ln_Succ))
   {
-    if(exceptType != NNT_NONE)
+    if (exceptType != NNT_NONE)
     {
-      if(pWorkNode->ln_Type == exceptType)
+      if (pWorkNode->ln_Type == exceptType)
       {
         // Skip / don't delete this node
         pWorkNode = pNextNode;
@@ -90,7 +90,7 @@ void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptTyp
       }
     }
 
-    if(pWorkNode->ln_Name)
+    if (pWorkNode->ln_Name)
     {
       FreeVec(pWorkNode->ln_Name);
     }
@@ -101,128 +101,172 @@ void clearNotificationsExcept(struct List* pList, NotificationNodeType exceptTyp
   }
 }
 
-void printNotifications(struct List* pList)
+void printNotifications(struct List *pList)
 {
   ULONG count;
-  struct Node* pNode;
+  struct Node *pNode;
 
-  if((pNode = findFirstNotificationByType(pList, NNT_SELECTED_PATH_INFO)))
+  if ((pNode = findFirstNotificationByType(pList, NNT_SELECTED_PATH_INFO)))
   {
-    printf("Selected path is '%s'\n\n", pNode->ln_Name);
+    Printf("Selected path is '%s'\n\n", pNode->ln_Name);
   }
 
-  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH)))
+  if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH)))
   {
-    printf("Skipped %u input file(s) because of wrong paths:\n", count);
+    Printf("Skipped %lu input file(s) because of wrong paths:\n", count);
 
-    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      if(pNode->ln_Type == NNT_SKIPPED_WRONG_PATH)
+      if (pNode->ln_Type == NNT_SKIPPED_WRONG_PATH)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
-  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_INFO_FILE)))
+  if (0 <
+    (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
   {
-    printf("Skipped %u input file(s) because of they are .info files "
-           "which are not supported:\n", count);
+    Printf(
+      "Skipped %lu input file(s) because of over long / truncated paths:\n",
+      count);
 
-    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      if(pNode->ln_Type == NNT_SKIPPED_INFO_FILE)
+      if (pNode->ln_Type == NNT_SKIPPED_PATH_TOO_LONG)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
-  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
+  if (0 < (count = getNotificationCountByType(
+             pList, NNT_SKIPPED_FAILED_DATETIMEPARTS)))
   {
-    printf("Skipped %u input file(s) because of over long / "
-           "truncated paths:\n", count);
+    Printf("Skipped %lu input file(s) because their date stamp couldn't be "
+           "split into parts:\n",
+      count);
 
-    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      if(pNode->ln_Type == NNT_SKIPPED_PATH_TOO_LONG)
+      if (pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
-  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_DATETIMEPARTS)))
+  if (0 <
+    (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
   {
-    printf("Skipped %u input file(s) because their date stamp couldn't "
-           "be split into parts:\n", count);
+    Printf(
+      "Skipped %lu input file(s) because they couldn't be examined:\n", count);
 
-    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
+      if (pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
-  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
+  if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
   {
-    printf("Skipped %u input file(s) because they couldn't be / "
-           "examined:\n", count);
+    Printf("Failed to add (lock) %lu input file(s) / dir(s):\n", count);
 
-    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
+      if (pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
-  if(0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
+  if (0 < (count = getNotificationCountByType(
+             pList, NNT_SKIPPED_LINKS_NOT_SUPPORTED)))
   {
-    printf("Skipped %u input file(s) because they couldn't be / "
-           "locked:\n", count);
+    Printf(
+      "Skipped %lu input file(s) because links are not supported:\n", count);
 
-    for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
-      if(pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
+      if (pNode->ln_Type == NNT_SKIPPED_LINKS_NOT_SUPPORTED)
       {
-        printf("  %s\n", pNode->ln_Name);
+        Printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    printf("\n");
+    PutStr("\n");
   }
 
+  if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_DUPLICATE)))
+  {
+    Printf("Skipped %lu input file(s) because they are already in processing "
+           "list:\n",
+      count);
 
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      if (pNode->ln_Type == NNT_SKIPPED_DUPLICATE)
+      {
+        Printf("  %s\n", pNode->ln_Name);
+      }
+    }
+
+    PutStr("\n");
+  }
+
+  if (0 < (count = getNotificationCountByType(pList, NNT_RENAME_FAILED)))
+  {
+    Printf("Rename failed for %lu new file names:\n", count);
+
+    for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+    {
+      if (pNode->ln_Type == NNT_RENAME_FAILED)
+      {
+        Printf("  %s\n", pNode->ln_Name);
+      }
+    }
+
+    PutStr("\n");
+  }
 }
 
-BOOL containsSkippedNotifications(struct List* pList)
+BOOL containsSkippedNotifications(struct List *pList)
 {
-  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG))
+  if (0 < getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG))
   {
     return TRUE;
   }
 
-
-  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_INFO_FILE))
+  if (0 < getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH))
   {
     return TRUE;
   }
 
-  if(0 < getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH))
+  if (0 < getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK))
+  {
+    return TRUE;
+  }
+
+  if (0 < getNotificationCountByType(pList, NNT_SKIPPED_DUPLICATE))
+  {
+    return TRUE;
+  }
+
+  if (0 < getNotificationCountByType(pList, NNT_SKIPPED_LINKS_NOT_SUPPORTED))
   {
     return TRUE;
   }
@@ -230,14 +274,14 @@ BOOL containsSkippedNotifications(struct List* pList)
   return FALSE;
 }
 
-struct Node* findFirstNotificationByType(struct List* pList,
-                                         NotificationNodeType type)
+struct Node *findFirstNotificationByType(
+  struct List *pList, NotificationNodeType type)
 {
-  struct Node* pNode;
+  struct Node *pNode;
 
-  for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    if(pNode->ln_Type == type)
+    if (pNode->ln_Type == type)
     {
       return pNode;
     }
@@ -246,17 +290,16 @@ struct Node* findFirstNotificationByType(struct List* pList,
   return NULL;
 }
 
-ULONG getNotificationCountByType(struct List* pList,
-                                 NotificationNodeType type)
+ULONG getNotificationCountByType(struct List *pList, NotificationNodeType type)
 {
   ULONG count = 0;
-  struct Node* pNotificationNode;
-  struct Node* pNode;
+  struct Node *pNotificationNode;
+  struct Node *pNode;
 
-  for(pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pNotificationNode = (struct Node*)pNode;
-    if(pNotificationNode->ln_Type == type)
+    pNotificationNode = (struct Node *)pNode;
+    if (pNotificationNode->ln_Type == type)
     {
       count++;
     }

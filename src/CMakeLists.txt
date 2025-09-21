@@ -13,7 +13,9 @@ set(CMAKE_C_LINK_EXECUTABLE "${CMAKE_C_LINK_EXECUTABLE} ${EXTRALIBS_LINK_FLAGS}"
 add_executable (MultiRename_gcc
                 application.c
                 date_tools.c
-                file_list.c
+                file_tools.c
+                file_nodes.c
+                menu_tools.c
                 main.c
                 notifications.c
                 parsed_args.c
@@ -22,6 +24,7 @@ add_executable (MultiRename_gcc
                 rename_counter.c
                 rename_algorithm.c
                 rename_parser.c
+                rename.c
                 requester.c
                 string_tools.c
                 ui_tools.c)

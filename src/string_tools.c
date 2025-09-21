@@ -1,19 +1,32 @@
-#include <string.h>
 #include "string_tools.h"
+#include <string.h>
 
+ULONG createStringToken(const char *pStr, ULONG strLength)
+{
+  ULONG i, token = 0;
 
-int appendString(STRPTR pDest,
-                 ULONG destSize,
-                 ULONG* pNewDestLen,
-                 STRPTR pSrc,
-                 ULONG numChars)
+  if (!pStr || strLength == 0)
+  {
+    return 0;
+  }
+
+  for (i = 0; i < strLength; i++)
+  {
+    token += 2 * token + *(pStr++);
+  }
+
+  return token;
+}
+
+BOOL appendString(
+  STRPTR pDest, ULONG destSize, ULONG *pNewDestLen, STRPTR pSrc, ULONG numChars)
 {
   ULONG remainingDestSize, srcLen, currentDestLen;
 
   currentDestLen = strlen(pDest);
-  if(currentDestLen >= (destSize - 1))
+  if (currentDestLen >= (destSize - 1))
   {
-    if(pNewDestLen)
+    if (pNewDestLen)
     {
       *pNewDestLen = currentDestLen;
     }
@@ -24,18 +37,18 @@ int appendString(STRPTR pDest,
   remainingDestSize = destSize - currentDestLen - 1;
 
   srcLen = strlen(pSrc);
-  if(numChars > 0)
+  if (numChars > 0)
   {
     /* TODO Is here a min/max needed? */
     srcLen = numChars;
   }
 
-  if(srcLen > remainingDestSize)
+  if (srcLen > remainingDestSize)
   {
     memcpy(pDest + currentDestLen, pSrc, remainingDestSize);
     pDest[destSize - 1] = '\0';
-    
-    if(pNewDestLen)
+
+    if (pNewDestLen)
     {
       *pNewDestLen = currentDestLen + remainingDestSize;
     }
@@ -47,11 +60,38 @@ int appendString(STRPTR pDest,
     memcpy(pDest + currentDestLen, pSrc, srcLen);
     pDest[currentDestLen + srcLen] = '\0';
 
-    if(pNewDestLen)
+    if (pNewDestLen)
     {
       *pNewDestLen = currentDestLen + srcLen;
     }
 
     return FALSE;
   }
+}
+
+int insertString(const STRPTR pSrcStr,
+  STRPTR pStrToInsert,
+  ULONG insertPos,
+  STRPTR pDestBuf,
+  ULONG destBufSize)
+{
+  if (!pStrToInsert || !pDestBuf || !pSrcStr)
+  {
+    return -1;
+  }
+
+  // Start with a clean target buffer
+  strcpy(pDestBuf, "");
+
+  // Apply the beginning until the insert position
+  strncat(pDestBuf, pSrcStr, insertPos);
+  pDestBuf[insertPos] = '\0';
+
+  // Apply the 'string to insert'
+  strcat(pDestBuf, pStrToInsert);
+
+  // Apply the end, after the insert position
+  strcat(pDestBuf, pSrcStr + insertPos);
+
+  return (int)(insertPos + strlen(pStrToInsert));
 }

@@ -1,7 +1,7 @@
 {
   "C_Cpp.intelliSenseEngineFallback": "enabled",
   "editor.rulers": [
-    72
+    80
   ],
   "cSpell.enabled": true,
   "cSpell.diagnosticLevel": "Hint",
@@ -80,11 +80,17 @@
     "stdlib.h": "c",
     "compiler-specific.h": "c",
     "range_mask.h": "c",
-    "layout.h": "c"
+    "layout.h": "c",
+    "rename_algorithm.h": "c",
+    "parsed_args.h": "c",
+    "intuition.h": "c",
+    "exec.h": "c",
+    "rename.h": "c",
+    "menu_tools.h": "c",
+    "file_tools.h": "c",
+    "dos_protos.h": "c",
+    "icon.h": "c"
   },
-  "cSpell.enableFiletypes": [
-    "cpp", "h"
-  ],
   "cSpell.words": [
     "ADIFFVIEW",
     "ASKONWORKBENCH",
@@ -99,4 +105,13 @@
     "smsrd",
     "TABSIZE"
   ],
+  "editor.formatOnSave": true,
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "C_Cpp.clang_format_style": "file"
+
 }

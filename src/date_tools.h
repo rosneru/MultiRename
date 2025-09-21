@@ -12,28 +12,23 @@ typedef struct DateTimeParts
 {
   char dateBuf[DATETIMEBUF_SIZE];
   ULONG currentIdx;
-  char* pYear;
-  char* pMonth;
-  char* pDay;
-  char* pHour;
-  char* pMinute;
-  char* pSecond;
+  char *pYear;
+  char *pMonth;
+  char *pDay;
+  char *pHour;
+  char *pMinute;
+  char *pSecond;
 } DateTimeParts;
 
-
 /**
- * Create string parts (year, month, etc.) from `pDateStamp` and fill 
+ * Create string parts (year, month, etc.) from `pDateStamp` and fill
  * `pDateTimeParts` struct with these.
  *
  * An open locale is needed too, but can be opened as default (NULL)
  * for this.
  */
-BOOL fillDateTimeParts(struct Locale* pLocale,
-                       struct DateStamp* pDateStamp,
-                       DateTimeParts* pDateTimeParts);
-
-
-
+BOOL fillDateTimeParts(struct Locale *pLocale,
+  struct DateStamp *pDateStamp,
+  DateTimeParts *pDateTimeParts);
 
 #endif
-

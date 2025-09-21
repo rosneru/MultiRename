@@ -1,31 +1,37 @@
 #ifndef PARSED_ARGS_H
 #define PARSED_ARGS_H
 
-
 #include <exec/lists.h>
 #include <libraries/locale.h>
 
 #include "notifications.h"
 
-#define ARG_TEMPLATE "FILES/M,PUBSCREEN/K"
-enum {ARG_FILES, ARG_PUBSCREEN, ARG_ARRAY_SIZE};
+#define ARG_TEMPLATE "FILES/M,PUBSCREEN/K,LONGNAMES/S,SKIPICONS/S"
+enum
+{
+  ARG_FILES,
+  ARG_PUBSCREEN,
+  ARG_LONGNAMES,
+  ARG_SKIPICONS,
+  ARG_ARRAY_SIZE
+};
 
-
+#define TEMP_PATH_BUF_SIZE (MAX_PATH_LEN + 1)
 typedef struct ParsedArgs
 {
-  STRPTR pProcessingDir;
-  char* pPubScreenName;
-  struct DiskObject* pDiskObject;
-  char pScratchPathBuf[MAX_PATH_LEN + 1];
+  char *pPubScreenName;
+  BOOL AreLongNamesAllowed;
+  BOOL AreIconsSkipped;
+  struct DiskObject *pDiskObject;
+  char pTempPathBuf[TEMP_PATH_BUF_SIZE];
 } ParsedArgs;
 
-ParsedArgs* createParsedArgs(int argc,
-                             char **argv,
-                             struct List* pFilesList,
-                             struct Locale* pLocale,
-                             struct List* pNotifications);
+ParsedArgs *createParsedArgs(int argc,
+  char **argv,
+  FileNodes *pFiles,
+  struct Locale *pLocale,
+  struct List *pNotifications);
 
-void freeParsedArgs(ParsedArgs* pParsedArgs);
-
+void freeParsedArgs(ParsedArgs *pParsedArgs);
 
 #endif

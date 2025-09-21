@@ -3,59 +3,50 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "string_tools.h"
 #include "file_node.h"
-#include "rename_parser.h"
 #include "rename_algorithm.h"
+#include "rename_parser.h"
+#include "string_tools.h"
 
-
-/// Private function forward declarations
-
+/// Forwards / private function declarations
 
 /**
- * Fills the given NewName field of given FileNode* with the new name
+ * Fills the NewName field of `FileNode*` with the new name
  * that is computed from the OriginalName field, the rename mask pMask,
  * the counter and the list of rename actions (that must have been
  * parsed from the pMask in the former step)
  */
-void applyActions(FileNode* pFileNode,
-                  ULONG bufSize,
-                  struct List* pActionList,
-                  STRPTR pMask,
-                  Counter* pCounter);
+void applyActions(FileNode *pFileNode,
+  ULONG bufSize,
+  struct List *pActionList,
+  STRPTR pMask,
+  Counter *pCounter);
 
-/**
- * Calculate and fill a Token for the new name that will be used for
- * duplicate detection in the first pass before the actual renaming
- * starts.
- */
-void createNewNameToken(FileNode* pFileNode);
-
-
+///
 /// Public function implementations
 
-
-BOOL createNewNames(struct List* pFilesList,
-                  STRPTR pNameMask,
-                  STRPTR pExtMask,
-                  LONG counterStart,
-                  LONG counterInc,
-                  BYTE counterWidth)
+BOOL createNewNames(FileNodes *pFiles,
+  ULONG maxAllowedNameLength,
+  STRPTR pNameMask,
+  STRPTR pExtMask,
+  LONG counterStart,
+  LONG counterInc,
+  BYTE counterWidth)
 {
-  struct Node* pNode;
-  FileNode* pFileNode;
+  struct Node *pNode;
+  FileNode *pFileNode;
   ULONG maskSize;
   STRPTR pMask;
   Counter counter;
   ActionParser parser;
 
-  if(!pFilesList || ! pNameMask || ! pExtMask)
+  if (!pFiles || !pFiles->pList || !pNameMask || !pExtMask)
   {
     return FALSE;
   }
 
   maskSize = strlen(pNameMask) + strlen(pExtMask) + 2;
-  if(!(pMask = malloc(maskSize * sizeof(char))))
+  if (!(pMask = malloc(maskSize * sizeof(char))))
   {
     return FALSE;
   }
@@ -69,23 +60,26 @@ BOOL createNewNames(struct List* pFilesList,
   initCounter(&counter, counterStart, counterInc, counterWidth);
   initActionParser(&parser, pMask);
 
-  if(!parseActions(&parser))
+  if (!parseActions(&parser))
   {
     freeActionNodes(&parser.ActionList);
     free(pMask);
     return FALSE;
   }
 
-  for(pNode = pFilesList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pFiles->pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pFileNode = (FileNode*)pNode;
+    pFileNode = (FileNode *)pNode;
     applyActions(pFileNode,
-                 MAX_NAME_LEN + 1,      // buffer *is* one bigger than the
-                 &parser.ActionList,    // max name len for the trailing '\0'
-                 pMask,
-                 &counter);
+      maxAllowedNameLength + 1, // buffer *is* one bigger than the
+      &parser.ActionList,       // max name len for the trailing '\0'
+      pMask,
+      &counter);
 
-    createNewNameToken(pFileNode);
+    // Create a token for the new name that will be used for duplicate
+    // detection in the first pass before the actual renaming starts.
+    pFileNode->NewNameToken =
+      createStringToken(pFileNode->NewName, pFileNode->NewNameFullLen);
   }
 
   freeActionNodes(&parser.ActionList);
@@ -93,24 +87,23 @@ BOOL createNewNames(struct List* pFilesList,
   return TRUE;
 }
 
-
+///
 /// Private function implementations
 
-
-void applyActions(FileNode* pFileNode,
-                  ULONG bufSize,
-                  struct List* pActionList,
-                  STRPTR pMask,
-                  Counter* pCounter)
+void applyActions(FileNode *pFileNode,
+  ULONG bufSize,
+  struct List *pActionList,
+  STRPTR pMask,
+  Counter *pCounter)
 {
-  struct Node* pNode;
-  ActionNode* pAction;
+  struct Node *pNode;
+  ActionNode *pAction;
   BOOL mustIncrementCounter = FALSE;
   ULONG numChars, end;
   int lastIndex;
   STRPTR pExt = pFileNode->OriginalName + pFileNode->OriginalNameLen + 1;
 
-  if(!pFileNode || !pActionList || !pMask || !pCounter)
+  if (!pFileNode || !pActionList || !pMask || !pCounter)
   {
     return;
   }
@@ -118,180 +111,163 @@ void applyActions(FileNode* pFileNode,
   strcpy(pFileNode->NewName, "");
   pFileNode->IsNewNameTruncated = FALSE;
 
-  for(pNode = pActionList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
+  for (pNode = pActionList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
   {
-    pAction = (ActionNode*)pNode;
-    switch(pAction->Command)
+    pAction = (ActionNode *)pNode;
+    switch (pAction->Command)
     {
-      case AC_APPLY:
+    case AC_APPLY:
+    {
+      numChars = pAction->End - pAction->Start + 1;
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        pMask + pAction->Start,
+        numChars);
+      break;
+    }
+    case AC_COUNTER:
+    {
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        getCounterValue(pCounter),
+        0);
+      mustIncrementCounter = TRUE;
+      break;
+    }
+    case AC_NAME:
+    {
+      if ((pAction->Start > -1) && (pAction->End > -1))
       {
-        numChars = pAction->End - pAction->Start + 1;
-        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                      bufSize,
-                                                      &pFileNode->NewNameFullLen,
-                                                      pMask + pAction->Start,
-                                                      numChars);
-        break;
-      }
-      case AC_COUNTER:
-      {
-        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                      bufSize,
-                                                      &pFileNode->NewNameFullLen,
-                                                      getCounterValue(pCounter),
-                                                      0);
-        mustIncrementCounter = TRUE;
-        break;
-      }
-      case AC_NAME:
-      {
-        if((pAction->Start > -1) && (pAction->End > -1))
+        end = pAction->End;
+        if (end >= pFileNode->OriginalNameLen)
         {
-          end = pAction->End;
-          if(end >= pFileNode->OriginalNameLen)
-          {
-            end = pFileNode->OriginalNameLen - 1;
-          }
+          end = pFileNode->OriginalNameLen - 1;
+        }
 
-          numChars = end - pAction->Start + 1;
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalName + pAction->Start,
-                                                        numChars);
-        }
-        else
-        {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalName,
-                                                        pFileNode->OriginalNameLen);
-        }
-        break;
+        numChars = end - pAction->Start + 1;
+        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+          bufSize,
+          &pFileNode->NewNameFullLen,
+          pFileNode->OriginalName + pAction->Start,
+          numChars);
       }
-      case AC_EXTENSION:
+      else
       {
-        if((pAction->Start > -1) && (pAction->End > -1))
+        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+          bufSize,
+          &pFileNode->NewNameFullLen,
+          pFileNode->OriginalName,
+          pFileNode->OriginalNameLen);
+      }
+      break;
+    }
+    case AC_EXTENSION:
+    {
+      if ((pAction->Start > -1) && (pAction->End > -1))
+      {
+        end = pAction->End;
+        if (end >= pFileNode->OriginalExtLen)
         {
-          end = pAction->End;
-          if(end >= pFileNode->OriginalExtLen)
-          {
-            end = pFileNode->OriginalExtLen - 1;
-          }
+          end = pFileNode->OriginalExtLen - 1;
+        }
 
-          numChars = end - pAction->Start + 1;
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pExt + pAction->Start,
-                                                        numChars);
-        }
-        else
-        {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pExt,
-                                                        pFileNode->OriginalExtLen);
-        }
-        break;
+        numChars = end - pAction->Start + 1;
+        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+          bufSize,
+          &pFileNode->NewNameFullLen,
+          pExt + pAction->Start,
+          numChars);
       }
-      case AC_YEAR:
+      else
       {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalDate.pYear,
-                                                        4);
-        break;
+        pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+          bufSize,
+          &pFileNode->NewNameFullLen,
+          pExt,
+          pFileNode->OriginalExtLen);
       }
-      case AC_MONTH:
-      {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalDate.pMonth,
-                                                        2);
-        break;
-      }
-      case AC_DAY:
-      {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalDate.pDay,
-                                                        2);
-        break;
-      }
-      case AC_HOUR:
-      {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalDate.pHour,
-                                                        2);
-        break;
-      }
-      case AC_MINUTE:
-      {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalDate.pMinute,
-                                                        2);
-        break;
-      }
-      case AC_SECOND:
-      {
-          pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
-                                                        bufSize,
-                                                        &pFileNode->NewNameFullLen,
-                                                        pFileNode->OriginalDate.pSecond,
-                                                        2);
-        break;
-      }
-      case AC_NONE:
-      {
-        // Nothing
-        break;
-      }
+      break;
+    }
+    case AC_YEAR:
+    {
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        pFileNode->OriginalDate.pYear,
+        4);
+      break;
+    }
+    case AC_MONTH:
+    {
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        pFileNode->OriginalDate.pMonth,
+        2);
+      break;
+    }
+    case AC_DAY:
+    {
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        pFileNode->OriginalDate.pDay,
+        2);
+      break;
+    }
+    case AC_HOUR:
+    {
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        pFileNode->OriginalDate.pHour,
+        2);
+      break;
+    }
+    case AC_MINUTE:
+    {
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        pFileNode->OriginalDate.pMinute,
+        2);
+      break;
+    }
+    case AC_SECOND:
+    {
+      pFileNode->IsNewNameTruncated |= appendString(pFileNode->NewName,
+        bufSize,
+        &pFileNode->NewNameFullLen,
+        pFileNode->OriginalDate.pSecond,
+        2);
+      break;
+    }
+    case AC_NONE:
+    {
+      // Nothing
+      break;
+    }
     }
   }
 
-  if(mustIncrementCounter)
+  if (mustIncrementCounter)
   {
     incrementCounter(pCounter);
   }
 
   // Remove trailing '.'
   lastIndex = strlen(pFileNode->NewName);
-  if(lastIndex == 0)
+  if (lastIndex == 0)
   {
     return;
   }
-  
-  while(pFileNode->NewName[--lastIndex] == '.')
+
+  while (pFileNode->NewName[--lastIndex] == '.')
   {
     pFileNode->NewName[lastIndex] = '\0';
   }
-
 }
 
-void createNewNameToken(FileNode* pFileNode)
-{
-  ULONG i;
-  const char *pItemText;
-
-  if(!pFileNode)
-  {
-    return;
-  }
-
-  pItemText = pFileNode->NewName;
-  pFileNode->NewNameToken = 0;
-  for (i = 0; i < pFileNode->NewNameFullLen; i++)
-  {
-    pFileNode->NewNameToken += 2 * pFileNode->NewNameToken + *(pItemText++);
-  }
-}
+///
