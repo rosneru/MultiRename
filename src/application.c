@@ -552,10 +552,10 @@ void setAllGadgetsDisabledState(Application *pApp, BOOL disable)
   {
     if (gadgetId == GID_BTN_START && !disable)
     {
+      // Instead of whats requested, disable the start button if it is not
+      // allowed to be enabled.
       if (!pApp->IsStartAllowed || pApp->FilesCount == 0)
       {
-        // Instead of whats requested, disable the start button if it is not
-        // allowed to be enabled.
 
         // clang-format off
         SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
@@ -1208,8 +1208,18 @@ void menuFunctionProjectNew(Application *pApp)
     return;
   }
 
-  if (!pApp->IsResetNeeded)
+  if (!pApp->IsResetNeeded && pApp->FilesCount > 0)
   {
+    if (!showEasyRequest(pApp->pWinObject,
+          pApp->pIntuiWindow,
+          "MultiRename",
+          "Continue|Cancel",
+          "Continue to create a new project will clear the processing list\n"
+          "and set the masks to a default value.\n\n"
+          "Continue anyway?"))
+    {
+      return;
+    }
   }
 
   // Detach list from ListBrowser. Must be done before changing the list.
@@ -1246,6 +1256,7 @@ void menuFunctionProjectNew(Application *pApp)
 
   pApp->IsResetNeeded = FALSE;
   updateMainWindowTitle(pApp);
+  setAllGadgetsDisabledState(pApp, FALSE);
 }
 
 static void handleMenu(Application *pApp, ULONG result)
