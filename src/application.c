@@ -543,7 +543,6 @@ void updateMainWindowTitle(Application *pApp)
 void setAllGadgetsDisabledState(Application *pApp, BOOL disable)
 {
   ULONG gadgetId = 1;
-
   if (!pApp)
   {
     return;
@@ -551,11 +550,22 @@ void setAllGadgetsDisabledState(Application *pApp, BOOL disable)
 
   for (gadgetId = 1; gadgetId < MAXGADGETS; gadgetId++)
   {
-    if (gadgetId == GID_BTN_START && !disable && !pApp->IsStartAllowed)
+    if (gadgetId == GID_BTN_START && !disable)
     {
-      // Skip enabling of the start button if it is not allowed to be
-      // enabled.
-      continue;
+      if (!pApp->IsStartAllowed || pApp->FilesCount == 0)
+      {
+        // Instead of whats requested, disable the start button if it is not
+        // allowed to be enabled.
+
+        // clang-format off
+        SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
+                        pApp->pIntuiWindow, 
+                        NULL,
+                        GA_DISABLED, TRUE,
+                        TAG_DONE);
+        // clang-format on
+        continue;
+      }
     }
 
     // clang-format off
@@ -885,6 +895,9 @@ BOOL updateNewNames(Application *pApp)
 
   counterPlacesValue = atoi(m_ppCounterPlaces[counterPlacesId]);
 
+  // Temporarily reset the files count. It will be set below to the right value.
+  pApp->FilesCount = 0;
+
   // Use the rename algorithm to fill the NewName fields according the
   // masks and counter settings
   if (createNewNames(pApp->pFiles,
@@ -919,6 +932,7 @@ BOOL updateNewNames(Application *pApp)
                                 LBNCA_Text, pFileNode->NewName,
                               TAG_DONE);
       // clang-format on
+      pApp->FilesCount++;
     }
   }
   else
@@ -944,11 +958,11 @@ BOOL updateNewNames(Application *pApp)
   // Attach changed list to ListBrowser.
   // clang-format off
   SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                  LISTBROWSER_AutoFit, TRUE,
-                  TAG_DONE);
+                 pApp->pIntuiWindow, 
+                 NULL,
+                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                 LISTBROWSER_AutoFit, TRUE,
+                 TAG_DONE);
   // clang-format on
 
   // De-/activate Start button depending if all names were updated
@@ -956,12 +970,11 @@ BOOL updateNewNames(Application *pApp)
   if (!pApp->IsResetNeeded)
   {
     pApp->IsStartAllowed = wasUpdatedSuccessfully;
-
     // clang-format off
     SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_BTN_START],
                     pApp->pIntuiWindow, 
                     NULL,
-                    GA_DISABLED, !pApp->IsStartAllowed,
+                    GA_DISABLED, !pApp->IsStartAllowed || pApp->FilesCount == 0,
                     TAG_DONE);
     // clang-format on
   }
@@ -1173,10 +1186,10 @@ static void handleGadgets(Application *pApp, ULONG result)
 
       // clang-format off
           SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                         pApp->pIntuiWindow, 
-                         NULL,
-                         LISTBROWSER_Labels, ~0,
-                         TAG_DONE);
+                          pApp->pIntuiWindow, 
+                          NULL,
+                          LISTBROWSER_Labels, ~0,
+                          TAG_DONE);
       // clang-format on
 
       startRename(pApp);
@@ -1186,6 +1199,53 @@ static void handleGadgets(Application *pApp, ULONG result)
     break;
   }
   }
+}
+
+void menuFunctionProjectNew(Application *pApp)
+{
+  if (!pApp)
+  {
+    return;
+  }
+
+  if (!pApp->IsResetNeeded)
+  {
+  }
+
+  // Detach list from ListBrowser. Must be done before changing the list.
+
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, ~0,
+                  TAG_DONE);
+  // clang-format on
+
+  // Reset files and filedir lock
+  freeFileNodes(pApp->pFiles);
+
+  // Create a new, empty filenodes list
+  if ((pApp->pFiles = createFileNodes()))
+  {
+    // Attach changed list to ListBrowser.
+
+    // clang-format off
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                    pApp->pIntuiWindow, 
+                    NULL,
+                    LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                    TAG_DONE);
+    // clang-format on
+  }
+  else
+  {
+    PutStr("Failed to re-create the files list.\n");
+    disposeApplication(pApp);
+  }
+
+  pApp->IsResetNeeded = FALSE;
+  updateMainWindowTitle(pApp);
 }
 
 static void handleMenu(Application *pApp, ULONG result)
@@ -1210,39 +1270,7 @@ static void handleMenu(Application *pApp, ULONG result)
     {
     case MENU_PROJECT_NEW:
     {
-      // Detach list from ListBrowser. Must be done before changing the list.
-
-      // clang-format off
-        SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                       pApp->pIntuiWindow, 
-                       NULL,
-                       LISTBROWSER_Labels, ~0,
-                       TAG_DONE);
-      // clang-format on
-
-      // Reset files and filedir lock
-      freeFileNodes(pApp->pFiles);
-
-      // Create a new, empty filenodes list
-      if ((pApp->pFiles = createFileNodes()))
-      {
-        // Attach changed list to ListBrowser.
-
-        // clang-format off
-          SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                          pApp->pIntuiWindow, 
-                          NULL,
-                          LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                          TAG_DONE);
-        // clang-format on
-      }
-      else
-      {
-        PutStr("Failed to re-create the files list.\n");
-        disposeApplication(pApp);
-      }
-
-      updateMainWindowTitle(pApp);
+      menuFunctionProjectNew(pApp);
       break;
     }
 

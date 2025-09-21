@@ -23,6 +23,7 @@ typedef struct Application
   struct List *pNotifications;
   ParsedArgs *pParsedArgs;
   FileNodes *pFiles;
+  ULONG FilesCount;
   Object *pWinObject;
   RangeMask RangeMask;
   RangeSelectWindow *pRangeSelectWindow;
