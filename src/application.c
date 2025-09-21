@@ -754,6 +754,9 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
 
   if (pApp->IsResetNeeded)
   {
+    // Not allowed to add files when reset is needed. This is the cause e.g.
+    // after an rename was done. Menu 'Project' -> 'New' is needed to allow to
+    // add new files.
     return;
   }
 
