@@ -1582,7 +1582,7 @@ Object *createLayout(void)
         LAYOUT_AddChild, m_ppGadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_START,
           GA_RelVerify, TRUE,
-          GA_Text, (ULONG)"Start",
+          GA_Text, (ULONG)"Start rename",
         TAG_DONE),
         CHILD_WeightedWidth, 0,
       TAG_DONE),

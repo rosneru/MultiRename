@@ -1,28 +1,28 @@
-The tool allows the simultaneous renaming of all selected files with the following functions:
+        The tool allows the simultaneous renaming of all selected files with the following functions:
 
-- Create a numbered file list 
-- Convert to upper/lower case letters 
-- Replace a specific text in the file name with another one
-- Inserting the date/time of the file 
-- Keep only certain letters of the file name 
+        - Create a numbered file list 
+        - Convert to upper/lower case letters 
+        - Replace a specific text in the file name with another one
+        - Inserting the date/time of the file 
+        - Keep only certain letters of the file name 
 
-In the input fields square brackets [] are used as placeholders for special values like date or part of original name selection. Below the input fields are buttons to help with the special values. The expected result of the rename process is displayed in a processing list bewlo the input section. The renaming begins when the start button is pressed.
+        In the input fields square brackets [] are used as placeholders for special values like date or part of original name selection. Below the input fields are buttons to help with the special values. The expected result of the rename process is displayed in a processing list bewlo the input section. The renaming begins when the start button is pressed.
 
-The default maximum length of file names created by the tool is 32 characters, as this was the length supported on the Amiga from the beginning. If you use a file system with long file name support like PFS, SFS or the FFS v46+ (came with AmigaOS 3.1.4 onward) you can use the LONGNAMES tooltype / argument or the menu setting "Allow long filenames" - which the allows 107 characters. 
+        The default maximum length of file names created by the tool is 32 characters, as this was the length supported on the Amiga from the beginning. If you use a file system with long file name support like PFS, SFS or the FFS v46+ (came with AmigaOS 3.1.4 onward) you can use the LONGNAMES tooltype / argument or the menu setting "Allow long filenames" - which the allows 107 characters. 
 
-Default behavior is that icons (.info files) are also processed. So, the allowed name length is reduced to 27 or 102 (in long name mode) characters. When SKIPICONS is set as tooltype / argument or the menu item "Settings" -> "Skip icons" is manually checked the full name length is available. This is 32 characters or 107 characters in long name mode.
+        Default behavior is that icons (.info files) are also processed. So, the allowed name length is reduced to 27 or 102 (in long name mode) characters. When SKIPICONS is set as tooltype / argument or the menu item "Settings" -> "Skip icons" is manually checked the full name length is available. This is 32 characters or 107 characters in long name mode.
 
-# Icon handling 
+        # Icon handling 
 
-Note that Icons are never visible in the MultiRename's processing list, even in icons processing mode not. Instead the behavior is that for each file in the list there is a check if a .info file exists for it, and if so, this .info file is renamed, accordingly.
+        Note that Icons are never visible in the MultiRename's processing list, even in icons processing mode not. Instead the behavior is that for each file in the list there is a check if a .info file exists for it, and if so, this .info file is renamed, accordingly.
 
-# Input fields
-## Renaming mask: File name 
-In this field you can enter a definition for the new file name. The buttons below allow you to insert placeholders for the old name, parts of it, a counter or file date/time. Placeholders are always enclosed in square brackets [], while all other characters (without the square brackets) are transferred to the new name without change Example: [C][N2-8] numbers the files and takes over the letters 2 - 8 of the old name. A detailed description of all available placeholders can be found in the help. 
+        # Input fields
+        ## Renaming mask: File name 
+        In this field you can enter a definition for the new file name. The buttons below allow you to insert placeholders for the old name, parts of it, a counter or file date/time. Placeholders are always enclosed in square brackets [], while all other characters (without the square brackets) are transferred to the new name without change Example: [C][N2-8] numbers the files and takes over the letters 2 - 8 of the old name. A detailed description of all available placeholders can be found in the help. 
 
-## Extension
+        ## Extension
 
-Here you can change the file extension. In principle, all placeholders can be added to each of the two input fields. The renaming tool generates the renaming string as follows: Mask for file name + “.” + Mask for extension. The reason for two separate fields is to avoid accidentally removing the file extensions, which would destroy the link. 
+        Here you can change the file extension. In principle, all placeholders can be added to each of the two input fields. The renaming tool generates the renaming string as follows: Mask for file name + “.” + Mask for extension. The reason for two separate fields is to avoid accidentally removing the file extensions, which would destroy the link. 
 
 # Search and replace 
 
@@ -32,18 +32,21 @@ The text in the 'Search for' field is replaced by the text in 'Replace with'. Th
 
 Converts the entire name to upper/lower case or first letter upper case, the rest lower case. This function is used after the renaming mask and after search & replace.
 
-## Define counter [C]: 
-### Start at
-Number of the first file. The files are always displayed in the order in which they appear in the result list, numbered. {CHECK You can sort the result list by clicking on the heading of the original file name}.
+      ## Define counter [C]: 
+      ### Start at
+      Number of the first file. The files are always displayed in the order in which they appear in the result list, numbered.
 
-### Increment
+{CHECK You can sort the result list by clicking on the heading of the original file name}.
 
-The counter is incremented/decremented by this value. 
+      ### Increment
 
-### Number of digits
+      The counter is incremented/decremented by this value. 
 
-Width of the counter field. {CHECK If number of digits > 1, the renaming tool inserts leading zeros}.
+      ### Number of digits
 
-# Special notes
+      Width of the counter field.
+{CHECK If number of digits > 1, the renaming tool inserts leading zeros}.
 
-- File names ending with one or multiple dot '.' characters are not generated by this tool. If you create such a mask the trailing dots don't appear in the new name field.
+      # Special notes
+
+      - File names ending with one or multiple dot '.' characters are not generated by this tool. If you create such a mask the trailing dots don't appear in the new name field.

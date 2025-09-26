@@ -1,0 +1,31 @@
+Short:        Rename multiple files
+Author:       Uwe Rosner
+Uploader:     u.rosner@ymail.com (Uwe Rosner)
+Type:         util/misc
+Version:      1.0
+Architecture: m68k-amigaos >= 3.2.3
+Distribution: Aminet
+
+
+=====
+ABOUT
+=====
+Tool for renaming selected files or directories according to specified masks. All source files/directories must be in the same directory. The following functions can be applied using the masks:
+
+- Create a numbered file list 
+- Convert to upper/lower case letters 
+- Replace a specific text in the file name with another one
+- Inserting the date/time of the file 
+- Keep only certain letters of the file name 
+- Mix all the masks above
+- All of the above for name extension, too
+
+It is based on the AmigaOS3.2 BOOPSI objects (Reaction) so it only runs
+on Amigas with this operating system or newer. In fact, a recently updated function of the string.gadget from latest AmigaOS update 3.2.3  from April 2025 is used, so you need to have this OS version installed to run the tool properly.
+
+======= 
+CHANGES
+=======
+
+1.0 (xx.10.2025)
+- Initial version
