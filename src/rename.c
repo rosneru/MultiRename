@@ -12,6 +12,8 @@
 
 #include "rename.h"
 
+#define ERR_MSG_BUF_SIZE 512
+
 /// Forwards / private function declarations
 
 TokenCount *appendTokenCount(
@@ -21,7 +23,7 @@ TokenCount *findTokenCount(
 
 ///
 /// Public function implementations
-#define ERR_MSG_BUF_SIZE 512
+
 BOOL renameFiles(
   FileNodes *pFilesList, struct List *pNotifications, BOOL doSkipIcons)
 {
@@ -39,7 +41,7 @@ BOOL renameFiles(
   }
 
   for (pNode = pFilesList->pList->lh_Head; pNode->ln_Succ;
-       pNode = pNode->ln_Succ)
+    pNode = pNode->ln_Succ)
   {
     pFileNode = (FileNode *)pNode;
 
