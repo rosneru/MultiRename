@@ -145,20 +145,14 @@ Can be set with the SKIPICONS argument, see @{"Arguments and tool types" link ar
 
 @{b}@{u}Using MultiRename with DOpus 5.x@{uu}@{ub}
 
-To use this tool with DOpus 5.x you can setup a button to run MultiRename from there:
+I like to use MultiRename with Dopus 5.82 and have configured a button and a keyboard shortcut <Ctrl + m> for this purpose. However, it is not enough to start the tool and set ___TODO_command line___ as the command line, because Dopus, unlike AmigaOS 3.1.4+, has a limited command line length of 512 (?) characters, which is quickly exceeded when many files are passed to the tool.
 
-1) Edit the file DOpus/ARexx/Compare.dopus5. Change the line starting with "Address Command", which is almost at the bottom, so that it looks like this:
+That is why I wrote the script `MultiRename-starter.dopus5`, which can be copied into the DOpus:rexx directory and then added to a button in Dopus as an ARexx script, for example:
 
-@{fg shine}Address Command 'SYS:Tools/MultiRename "' || First_Name || '" "' || Second_Name || '"' IGNORELEADINGSPACES IGNORETRAILINGSPACES OLDERTOLEFT DONOTASK@{fg text}
+___TODO_command line___
 
-Alternately, if you want to use SYS:Tools/TextEdit (Os 3.1.4 or later needed) and open it on the same screen as MultiRename runs on:
+It expects MultiRename in the directory SYS:Tools/ and passes the parameters LONGNAMES and PUBSCREEN in addition to the files, whereby it gets the screen name from Dopus. If necessary, adapt the script to your requirements.
 
-@{fg shine}Address Command 'DH0:Tools/MultiRename "' || First_Name || '" "' || Second_Name || '"' IGNORELEADINGSPACES IGNORETRAILINGSPACES OLDERTOLEFT DONOTASK EDITOR 'SYS:Tools/TextEdit' EDITORONPUBSCREEN@{fg text}
-
-2) In DOpus create or edit a button, name it e.g. "Compare" and set this ARexx script to be executed on the button click:
-@{fg shine}DOpus5:ARexx/Compare.dopus5 {Qp}@{fg text}
-
-Now when clicking on "Compare" MultiRename will be started, immediately comparing the first two selected files. The files to compare can be selected from one lister or from two different listers.
 
 @endnode
 @node arguments "Arguments and tool types"
