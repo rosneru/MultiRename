@@ -147,13 +147,18 @@ Can be set with the SKIPICONS argument, see @{"Arguments and tool types" link ar
 
 @{b}@{u}Using MultiRename with DOpus 5.x@{uu}@{ub}
 
-I like to use MultiRename with Dopus 5.82 and have configured a button and a keyboard shortcut <Ctrl + m> for this purpose. However, it is not enough to start the tool and set ___TODO_command line___ as the command line, because Dopus, unlike AmigaOS 3.1.4+, has a limited command line length of 512 (?) characters, which is quickly exceeded when many files are passed to the tool.
+I like to use MultiRename with Dopus 5.82 and have configured a button and a keyboard shortcut <Ctrl + m> for this purpose. However, it is not enough to start the tool as AmigaDOS command and set 'SYS:Tools/MultiRename {F}' as the command line. Because Dopus, unlike AmigaOS 3.1.4+, has a limited command line length of 512 (?) characters, which is quickly exceeded when many files are passed to the tool.
 
-That is why I wrote the script `MultiRename-starter.dopus5`, which can be copied into the DOpus:rexx directory and then added to a button in Dopus as an ARexx script, for example:
+That is why I wrote the script `MultiRename-starter.dopus5`.
 
-___TODO_command line___
+To use the script:
 
-It expects MultiRename in the directory SYS:Tools/ and passes the parameters LONGNAMES and PUBSCREEN in addition to the files, whereby it gets the screen name from Dopus. If necessary, adapt the script to your requirements.
+- Copy 'MultiRename-starter.dopus5' to 'DOpus5:ARexx'
+- In Dopus5, configure a button for MultiRename
+- As command type for the button select: ARexx
+- As command line enter: DOpus5:ARexx/MultiRename-starter.dopus5 {Qp} {Qs}
+
+It expects 'MultiRename' in the directory 'SYS:Tools' and passes the parameters LONGNAMES and PUBSCREEN in addition to the files, whereby it gets the screen name from Dopus. If necessary, adapt the script to your requirements.
 
 
 @endnode
