@@ -47,7 +47,7 @@ When MultiRename adds the first source file to the processing list, it sets its 
 
 Whenever something goes wrong, an error requester is shown. It gives you the choice of clicking 'Ok' to continue working or clicking on 'Show errors' will open a window showing you what happened and which files are affected.
 
-@{i}In this first version, the output is only displayed in a simple CLI window, which cannot even be closed while the app is running.@{ui}
+@{i}In this version, the output is only displayed in a simple CLI window.@{ui}
 
 @{fg shine}Icon handling:@{fg text}
 
@@ -74,6 +74,8 @@ In case the rename process produces duplicate names, the programm offers to rena
   name (3)
 
 However, the resulting names may then be too long for what the file system supports and the renaming may fail.
+
+After successful renaming, the processing list is empty and most controls in the window are disabled. If errors occur during the rename process, all controls are also disabled - but the processing list still contains the files that could not be renamed. In both cases, the only options are to start a new session with the menu item 'Project' -> 'New' or to exit the program.
 
 @{fg shine}Special note@{fg text}
 
