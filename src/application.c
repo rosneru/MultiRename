@@ -110,9 +110,11 @@ void setAllGadgetsDisabledState(Application *pApp, BOOL disable);
 
 /**
  * Calculates the new names in the processing list / ListBrowser.
- * NOTE: De- and attaches the list browser labels.
+ *
+ * NOTE: List browser labels of processing list must be detached before this
+ * call and attached afterwards!
  */
-BOOL updateNewNames(Application *pApp);
+BOOL calculateNewNames(Application *pApp);
 
 /**
  * Informs the user about error / skip notifications, if there are some.
@@ -489,7 +491,7 @@ BOOL runApplication(Application *pApp)
     return FALSE;
   }
 
-  updateNewNames(pApp);
+  calculateNewNames(pApp);
 
   if ((pApp->pIntuiWindow =
           (struct Window *)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
@@ -826,13 +828,13 @@ void applyNewFiles(Application *pApp)
     }
   }
 
-  updateNewNames(pApp);
+  calculateNewNames(pApp);
   updateMainWindowTitle(pApp);
   setAllGadgetsDisabledState(pApp, pApp->IsResetNeeded);
   notifyUserAboutSkippedFiles(pApp);
 }
 
-BOOL updateNewNames(Application *pApp)
+BOOL calculateNewNames(Application *pApp)
 {
   BOOL wasUpdatedSuccessfully = TRUE;
   struct Node *pNode;
@@ -1059,7 +1061,7 @@ void insertCommandToStrGadget(
       TEMP_BUF_SIZE);
   }
 
-  updateNewNames(pApp);
+  calculateNewNames(pApp);
 }
 
 static void handleGadgets(Application *pApp, ULONG result)
@@ -1073,7 +1075,7 @@ static void handleGadgets(Application *pApp, ULONG result)
   case GID_STR_EXTENSION:
   case GID_STR_NAME:
   {
-    updateNewNames(pApp);
+    calculateNewNames(pApp);
     break;
   }
   case GID_BTN_NAME:
@@ -1162,7 +1164,7 @@ static void handleGadgets(Application *pApp, ULONG result)
   }
   case GID_BTN_START:
   {
-    if (updateNewNames(pApp))
+    if (calculateNewNames(pApp))
     {
       // Detach list from ListBrowser. Must be done because
       // `startRename()` changes the list (removes the successfully
@@ -1303,7 +1305,7 @@ static void handleMenu(Application *pApp, ULONG result)
 
       // Because skipping icons affects on the allowed new name length
       // (5 bytes more allowed because of the missing ".info")
-      updateNewNames(pApp);
+      calculateNewNames(pApp);
       break;
     }
 
@@ -1312,7 +1314,7 @@ static void handleMenu(Application *pApp, ULONG result)
       pApp->pParsedArgs->AreLongNamesAllowed = (pItem->Flags & CHECKED);
 
       // Because it directly affects the allowed new name length
-      updateNewNames(pApp);
+      calculateNewNames(pApp);
       break;
     }
     }
@@ -1353,12 +1355,12 @@ void intuiEventLoop(Application *pApp)
       case WMHI_MOUSEBUTTONS:
         if (code == SELECTDOWN || code == MENUDOWN)
         {
-          updateNewNames(pApp);
+          calculateNewNames(pApp);
         }
         break;
       case WMHI_ACTIVE:
       case WMHI_INACTIVE:
-        updateNewNames(pApp);
+        calculateNewNames(pApp);
         break;
       }
     }
@@ -1370,7 +1372,7 @@ void intuiEventLoop(Application *pApp)
       pApp->pRangeSelectWindow->WindowState = RSW_STATE_IDLE;
       if (TRUE == applySelectedRange(pApp))
       {
-        updateNewNames(pApp);
+        calculateNewNames(pApp);
       }
       else
       {
