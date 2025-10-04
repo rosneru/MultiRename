@@ -79,18 +79,16 @@ BOOL startRename(Application *pApp);
 /**
  * Iterate the given array of WbArgs and (try to) add each file to the
  * application processing list.
- *
- * NOTE: Detaches the list browser labels and the it calls
- * `applyNewFiles()` which then attaches them again.
  */
 void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs);
 
 /**
- * Re-attaches the list of FileNodes to the list browser.
- * Set the current working path if necessary.
- * Updates window title with the current working path.
+ * Re-attaches the list of FileNodes to the list browser. Set the current
+ * working path if necessary. Updates window title with the current working
+ * path.
  *
- * NOTE: Attaches the list browser labels. Must be detached before this call!
+ * NOTE: List browser labels of processing list must be detached before this
+ * call and attached afterwards!
  */
 void applyNewFiles(Application *pApp);
 
@@ -130,7 +128,7 @@ void intuiEventLoop(Application *pApp);
 /**
  * Create layout for main window.
  */
-Object *createLayout(void);
+Object *createLayout(struct List *pFilesList);
 
 ///
 /// Private variables
@@ -348,7 +346,7 @@ Application *createApplication(int argc, char **argv)
                    pApp->pLocale,
                    pApp->pNotifications)))
             {
-              if ((pMainLayout = createLayout()))
+              if ((pMainLayout = createLayout(pApp->pFiles->pList)))
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
@@ -491,21 +489,13 @@ BOOL runApplication(Application *pApp)
     return FALSE;
   }
 
-  // Display the files list in ListBrowser. Even needed when list is empty. See
-  // autodoc listbrowser_gc.doc: LISTBROWSER_Labels
-
-  // clang-format off
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                  LISTBROWSER_AutoFit, TRUE,
-                  TAG_DONE);
-  // clang-format on
+  updateNewNames(pApp);
 
   if ((pApp->pIntuiWindow =
           (struct Window *)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
-    applyNewFiles(pApp);
+    updateMainWindowTitle(pApp);
+    notifyUserAboutSkippedFiles(pApp);
     intuiEventLoop(pApp);
 
     // TODO: ClearMenuStrip()? before this..once a menu exists
@@ -525,7 +515,7 @@ BOOL runApplication(Application *pApp)
 /// Private function implementations
 void updateMainWindowTitle(Application *pApp)
 {
-  // If a files is already set (e.e. a lock exists)
+  // If a files directory is already set (e.e. a lock exists)
   if (getFilesDirLock(pApp->pFiles))
   {
     strcpy(pApp->WindowTitle, "MultiRename in [");
@@ -798,6 +788,16 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
   }
 
   applyNewFiles(pApp);
+
+  // Attach changed list to ListBrowser.
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                 pApp->pIntuiWindow,
+                 NULL,
+                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                 LISTBROWSER_AutoFit, TRUE,
+                 TAG_DONE);
+  // clang-format on
 }
 
 void applyNewFiles(Application *pApp)
@@ -876,15 +876,6 @@ BOOL updateNewNames(Application *pApp)
     }
   }
 
-  // Detach list from ListBrowser. Must be done before changing the list.
-  // clang-format off
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  LISTBROWSER_Labels, ~0,
-                  TAG_DONE);
-  // clang-format on
-
   // Read current name and extension masks
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG *)&pName);
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_EXTENSION], (ULONG *)&pExt);
@@ -957,16 +948,6 @@ BOOL updateNewNames(Application *pApp)
 
     wasUpdatedSuccessfully = FALSE;
   }
-
-  // Attach changed list to ListBrowser.
-  // clang-format off
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                 pApp->pIntuiWindow, 
-                 NULL,
-                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                 LISTBROWSER_AutoFit, TRUE,
-                 TAG_DONE);
-  // clang-format on
 
   // De-/activate Start button depending if all names were updated
   // successfully
@@ -1399,7 +1380,7 @@ void intuiEventLoop(Application *pApp)
   }
 }
 
-Object *createLayout(void)
+Object *createLayout(struct List *pFilesList)
 {
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL,
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
@@ -1576,6 +1557,7 @@ Object *createLayout(void)
         LISTBROWSER_ColumnTitles, TRUE,
         LISTBROWSER_HorizontalProp, TRUE,
         LISTBROWSER_TitleClickable, TRUE,
+        LISTBROWSER_Labels, pFilesList,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,

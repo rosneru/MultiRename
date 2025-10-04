@@ -89,7 +89,8 @@
     "menu_tools.h": "c",
     "file_tools.h": "c",
     "dos_protos.h": "c",
-    "icon.h": "c"
+    "icon.h": "c",
+    "workbench.h": "c"
   },
   "cSpell.words": [
     "ADIFFVIEW",
