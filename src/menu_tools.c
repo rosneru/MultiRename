@@ -36,6 +36,10 @@ struct NewMenu *findNewMenuItem(struct NewMenu *pNewMenuArray, ULONG itemId)
 struct MenuItem *findMenuItem(
   struct Menu *pMenu, APTR pUserDataToFind, WORD *pFoundMenuNumber)
 {
+  int iMenu = 0, iItem = 0;
+  struct MenuItem *pItem = NULL;
+  APTR pUserData;
+
   if (!pMenu || !pUserDataToFind || !pFoundMenuNumber)
   {
     return NULL;
@@ -43,20 +47,17 @@ struct MenuItem *findMenuItem(
 
   *pFoundMenuNumber = 0;
 
-  struct MenuItem *pItem = pMenu->FirstItem;
+  pItem = pMenu->FirstItem;
   if (!pItem)
   {
     return NULL;
   }
 
-  int iMenu = 0;
-  int iItem = 0;
-
   do
   {
     do
     {
-      APTR pUserData = GTMENUITEM_USERDATA(pItem);
+      pUserData = GTMENUITEM_USERDATA(pItem);
       if (pUserData == pUserDataToFind)
       {
         *pFoundMenuNumber = FULLMENUNUM(iMenu, iItem, 0);
@@ -81,16 +82,15 @@ struct MenuItem *findMenuItem(
 
 void disableMenuItem(struct Window *pWindow, APTR pUserDataMenuItemToDisable)
 {
+  WORD menuNumber = 0;
+
   if (!pWindow || !pWindow->MenuStrip || !pUserDataMenuItemToDisable)
   {
     return;
   }
 
-  WORD menuNumber = 0;
-  struct MenuItem *pFoundItem =
-    findMenuItem(pWindow->MenuStrip, pUserDataMenuItemToDisable, &menuNumber);
-
-  if (!pFoundItem)
+  if (!findMenuItem(
+        pWindow->MenuStrip, pUserDataMenuItemToDisable, &menuNumber))
   {
     return;
   }
@@ -100,16 +100,14 @@ void disableMenuItem(struct Window *pWindow, APTR pUserDataMenuItemToDisable)
 
 void enableMenuItem(struct Window *pWindow, APTR pUserDataMenuItemToEnable)
 {
+  WORD menuNumber = 0;
+
   if (!pWindow || !pWindow->MenuStrip || !pUserDataMenuItemToEnable)
   {
     return;
   }
 
-  WORD menuNumber = 0;
-  struct MenuItem *pFoundItem =
-    findMenuItem(pWindow->MenuStrip, pUserDataMenuItemToEnable, &menuNumber);
-
-  if (!pFoundItem)
+  if (!findMenuItem(pWindow->MenuStrip, pUserDataMenuItemToEnable, &menuNumber))
   {
     return;
   }
