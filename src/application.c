@@ -1452,7 +1452,7 @@ Object *createLayout(struct List *pFilesList)
     LAYOUT_AddChild, m_ppGadgets[GID_STR_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_NAME,
       GA_RelVerify, TRUE,
-      STRINGA_TextVal, (ULONG)"[C] - [N]",
+      STRINGA_TextVal, (ULONG)"[N]",
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
