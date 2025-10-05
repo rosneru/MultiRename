@@ -120,7 +120,7 @@ With the commands [YMD] and [hms] you can insert date and time of the file. Play
 
 @{b}@{u}Project -> New@{uu}@{ub}
 
-With 'New' you can start a new session. The processing list will be cleared and the 'working directory' will be reset.
+With 'New' you can start a new session. The processing list will be cleared and the 'working directory' will be reset. However, the masks you have entered are not reset. This gives you the option of re-applying the masks for another session. To reset the masks as well, restart MultiRename.
 
 @{b}@{u}Project -> Add files@{uu}@{ub}
 
