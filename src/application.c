@@ -146,7 +146,7 @@ Object *createLayout(struct List *pFilesList);
 
 struct ColumnInfo *m_pColumnInfo = NULL;
 
-static UBYTE *m_ppCounterPlaces[] = {
+STRPTR m_ppCounterPlaces[] = {
   "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", NULL
 };
 
@@ -1575,6 +1575,7 @@ Object *createLayout(struct List *pFilesList)
         CHOOSER_Justification, CHJ_RIGHT,
         CHOOSER_Selected, 1,
         CHOOSER_AutoFit, TRUE,
+        CHOOSER_PopUp, TRUE,
       TAG_DONE),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Places:", TAG_DONE),
     TAG_DONE),
