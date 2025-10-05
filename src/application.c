@@ -616,7 +616,7 @@ BOOL startRename(Application *pApp)
   BOOL hasAlreadyAskedToProceed = FALSE;
   BOOL renameSucceeded = FALSE;
   STRPTR pFileNameExtensionDot = NULL;
-  ULONG fileNameExtensionDotIdx;
+  ULONG insertPos;
 
   fileCount = countFileNodes(pApp->pFiles);
   if (fileCount == 0)
@@ -683,39 +683,44 @@ BOOL startRename(Application *pApp)
       // Find the dot '.' in new filename
       if ((pFileNameExtensionDot = strrchr(pFileNode->NewName, '.')))
       {
-        fileNameExtensionDotIdx =
-          pFileNameExtensionDot - (STRPTR)pFileNode->NewName;
-        if (insertString(pFileNode->NewName,
-              pApp->pParsedArgs->pTempPathBuf,
-              fileNameExtensionDotIdx,
-              pApp->TempBuf,
-              TEMP_BUF_SIZE) < 0)
-        {
-          showEasyRequest(pApp->pWinObject,
-            pApp->pIntuiWindow,
-            "MultiRename",
-            "Cancel",
-            "Error, failed to automatically create name for duplicate file!");
-          freeTokenCounts(pTokenCounts);
-          return FALSE;
-        }
-
-        // Check if name length (+ the possible '.info') is allowed by
-        // file system. TODO: Replace MAX_NAME_LEN by proper allowed
-        // length 32 || 107
-        if ((strlen(pApp->TempBuf) + 5) > MAX_NAME_LEN)
-        {
-          showEasyRequest(pApp->pWinObject,
-            pApp->pIntuiWindow,
-            "MultiRename",
-            "Cancel",
-            "Error, auto-renamed file name would be too long for file system!");
-          freeTokenCounts(pTokenCounts);
-          return FALSE;
-        }
-
-        strcpy(pFileNode->NewName, pApp->TempBuf);
+        insertPos = pFileNameExtensionDot - (STRPTR)pFileNode->NewName;
       }
+      else
+      {
+        // No dot '.' found: insert position is the end of the name
+        insertPos = pFileNode->NewNameFullLen;
+      }
+
+      if (insertString(pFileNode->NewName,
+            pApp->pParsedArgs->pTempPathBuf,
+            insertPos,
+            pApp->TempBuf,
+            TEMP_BUF_SIZE) < 0)
+      {
+        showEasyRequest(pApp->pWinObject,
+          pApp->pIntuiWindow,
+          "MultiRename",
+          "Cancel",
+          "Error, failed to automatically create name for duplicate file!");
+        freeTokenCounts(pTokenCounts);
+        return FALSE;
+      }
+
+      // Check if name length (+ the possible '.info') is allowed by
+      // file system. TODO: Replace MAX_NAME_LEN by proper allowed
+      // length 32 || 107
+      if ((strlen(pApp->TempBuf) + 5) > MAX_NAME_LEN)
+      {
+        showEasyRequest(pApp->pWinObject,
+          pApp->pIntuiWindow,
+          "MultiRename",
+          "Cancel",
+          "Error, auto-renamed file name would be too long for file system!");
+        freeTokenCounts(pTokenCounts);
+        return FALSE;
+      }
+
+      strcpy(pFileNode->NewName, pApp->TempBuf);
     }
   }
 
