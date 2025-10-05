@@ -167,8 +167,10 @@ struct Node *createFileNode(struct Locale *pLocale,
       return NULL;
     }
 
-    pFileNode->OriginalNameToken =
-      createStringToken(pFileNode->OriginalName, pFileNode->OriginalNameLen);
+    // For token creation, the full length of original name + extension + 1 for
+    // the dot must be given
+    pFileNode->OriginalNameToken = createStringToken(pFileNode->OriginalName,
+      pFileNode->OriginalNameLen + pFileNode->OriginalExtLen + 1);
 
     // clang-format off
     SetListBrowserNodeAttrs(pNode,
