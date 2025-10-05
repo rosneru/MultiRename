@@ -734,19 +734,6 @@ BOOL startRename(Application *pApp)
   freeTokenCounts(pTokenCounts);
   pApp->IsResetNeeded = TRUE;
 
-  if (!renameSucceeded)
-  {
-    if (!showEasyRequest(pApp->pWinObject,
-          pApp->pIntuiWindow,
-          "MultiRename",
-          "Ok|Show errors",
-          "Failed to rename some of the input files"))
-    {
-      printNotifications(pApp->pNotifications);
-      return FALSE;
-    }
-  }
-
   return renameSucceeded;
 }
 
@@ -816,6 +803,8 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
                  LISTBROWSER_AutoFit, TRUE,
                  TAG_DONE);
   // clang-format on
+
+  notifyUserAboutSkippedFiles(pApp);
 }
 
 void applyNewFiles(Application *pApp)
@@ -847,7 +836,6 @@ void applyNewFiles(Application *pApp)
   calculateNewNames(pApp);
   updateMainWindowTitle(pApp);
   setAllGadgetsDisabledState(pApp, pApp->IsResetNeeded);
-  notifyUserAboutSkippedFiles(pApp);
 }
 
 BOOL calculateNewNames(Application *pApp)
@@ -1110,6 +1098,7 @@ void insertCommandToStrGadget(
 
 static void handleGadgets(Application *pApp, ULONG result)
 {
+  BOOL renameSucceeded = FALSE;
   FileNode *pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
@@ -1215,16 +1204,35 @@ static void handleGadgets(Application *pApp, ULONG result)
       // renamed files)
 
       // clang-format off
-          SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                          pApp->pIntuiWindow, 
-                          NULL,
-                          LISTBROWSER_Labels, ~0,
-                          TAG_DONE);
+      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                      pApp->pIntuiWindow, 
+                      NULL,
+                      LISTBROWSER_Labels, ~0,
+                      TAG_DONE);
       // clang-format on
 
-      startRename(pApp);
-      applyNewFiles(pApp); // Re-attach files node list to ListBrowser
-                           // to display the errorous files.
+      renameSucceeded = startRename(pApp);
+
+      // clang-format off
+      SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                      pApp->pIntuiWindow, 
+                      NULL,
+                      LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                      TAG_DONE);
+      // clang-format on
+
+      setAllGadgetsDisabledState(pApp, TRUE);
+      if (!renameSucceeded)
+      {
+        if (!showEasyRequest(pApp->pWinObject,
+              pApp->pIntuiWindow,
+              "MultiRename",
+              "Ok|Show errors",
+              "Failed to rename some of the input files"))
+        {
+          printNotifications(pApp->pNotifications);
+        }
+      }
     }
     break;
   }
