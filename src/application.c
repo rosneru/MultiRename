@@ -117,6 +117,14 @@ void setAllGadgetsDisabledState(Application *pApp, BOOL disable);
 BOOL calculateNewNames(Application *pApp);
 
 /**
+ * Calculates the new names in the processing list / ListBrowser.
+ *
+ * NOTE: This function detaches the list browser labels of procesing list before
+ * calculating the new names and re-attaches them after it.
+ **/
+BOOL calculateNewNamesWithLabelsDetachAttach(Application *pApp);
+
+/**
  * Informs the user about error / skip notifications, if there are some.
  * With the option to display the details.
  */
@@ -491,6 +499,8 @@ BOOL runApplication(Application *pApp)
     return FALSE;
   }
 
+  //  This changes the processing list which yet is not attached to the list
+  //  browser. In the `WM_OPEN` call below it will be attached and displayed.
   calculateNewNames(pApp);
 
   if ((pApp->pIntuiWindow =
@@ -968,6 +978,34 @@ BOOL calculateNewNames(Application *pApp)
   return wasUpdatedSuccessfully;
 }
 
+BOOL calculateNewNamesWithLabelsDetachAttach(Application *pApp)
+{
+  BOOL successfullyCalculated = FALSE;
+
+  // Detach list from ListBrowser. Must be done before changing the list.
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, ~0,
+                  TAG_DONE);
+  // clang-format on
+
+  successfullyCalculated = calculateNewNames(pApp);
+
+  // Attach changed list to ListBrowser.
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                 pApp->pIntuiWindow,
+                 NULL,
+                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                 LISTBROWSER_AutoFit, TRUE,
+                 TAG_DONE);
+  // clang-format on
+
+  return successfullyCalculated;
+}
+
 BOOL applySelectedRange(Application *pApp)
 {
   long bufferPos = -1;
@@ -1061,7 +1099,7 @@ void insertCommandToStrGadget(
       TEMP_BUF_SIZE);
   }
 
-  calculateNewNames(pApp);
+  calculateNewNamesWithLabelsDetachAttach(pApp);
 }
 
 static void handleGadgets(Application *pApp, ULONG result)
@@ -1075,7 +1113,7 @@ static void handleGadgets(Application *pApp, ULONG result)
   case GID_STR_EXTENSION:
   case GID_STR_NAME:
   {
-    calculateNewNames(pApp);
+    calculateNewNamesWithLabelsDetachAttach(pApp);
     break;
   }
   case GID_BTN_NAME:
@@ -1164,7 +1202,7 @@ static void handleGadgets(Application *pApp, ULONG result)
   }
   case GID_BTN_START:
   {
-    if (calculateNewNames(pApp))
+    if (calculateNewNamesWithLabelsDetachAttach(pApp))
     {
       // Detach list from ListBrowser. Must be done because
       // `startRename()` changes the list (removes the successfully
@@ -1305,7 +1343,7 @@ static void handleMenu(Application *pApp, ULONG result)
 
       // Because skipping icons affects on the allowed new name length
       // (5 bytes more allowed because of the missing ".info")
-      calculateNewNames(pApp);
+      calculateNewNamesWithLabelsDetachAttach(pApp);
       break;
     }
 
@@ -1314,7 +1352,7 @@ static void handleMenu(Application *pApp, ULONG result)
       pApp->pParsedArgs->AreLongNamesAllowed = (pItem->Flags & CHECKED);
 
       // Because it directly affects the allowed new name length
-      calculateNewNames(pApp);
+      calculateNewNamesWithLabelsDetachAttach(pApp);
       break;
     }
     }
@@ -1355,12 +1393,12 @@ void intuiEventLoop(Application *pApp)
       case WMHI_MOUSEBUTTONS:
         if (code == SELECTDOWN || code == MENUDOWN)
         {
-          calculateNewNames(pApp);
+          calculateNewNamesWithLabelsDetachAttach(pApp);
         }
         break;
       case WMHI_ACTIVE:
       case WMHI_INACTIVE:
-        calculateNewNames(pApp);
+        calculateNewNamesWithLabelsDetachAttach(pApp);
         break;
       }
     }
@@ -1372,7 +1410,7 @@ void intuiEventLoop(Application *pApp)
       pApp->pRangeSelectWindow->WindowState = RSW_STATE_IDLE;
       if (TRUE == applySelectedRange(pApp))
       {
-        calculateNewNames(pApp);
+        calculateNewNamesWithLabelsDetachAttach(pApp);
       }
       else
       {
