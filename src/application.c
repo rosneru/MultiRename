@@ -62,10 +62,11 @@
 #include "string_tools.h"
 #include "ui_tools.h"
 
+#include "MultiRename_rev.h"
+
 /// Defines
 
-#define VERSTAG "\0$VER: MultiRename 0.5 (22.3.2025)"
-#define COPYRIGHT "\n\nCopyright(c) 2024 Uwe Rosner (u.rosner@ymail.com)\n\n"
+#define COPYRIGHT "\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n"
 #define DISTRIBUTION                                                           \
   "This release of MultiRename may be freely distributed.\n"                   \
   "It may not be commercially distributed without the\n"                       \
