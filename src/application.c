@@ -1278,6 +1278,9 @@ void menuFunctionProjectNew(Application *pApp)
     disposeApplication(pApp);
   }
 
+  // TODO Move this to a function in `File_nodes.c`?
+  strcpy(pApp->pFiles->DirPath, "");
+
   pApp->IsResetNeeded = FALSE;
   updateMainWindowTitle(pApp);
   setAllGadgetsDisabledState(pApp, FALSE);
@@ -1311,8 +1314,10 @@ static void handleMenu(Application *pApp, ULONG result)
 
     case MENU_PROJECT_ADD_FILES:
     {
-      if ((pFileReq = showMultiFileSelector(
-             pApp->pWinObject, pApp->pIntuiWindow, "Select files to rename")))
+      if ((pFileReq = showMultiFileSelector(pApp->pWinObject,
+             pApp->pIntuiWindow,
+             "Select files to rename",
+             getFilesDirPath(pApp->pFiles))))
       {
         appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
         freeMultiFileSelector(pFileReq);
