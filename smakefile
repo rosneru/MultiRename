@@ -27,6 +27,9 @@ $(OBJDIR)file_tools.o : src/file_tools.c
 $(OBJDIR)file_nodes.o : src/file_nodes.c
 	$(CC) nolink src/file_nodes.c
 
+$(OBJDIR)menu_tools.o : src/menu_tools.c
+	$(CC) nolink src/menu_tools.c
+
 $(OBJDIR)main.o : src/main.c
 	$(CC) nolink src/main.c
 

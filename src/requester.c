@@ -114,13 +114,15 @@ void __ASM__ __SAVE_DS__ IntuiMsgFunc(__REG__(a0, struct Hook *pHook),
 
 struct Hook m_IntuiMsgHook;
 
-struct FileRequester *showMultiFileSelector(
-  Object *pWinObject, struct Window *pParentWindow, STRPTR pTitle)
+struct FileRequester *showMultiFileSelector(Object *pWinObject,
+  struct Window *pParentWindow,
+  STRPTR pTitle,
+  STRPTR pInitialDirectory)
 {
   struct Requester sleepRequester;
   struct FileRequester *pFileRequest;
 
-  m_IntuiMsgHook.h_Entry = (ULONG(*)())IntuiMsgFunc;
+  m_IntuiMsgHook.h_Entry = (ULONG (*)())IntuiMsgFunc;
   m_IntuiMsgHook.h_SubEntry = NULL;
   m_IntuiMsgHook.h_Data = pWinObject;
 
@@ -129,7 +131,7 @@ struct FileRequester *showMultiFileSelector(
   // clang-format off
   pFileRequest = (struct FileRequester*) AllocAslRequestTags(ASL_FileRequest,
     ASLFR_TitleText, (ULONG) pTitle,
-    // ASLFR_InitialDrawer, (ULONG) initialPath.c_str(),
+    ASLFR_InitialDrawer, (ULONG) pInitialDirectory,
     // ASLFR_InitialFile, (ULONG) initialFile.c_str(),
     ASLFR_Window, (ULONG) pParentWindow,
     ASLFR_RejectIcons, TRUE,

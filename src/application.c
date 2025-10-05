@@ -62,10 +62,11 @@
 #include "string_tools.h"
 #include "ui_tools.h"
 
+#include "MultiRename_rev.h"
+
 /// Defines
 
-#define VERSTAG "\0$VER: MultiRename 0.5 (22.3.2025)"
-#define COPYRIGHT "\n\nCopyright(c) 2024 Uwe Rosner (u.rosner@ymail.com)\n\n"
+#define COPYRIGHT "\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n"
 #define DISTRIBUTION                                                           \
   "This release of MultiRename may be freely distributed.\n"                   \
   "It may not be commercially distributed without the\n"                       \
@@ -79,18 +80,16 @@ BOOL startRename(Application *pApp);
 /**
  * Iterate the given array of WbArgs and (try to) add each file to the
  * application processing list.
- *
- * NOTE: Detaches the list browser labels and the it calls
- * `applyNewFiles()` which then attaches them again.
  */
 void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs);
 
 /**
- * Re-attaches the list of FileNodes to the list browser.
- * Set the current working path if necessary.
- * Updates window title with the current working path.
+ * Re-attaches the list of FileNodes to the list browser. Set the current
+ * working path if necessary. Updates window title with the current working
+ * path.
  *
- * NOTE: Attaches the list browser labels. Must be detached before this call!
+ * NOTE: List browser labels of processing list must be detached before this
+ * call and attached afterwards!
  */
 void applyNewFiles(Application *pApp);
 
@@ -112,9 +111,19 @@ void setAllGadgetsDisabledState(Application *pApp, BOOL disable);
 
 /**
  * Calculates the new names in the processing list / ListBrowser.
- * NOTE: De- and attaches the list browser labels.
+ *
+ * NOTE: List browser labels of processing list must be detached before this
+ * call and attached afterwards!
  */
-BOOL updateNewNames(Application *pApp);
+BOOL calculateNewNames(Application *pApp);
+
+/**
+ * Calculates the new names in the processing list / ListBrowser.
+ *
+ * NOTE: This function detaches the list browser labels of procesing list before
+ * calculating the new names and re-attaches them after it.
+ **/
+BOOL calculateNewNamesWithLabelsDetachAttach(Application *pApp);
 
 /**
  * Informs the user about error / skip notifications, if there are some.
@@ -130,7 +139,7 @@ void intuiEventLoop(Application *pApp);
 /**
  * Create layout for main window.
  */
-Object *createLayout(void);
+Object *createLayout(struct List *pFilesList);
 
 ///
 /// Private variables
@@ -348,7 +357,7 @@ Application *createApplication(int argc, char **argv)
                    pApp->pLocale,
                    pApp->pNotifications)))
             {
-              if ((pMainLayout = createLayout()))
+              if ((pMainLayout = createLayout(pApp->pFiles->pList)))
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
@@ -491,21 +500,15 @@ BOOL runApplication(Application *pApp)
     return FALSE;
   }
 
-  // Display the files list in ListBrowser. Even needed when list is empty. See
-  // autodoc listbrowser_gc.doc: LISTBROWSER_Labels
-
-  // clang-format off
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, NULL,
-                  LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                  LISTBROWSER_AutoFit, TRUE,
-                  TAG_DONE);
-  // clang-format on
+  //  This changes the processing list which yet is not attached to the list
+  //  browser. In the `WM_OPEN` call below it will be attached and displayed.
+  calculateNewNames(pApp);
 
   if ((pApp->pIntuiWindow =
           (struct Window *)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
-    applyNewFiles(pApp);
+    updateMainWindowTitle(pApp);
+    notifyUserAboutSkippedFiles(pApp);
     intuiEventLoop(pApp);
 
     // TODO: ClearMenuStrip()? before this..once a menu exists
@@ -525,7 +528,7 @@ BOOL runApplication(Application *pApp)
 /// Private function implementations
 void updateMainWindowTitle(Application *pApp)
 {
-  // If a files is already set (e.e. a lock exists)
+  // If a files directory is already set (e.e. a lock exists)
   if (getFilesDirLock(pApp->pFiles))
   {
     strcpy(pApp->WindowTitle, "MultiRename in [");
@@ -614,7 +617,7 @@ BOOL startRename(Application *pApp)
   BOOL hasAlreadyAskedToProceed = FALSE;
   BOOL renameSucceeded = FALSE;
   STRPTR pFileNameExtensionDot = NULL;
-  ULONG fileNameExtensionDotIdx;
+  ULONG insertPos;
 
   fileCount = countFileNodes(pApp->pFiles);
   if (fileCount == 0)
@@ -681,39 +684,44 @@ BOOL startRename(Application *pApp)
       // Find the dot '.' in new filename
       if ((pFileNameExtensionDot = strrchr(pFileNode->NewName, '.')))
       {
-        fileNameExtensionDotIdx =
-          pFileNameExtensionDot - (STRPTR)pFileNode->NewName;
-        if (insertString(pFileNode->NewName,
-              pApp->pParsedArgs->pTempPathBuf,
-              fileNameExtensionDotIdx,
-              pApp->TempBuf,
-              TEMP_BUF_SIZE) < 0)
-        {
-          showEasyRequest(pApp->pWinObject,
-            pApp->pIntuiWindow,
-            "MultiRename",
-            "Cancel",
-            "Error, failed to automatically create name for duplicate file!");
-          freeTokenCounts(pTokenCounts);
-          return FALSE;
-        }
-
-        // Check if name length (+ the possible '.info') is allowed by
-        // file system. TODO: Replace MAX_NAME_LEN by proper allowed
-        // length 32 || 107
-        if ((strlen(pApp->TempBuf) + 5) > MAX_NAME_LEN)
-        {
-          showEasyRequest(pApp->pWinObject,
-            pApp->pIntuiWindow,
-            "MultiRename",
-            "Cancel",
-            "Error, auto-renamed file name would be too long for file system!");
-          freeTokenCounts(pTokenCounts);
-          return FALSE;
-        }
-
-        strcpy(pFileNode->NewName, pApp->TempBuf);
+        insertPos = pFileNameExtensionDot - (STRPTR)pFileNode->NewName;
       }
+      else
+      {
+        // No dot '.' found: insert position is the end of the name
+        insertPos = pFileNode->NewNameFullLen;
+      }
+
+      if (insertString(pFileNode->NewName,
+            pApp->pParsedArgs->pTempPathBuf,
+            insertPos,
+            pApp->TempBuf,
+            TEMP_BUF_SIZE) < 0)
+      {
+        showEasyRequest(pApp->pWinObject,
+          pApp->pIntuiWindow,
+          "MultiRename",
+          "Cancel",
+          "Error, failed to automatically create name for duplicate file!");
+        freeTokenCounts(pTokenCounts);
+        return FALSE;
+      }
+
+      // Check if name length (+ the possible '.info') is allowed by
+      // file system. TODO: Replace MAX_NAME_LEN by proper allowed
+      // length 32 || 107
+      if ((strlen(pApp->TempBuf) + 5) > MAX_NAME_LEN)
+      {
+        showEasyRequest(pApp->pWinObject,
+          pApp->pIntuiWindow,
+          "MultiRename",
+          "Cancel",
+          "Error, auto-renamed file name would be too long for file system!");
+        freeTokenCounts(pTokenCounts);
+        return FALSE;
+      }
+
+      strcpy(pFileNode->NewName, pApp->TempBuf);
     }
   }
 
@@ -798,6 +806,16 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
   }
 
   applyNewFiles(pApp);
+
+  // Attach changed list to ListBrowser.
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                 pApp->pIntuiWindow,
+                 NULL,
+                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                 LISTBROWSER_AutoFit, TRUE,
+                 TAG_DONE);
+  // clang-format on
 }
 
 void applyNewFiles(Application *pApp)
@@ -826,13 +844,13 @@ void applyNewFiles(Application *pApp)
     }
   }
 
-  updateNewNames(pApp);
+  calculateNewNames(pApp);
   updateMainWindowTitle(pApp);
   setAllGadgetsDisabledState(pApp, pApp->IsResetNeeded);
   notifyUserAboutSkippedFiles(pApp);
 }
 
-BOOL updateNewNames(Application *pApp)
+BOOL calculateNewNames(Application *pApp)
 {
   BOOL wasUpdatedSuccessfully = TRUE;
   struct Node *pNode;
@@ -875,15 +893,6 @@ BOOL updateNewNames(Application *pApp)
       pTextTruncated = pTruncatedShort;
     }
   }
-
-  // Detach list from ListBrowser. Must be done before changing the list.
-  // clang-format off
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                  pApp->pIntuiWindow, 
-                  NULL,
-                  LISTBROWSER_Labels, ~0,
-                  TAG_DONE);
-  // clang-format on
 
   // Read current name and extension masks
   GetAttr(STRINGA_TextVal, m_ppGadgets[GID_STR_NAME], (ULONG *)&pName);
@@ -958,16 +967,6 @@ BOOL updateNewNames(Application *pApp)
     wasUpdatedSuccessfully = FALSE;
   }
 
-  // Attach changed list to ListBrowser.
-  // clang-format off
-  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
-                 pApp->pIntuiWindow, 
-                 NULL,
-                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
-                 LISTBROWSER_AutoFit, TRUE,
-                 TAG_DONE);
-  // clang-format on
-
   // De-/activate Start button depending if all names were updated
   // successfully
   if (!pApp->IsResetNeeded)
@@ -983,6 +982,34 @@ BOOL updateNewNames(Application *pApp)
   }
 
   return wasUpdatedSuccessfully;
+}
+
+BOOL calculateNewNamesWithLabelsDetachAttach(Application *pApp)
+{
+  BOOL successfullyCalculated = FALSE;
+
+  // Detach list from ListBrowser. Must be done before changing the list.
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                  pApp->pIntuiWindow, 
+                  NULL,
+                  LISTBROWSER_Labels, ~0,
+                  TAG_DONE);
+  // clang-format on
+
+  successfullyCalculated = calculateNewNames(pApp);
+
+  // Attach changed list to ListBrowser.
+  // clang-format off
+  SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
+                 pApp->pIntuiWindow,
+                 NULL,
+                 LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
+                 LISTBROWSER_AutoFit, TRUE,
+                 TAG_DONE);
+  // clang-format on
+
+  return successfullyCalculated;
 }
 
 BOOL applySelectedRange(Application *pApp)
@@ -1078,7 +1105,7 @@ void insertCommandToStrGadget(
       TEMP_BUF_SIZE);
   }
 
-  updateNewNames(pApp);
+  calculateNewNamesWithLabelsDetachAttach(pApp);
 }
 
 static void handleGadgets(Application *pApp, ULONG result)
@@ -1092,7 +1119,7 @@ static void handleGadgets(Application *pApp, ULONG result)
   case GID_STR_EXTENSION:
   case GID_STR_NAME:
   {
-    updateNewNames(pApp);
+    calculateNewNamesWithLabelsDetachAttach(pApp);
     break;
   }
   case GID_BTN_NAME:
@@ -1181,7 +1208,7 @@ static void handleGadgets(Application *pApp, ULONG result)
   }
   case GID_BTN_START:
   {
-    if (updateNewNames(pApp))
+    if (calculateNewNamesWithLabelsDetachAttach(pApp))
     {
       // Detach list from ListBrowser. Must be done because
       // `startRename()` changes the list (removes the successfully
@@ -1257,6 +1284,9 @@ void menuFunctionProjectNew(Application *pApp)
     disposeApplication(pApp);
   }
 
+  // TODO Move this to a function in `File_nodes.c`?
+  strcpy(pApp->pFiles->DirPath, "");
+
   pApp->IsResetNeeded = FALSE;
   updateMainWindowTitle(pApp);
   setAllGadgetsDisabledState(pApp, FALSE);
@@ -1290,8 +1320,10 @@ static void handleMenu(Application *pApp, ULONG result)
 
     case MENU_PROJECT_ADD_FILES:
     {
-      if ((pFileReq = showMultiFileSelector(
-             pApp->pWinObject, pApp->pIntuiWindow, "Select files to rename")))
+      if ((pFileReq = showMultiFileSelector(pApp->pWinObject,
+             pApp->pIntuiWindow,
+             "Select files to rename",
+             getFilesDirPath(pApp->pFiles))))
       {
         appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
         freeMultiFileSelector(pFileReq);
@@ -1322,7 +1354,7 @@ static void handleMenu(Application *pApp, ULONG result)
 
       // Because skipping icons affects on the allowed new name length
       // (5 bytes more allowed because of the missing ".info")
-      updateNewNames(pApp);
+      calculateNewNamesWithLabelsDetachAttach(pApp);
       break;
     }
 
@@ -1331,7 +1363,7 @@ static void handleMenu(Application *pApp, ULONG result)
       pApp->pParsedArgs->AreLongNamesAllowed = (pItem->Flags & CHECKED);
 
       // Because it directly affects the allowed new name length
-      updateNewNames(pApp);
+      calculateNewNamesWithLabelsDetachAttach(pApp);
       break;
     }
     }
@@ -1372,12 +1404,12 @@ void intuiEventLoop(Application *pApp)
       case WMHI_MOUSEBUTTONS:
         if (code == SELECTDOWN || code == MENUDOWN)
         {
-          updateNewNames(pApp);
+          calculateNewNamesWithLabelsDetachAttach(pApp);
         }
         break;
       case WMHI_ACTIVE:
       case WMHI_INACTIVE:
-        updateNewNames(pApp);
+        calculateNewNamesWithLabelsDetachAttach(pApp);
         break;
       }
     }
@@ -1389,7 +1421,7 @@ void intuiEventLoop(Application *pApp)
       pApp->pRangeSelectWindow->WindowState = RSW_STATE_IDLE;
       if (TRUE == applySelectedRange(pApp))
       {
-        updateNewNames(pApp);
+        calculateNewNamesWithLabelsDetachAttach(pApp);
       }
       else
       {
@@ -1399,7 +1431,7 @@ void intuiEventLoop(Application *pApp)
   }
 }
 
-Object *createLayout(void)
+Object *createLayout(struct List *pFilesList)
 {
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL,
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
@@ -1431,7 +1463,7 @@ Object *createLayout(void)
     LAYOUT_AddChild, m_ppGadgets[GID_STR_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_NAME,
       GA_RelVerify, TRUE,
-      STRINGA_TextVal, (ULONG)"[C] - [N]",
+      STRINGA_TextVal, (ULONG)"[N]",
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -1576,13 +1608,14 @@ Object *createLayout(void)
         LISTBROWSER_ColumnTitles, TRUE,
         LISTBROWSER_HorizontalProp, TRUE,
         LISTBROWSER_TitleClickable, TRUE,
+        LISTBROWSER_Labels, pFilesList,
       TAG_DONE),
       LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
         LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
         LAYOUT_AddChild, m_ppGadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_START,
           GA_RelVerify, TRUE,
-          GA_Text, (ULONG)"Start",
+          GA_Text, (ULONG)"Start rename",
         TAG_DONE),
         CHILD_WeightedWidth, 0,
       TAG_DONE),

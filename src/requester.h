@@ -34,8 +34,10 @@ long showEasyRequest(Object *pWinObject,
  * Intuition window. When such a message arrives it triggers a redraw of
  * the parent window.
  */
-struct FileRequester *showMultiFileSelector(
-  Object *pWinObject, struct Window *pParentWindow, STRPTR pTitle);
+struct FileRequester *showMultiFileSelector(Object *pWinObject,
+  struct Window *pParentWindow,
+  STRPTR pTitle,
+  STRPTR pInitialDirectory);
 
 void freeMultiFileSelector(struct FileRequester *pFileRequester);
 
