@@ -20,8 +20,7 @@ Tool for renaming selected files or directories according to specified masks. Al
 - Mix all the masks above
 - All of the above for name extension, too
 
-It is based on the AmigaOS3.2 BOOPSI objects (Reaction) so it only runs
-on Amigas with this operating system or newer. In fact, a recently updated function of the string.gadget from latest AmigaOS update 3.2.3  from April 2025 is used, so you need to have this OS version installed to run the tool properly.
+It is based on the AmigaOS3.2.3(!) BOOPSI objects (Reaction) so it only runs on Amigas with this operating system or newer. In fact, a recently updated function of the 'string.gadget' from latest AmigaOS update 3.2.3 from April 2025 is used, so you need to have this OS version installed to run the tool properly.
 
 ======= 
 CHANGES
