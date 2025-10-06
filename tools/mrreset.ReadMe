@@ -1,0 +1,11 @@
+Script to freshly re-initialize the 'testdata' dir for MultiRename.
+
+- Copy 'mrtestdata.lha' from tools directory to the parent of this MultiRename
+development directory: 'copy tools/mrtestdata / CLONE'.
+- Copy 'mrreset' to 'SYS:s'
+- Also ensure that it has the s bit set: 'protect SYS:s/mrreset +s'
+  (s bit gets lost in git)
+- Then, just run 'mrreset' from this MultiRename development directory
+
+Uwe Rosner, October 2025
+

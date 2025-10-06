@@ -1,0 +1,6 @@
+FailAt 21
+delete testdata/#? all
+delete testdata
+FailAt 10
+lha x /mrtestdata.lha /
+
