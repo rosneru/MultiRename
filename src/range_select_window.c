@@ -107,7 +107,7 @@ void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
 
 /// Public function implementations
 
-RangeSelectWindow *createRangeSelectWindow(void)
+RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
 {
   Object *pMainLayout;
 
@@ -219,6 +219,7 @@ RangeSelectWindow *createRangeSelectWindow(void)
     WA_DragBar, TRUE,
     WA_SizeGadget, FALSE,
     WA_Width, 500,
+    WA_PubScreen, pScreen,
     WA_AutoAdjust, TRUE,
     WA_IDCMP, IDCMP_CLOSEWINDOW|IDCMP_GADGETUP,
     WINDOW_GadgetHelp, TRUE,

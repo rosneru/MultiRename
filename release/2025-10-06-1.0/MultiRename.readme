@@ -1,0 +1,27 @@
+Short:        Rename multiple files
+Author:       Uwe Rosner
+Uploader:     u.rosner@ymail.com (Uwe Rosner)
+Type:         util/misc
+Version:      1.0
+Architecture: m68k-amigaos >= 3.2.3
+Distribution: Aminet
+
+
+=====
+ABOUT
+=====
+
+MultiRename is a tool for renaming multiple input files and directories
+according to a user defined pattern. It is inspired by the MultiRename tool of
+TotalCommander (Windows), but does not yet have all of its functions.
+
+To run it an Amiga with AmigaOS 3.2.3 (!) is needed: MultiRename uses BOOPSI
+objects (Reaction) and needs a recently updated function of 'string.gadget'
+which was released in the 3.2.3 update in April 2025.
+
+======= 
+CHANGES
+=======
+
+1.0 (06.10.2025)
+- Initial version
