@@ -29,7 +29,7 @@ For bug reports and suggestions write me, Uwe Rosner (u.rosner@ymail.com).
 
 @{b}@{u}System requirements@{uu}@{ub}
 
-MultiRename is based on the AmigaOS3.2.3(!) BOOPSI objects (Reaction) so it only runs on Amigas with this operating system or newer.
+MultiRename is based on the AmigaOS3.2.3(!) BOOPSI objects (Reaction) and therefore only runs on Amigas with this operating system or newer versions.
 
 In fact, a recently updated function of the 'string.gadget' from latest AmigaOS update 3.2.3 from April 2025 is used, so you need to have this OS version installed to run the tool properly.
 
