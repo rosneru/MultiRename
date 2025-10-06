@@ -361,7 +361,7 @@ Application *createApplication(int argc, char **argv)
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
-                  if ((pApp->pRangeSelectWindow = createRangeSelectWindow()))
+                  if ((pApp->pRangeSelectWindow = createRangeSelectWindow(pApp->pPubScreen)))
                   {
                     if ((pApp->pAboutMessage = createAboutMessage()))
                     {

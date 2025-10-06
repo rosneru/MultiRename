@@ -25,7 +25,7 @@ typedef struct RangeSelectWindow
   unsigned char NameBuf[MAX_NAME_LEN + 1];
 } RangeSelectWindow;
 
-RangeSelectWindow *createRangeSelectWindow(void);
+RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen);
 BOOL openRangeSelectWindow(RangeSelectWindow *pRangeSelectWindow,
   struct Window *pParentIntuiWin,
   ULONG *pParentSigMask,
