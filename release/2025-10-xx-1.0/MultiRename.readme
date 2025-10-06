@@ -22,7 +22,7 @@ Tool for renaming selected files or directories according to specified masks. Al
 
 MultiRename is based on the AmigaOS3.2.3(!) BOOPSI objects (Reaction) and therefore only runs on Amigas with this operating system or newer versions.
 
-In fact, it utilizes a recently updated feature of ‘string.gadget’ from the latest AmigaOS update 3.2.3 from April 2025. Therefore, you must have at least this operating system version installed in order to run the tool properly.
+In fact, it utilizes a recently updated feature of 'string.gadget' from the latest AmigaOS update 3.2.3 from April 2025. Therefore, you must have at least this operating system version installed in order to run the tool properly.
 
 ======= 
 CHANGES
