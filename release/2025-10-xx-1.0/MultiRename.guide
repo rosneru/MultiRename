@@ -7,7 +7,7 @@
 
 @{b}@{u}About@{uu}@{ub}
 
-MultiRename is a tool to rename the contents (files and directories) within one directory according to a specified mask. It is inspired by the MultiRename tool of the Windows tool TotalCommander, but it does not have all of its features.
+MultiRename is a tool for renaming multiple input files and directories according to a user defined pattern. It is inspired by the MultiRename tool of TotalCommander (Windows), but does not yet have all of its functions.
 
 Many thanks to Mason for creating the beautiful color icon for MultiRename in AmigaOS 3.2 style!
 
@@ -29,16 +29,14 @@ For bug reports and suggestions write me, Uwe Rosner (u.rosner@ymail.com).
 
 @{b}@{u}System requirements@{uu}@{ub}
 
-MultiRename is based on the AmigaOS3.2.3(!) BOOPSI objects (Reaction) and therefore only runs on Amigas with this operating system or newer versions.
-
-In fact, a recently updated function of the 'string.gadget' from latest AmigaOS update 3.2.3 from April 2025 is used, so you need to have this OS version installed to run the tool properly.
+To run it an Amiga with AmigaOS 3.2.3 (!) is needed: MultiRename uses BOOPSI objects (Reaction) and needs a recently updated function of 'string.gadget' which was released in the 3.2.3 update in April 2025.
 
 @endnode
 @node issues "Known issues"
 
 @{b}@{u}Known issues@{uu}@{ub}
 
-As I only recently found out, there is probably a bug in the chooser.gadget of AmigaOS 3.2.3: If you click on the cycle image of the gadget instead of expanding the list, there is an internal error (MuForce hit), which the user does not notice at first. However, such internal errors can make the Amiga unstable, so I recommend:
+As I only recently found out, there is probably a bug in the chooser.gadget of AmigaOS 3.2.3: If you click on the cycle image of the gadget instead of expanding the list, there is an internal error thrown (MuForce hit), which the user does not notice at first. However, such internal errors can make the Amiga unstable, so I recommend:
 
 @{fg shine}Please do not click on the cycle image to scroll through the Places selection in the Counter area, instead simply click on a number to open the list and make your selection there.@{fg text}
 
