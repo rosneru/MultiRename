@@ -1,7 +1,7 @@
 # MultiRename
 
 Another tool for Amiga computers. This time it's a MultiRename tool in the vein
-of that one, Windows tool [TotalCommander](https://www.ghisler.com) has build
+of that one, Windows tool [TotalCommander](https://www.ghisler.com) has built
 in. I use this a lot and wanted something like this on my favorite retro
 Computer.
 
