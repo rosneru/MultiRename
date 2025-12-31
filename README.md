@@ -22,16 +22,11 @@ Open Codecraft, open the project file `MultiRename.projecttree`, use the
 Build menu to build, then hit `F5` to run the app in the debugger.
 
 ## Linux
-### Dependencies
-The project can be build under Linux with *cmake* and [Bebbos gcc 6.5
-toolchain](https://mbergmann-sh.de/2025/10/04/bebbos-amiga-gcc-cross-compiler-toolchain-ist-umgezogen/)
-or on an Amiga with *StormC4*.
 
-## Build with Linux
 ### Dependencies
 
 The project was built with Debian on Windows with the Linux subsystem
-(WSL). The following packages must bbe installed in Debian:
+(WSL). The following packages must be installed in Debian:
 
  - build-essentials
  - cmake
@@ -53,6 +48,8 @@ git clone https://franke.ms/git/bebbo/amiga-gcc.git
 ```
 
 (as shown in an [Amiga forum](https://www.a1k.org/forum/index.php?threads/94725/post-1882035).)
+
+For more about Bebbos gcc, read [this blog](https://mbergmann-sh.de/2025/10/04/bebbos-amiga-gcc-cross-compiler-toolchain-ist-umgezogen/).
 
 ### Build
 To build this project a Makefile must be created with cmake:
