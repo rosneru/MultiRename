@@ -1,7 +1,15 @@
 # MultiRename
-An implementation of a rename tool for multiple files for Amiga 
-computers using the Reaction gui toolkit. Because of *Reaction* you need
-at least *AmigaOS 3.1.4* to use it.
+
+Another tool for Amiga computers. This time it's a MultiRename tool in the vein
+of that one, Windows tool [TotalCommander](https://www.ghisler.com) has build
+in. I use this a lot and wanted something like this on my favorite retro
+Computer.
+
+To run it, AmigaOS 3.2.3 (!) is needed: MultiRename uses *BOOPSI objects
+(Reaction)* and needs a recently updated function of `string.gadget` which was
+released in the 3.2.3 update in April 2025.
+
+![Screenshot](doc/screenshots/MultiRename-v1.0.png)
 
 # Build and debug
 
@@ -15,26 +23,36 @@ Build menu to build, then hit `F5` to run the app in the debugger.
 
 ## Linux
 ### Dependencies
-The project is tested to build with Debian 12 bookworm on Windows 11 WSL
-with the following packages installed:
+The project can be build under Linux with *cmake* and [Bebbos gcc 6.5
+toolchain](https://mbergmann-sh.de/2025/10/04/bebbos-amiga-gcc-cross-compiler-toolchain-ist-umgezogen/)
+or on an Amiga with *StormC4*.
+
+## Build with Linux
+### Dependencies
+
+The project was built with Debian on Windows with the Linux subsystem
+(WSL). The following packages must bbe installed in Debian:
 
  - build-essentials
  - cmake
  - git
- - [ Bebbos gcc 6.5 toolchain](https://github.com/bebbo/amiga-gcc) 
+ - ([Bebbos gcc 6.5 toolchain @ Github, retired](https://github.com/bebbo/amiga-gcc))
+ - [Bebbos gcc 6.5 toolchain @ Codeberg](https://codeberg.org/bebbo/amiga-gcc)
 which is expected to be installed in /opt
 
-#### reaction.lib
+**NOTE:** for the Codeberg variant, you'll have to replace
 
-This lib must be manually copied from
+```bash
+git clone https://github.com/bebbo/amiga-gcc
+```
 
-    /opt/amiga/m68k-amigaos/vbcc/lib/reaction.lib
+with
 
-to
+```bash
+git clone https://franke.ms/git/bebbo/amiga-gcc.git
+```
 
-    opt/amiga/lib/libreaction.a
-
-(note the renaming) to make it work.
+(as shown in an [Amiga forum](https://www.a1k.org/forum/index.php?threads/94725/post-1882035).)
 
 ### Build
 To build this project a Makefile must be created with cmake:
@@ -42,17 +60,22 @@ To build this project a Makefile must be created with cmake:
 - Manually create a directory *build-gcc* next to the *src* directory
 
 - Enter this directory and type.
-<!-- -->
-    cmake -DCMAKE_BUILD_TYPE=Release ..
 
+```bash
+cmake -DCMAKE_BUILD_TYPE=Release ..
+```
 
 - For preparing a debug Makefile with debug information, type:
-<!-- -->
-    cmake -DCMAKE_BUILD_TYPE=Debug ..
+
+```bash
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+```
 
 Then cmake is configured. Build can be started by simply typing 
     
-    make 
+```bash
+make
+```
 
 from inside the build directory.
 
