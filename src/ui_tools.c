@@ -106,7 +106,6 @@ int getStrGadgetBufferPos(Object *pStrGadget)
 
   if (!pStrGadget)
   {
-    printf("pStrGadget is NULL in `getStrGadgetBufferPos()`\n");
     return -1;
   }
 
