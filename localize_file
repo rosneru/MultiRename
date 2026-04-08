@@ -1,213 +1,113 @@
-src/file_tools.c|S|35|45|47|MSG_0000|/
-src/rename_counter.c|S|68|34|39|MSG_0001|%0*d
-src/ui_tools.c|S|109|13|63|MSG_0002|pStrGadget is NULL in `getStrGadgetBufferPos()`\n
-src/date_tools.c|S|42|24|42|MSG_0003|%Y-%m-%d-%H:%M:%S
-src/file_nodes.c|S|103|19|23|MSG_0004|DIR
-src/file_nodes.c|S|178|44|46|MSG_0005| 
-src/file_nodes.c|S|341|11|38|MSG_0006|** Original file list **\n
-src/file_nodes.c|S|342|11|58|MSG_0007|Name                                   |date\n
-src/file_nodes.c|S|343|11|81|MSG_0008|=======================================|=============================
-src/file_nodes.c|S|344|11|24|MSG_0009|==========\n
-src/file_nodes.c|S|348|13|40|MSG_0010|%-39s|%s-%s-%s, %s:%s:%s\n
-src/file_nodes.c|S|358|11|16|MSG_0011|\n\n
-src/file_nodes.c|S|365|11|27|MSG_0012|New name list\n
-src/file_nodes.c|S|366|11|27|MSG_0013|=============\n
-src/file_nodes.c|S|370|13|20|MSG_0014|  %s\n
-src/file_nodes.c|S|373|11|14|MSG_0015|\n
-src/rename_algorithm.c|S|57|18|20|MSG_0016|.
-src/parsed_args.c|S|53|13|63|MSG_0017|Failed to allocate memory for parsed arguments.\n
-src/parsed_args.c|S|195|52|62|MSG_0018|PUBSCREEN
-src/parsed_args.c|S|202|45|55|MSG_0019|LONGNAMES
-src/parsed_args.c|S|204|45|55|MSG_0020|SKIPICONS
-src/notifications.c|S|111|13|39|MSG_0021|Selected path is '%s'\n\n
-src/notifications.c|S|116|13|65|MSG_0022|Skipped %lu input file(s) because of wrong paths:\n
-src/notifications.c|S|122|17|24|MSG_0023|  %s\n
-src/notifications.c|S|126|13|16|MSG_0024|\n
-src/notifications.c|S|133|8|76|MSG_0025|Skipped %lu input file(s) because of over long / truncated paths:\n
-src/notifications.c|S|140|17|24|MSG_0026|  %s\n
-src/notifications.c|S|144|13|16|MSG_0027|\n
-src/notifications.c|S|150|13|77|MSG_0028|Skipped %lu input file(s) because their date stamp couldn't be 
-src/notifications.c|S|151|13|33|MSG_0029|split into parts:\n
-src/notifications.c|S|158|17|24|MSG_0030|  %s\n
-src/notifications.c|S|162|13|16|MSG_0031|\n
-src/notifications.c|S|169|8|71|MSG_0032|Skipped %lu input file(s) because they couldn't be examined:\n
-src/notifications.c|S|175|17|24|MSG_0033|  %s\n
-src/notifications.c|S|179|13|16|MSG_0034|\n
-src/notifications.c|S|184|13|64|MSG_0035|Failed to add (lock) %lu input file(s) / dir(s):\n
-src/notifications.c|S|190|17|24|MSG_0036|  %s\n
-src/notifications.c|S|194|13|16|MSG_0037|\n
-src/notifications.c|S|201|8|69|MSG_0038|Skipped %lu input file(s) because links are not supported:\n
-src/notifications.c|S|207|17|24|MSG_0039|  %s\n
-src/notifications.c|S|211|13|16|MSG_0040|\n
-src/notifications.c|S|216|13|79|MSG_0041|Skipped %lu input file(s) because they are already in processing 
-src/notifications.c|S|217|13|21|MSG_0042|list:\n
-src/notifications.c|S|224|17|24|MSG_0043|  %s\n
-src/notifications.c|S|228|13|16|MSG_0044|\n
-src/notifications.c|S|233|13|53|MSG_0045|Rename failed for %lu new file names:\n
-src/notifications.c|S|239|17|24|MSG_0046|  %s\n
-src/notifications.c|S|243|13|16|MSG_0047|\n
-src/range_select_window.c|S|145|27|41|MSG_0048|Longest item:
-src/range_select_window.c|S|155|28|33|MSG_0049|%2ld
-src/range_select_window.c|S|157|28|32|MSG_0050|222
-src/range_select_window.c|S|160|72|78|MSG_0051|From:
-src/range_select_window.c|S|168|28|33|MSG_0052|%2ld
-src/range_select_window.c|S|170|28|32|MSG_0053|222
-src/range_select_window.c|S|173|72|76|MSG_0054|To:
-src/range_select_window.c|S|180|72|90|MSG_0055|Selection result:
-src/range_select_window.c|S|187|72|85|MSG_0056|Result mask:
-src/range_select_window.c|S|194|26|29|MSG_0057|Ok
-src/range_select_window.c|S|201|26|33|MSG_0058|Cancel
-src/range_select_window.c|E|233|34|64|MSG_0059|MultiRename: Select name part
-src/range_select_window.c|E|234|39|74|MSG_0060|MultiRename: Select extension part
-src/application.c|D|69|20|78|MSG_0061|\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n
-src/application.c|E|71|4|61|MSG_0062|This release of MultiRename may be freely distributed.\n
-src/application.c|E|72|4|57|MSG_0063|It may not be commercially distributed without the\n
-src/application.c|E|73|4|41|MSG_0064|explicit permission of the author.\n
-src/application.c|S|150|4|6|MSG_0065|1
-src/application.c|S|150|9|11|MSG_0066|2
-src/application.c|S|150|14|16|MSG_0067|3
-src/application.c|S|150|19|21|MSG_0068|4
-src/application.c|S|150|24|26|MSG_0069|5
-src/application.c|S|150|29|31|MSG_0070|6
-src/application.c|S|150|34|36|MSG_0071|7
-src/application.c|S|150|39|41|MSG_0072|8
-src/application.c|S|150|44|46|MSG_0073|9
-src/application.c|S|150|49|52|MSG_0074|10
-src/application.c|S|180|49|70|MSG_0075|Allow long filenames
-src/application.c|S|181|49|60|MSG_0076|Skip icons
-src/application.c|S|197|18|26|MSG_0077|Project
-src/application.c|S|198|20|24|MSG_0078|New
-src/application.c|S|198|44|46|MSG_0079|n
-src/application.c|S|199|20|33|MSG_0080|Add files...
-src/application.c|S|199|44|46|MSG_0081|a
-src/application.c|S|201|20|26|MSG_0082|About
-src/application.c|S|203|20|25|MSG_0083|Quit
-src/application.c|S|203|44|46|MSG_0084|q
-src/application.c|S|204|18|27|MSG_0085|Settings
-src/application.c|S|205|20|41|MSG_0086|Allow long filenames
-src/application.c|S|206|20|31|MSG_0087|Skip icons
-src/application.c|S|280|15|51|MSG_0088|Failed to lock public screen '%s'\n
-src/application.c|S|289|15|55|MSG_0089|Failed to lock default public screen.\n
-src/application.c|S|308|16|28|MSG_0090|MultiRename
-src/application.c|S|375|31|69|MSG_0091|Failed to create the about message.\n
-src/application.c|S|381|29|73|MSG_0092|Failed to create the range select window.\n
-src/application.c|S|387|27|75|MSG_0093|Failed to create the application main window.\n
-src/application.c|S|394|25|52|MSG_0094|Failed to create layout.\n
-src/application.c|S|400|23|56|MSG_0095|Failed to parse the arguments.\n
-src/application.c|S|406|21|56|MSG_0096|Failed to create the files list.\n
-src/application.c|S|412|19|64|MSG_0097|Failed to create the notifications object.\n
-src/application.c|S|418|17|77|MSG_0098|Failed to create the message port for window drag'n drop.\n
-src/application.c|S|424|15|52|MSG_0099|Failed to open the default Locale.\n
-src/application.c|S|430|13|72|MSG_0100|Failed to allocate memory for application instance data.\n
-src/application.c|S|521|13|38|MSG_0101|Failed to open window.\n
-src/application.c|S|534|32|49|MSG_0102|MultiRename in [
-src/application.c|S|536|32|34|MSG_0103|]
-src/application.c|S|540|32|44|MSG_0104|MultiRename
-src/application.c|S|599|12|24|MSG_0105|MultiRename
-src/application.c|S|600|12|27|MSG_0106|Ok|Show errors
-src/application.c|S|601|12|50|MSG_0107|Failed to add some of the input files
-src/application.c|S|627|8|20|MSG_0108|MultiRename
-src/application.c|S|628|8|11|MSG_0109|Ok
-src/application.c|S|629|8|28|MSG_0110|No files to rename.
-src/application.c|S|637|8|20|MSG_0111|MultiRename
-src/application.c|S|638|8|15|MSG_0112|Cancel
-src/application.c|S|639|8|50|MSG_0113|Error, failed to create file name tokens!
-src/application.c|S|657|12|56|MSG_0114|Warning, duplicate names! Proceed anyway?\n
-src/application.c|S|658|12|19|MSG_0115|%s\n\n
-src/application.c|S|659|12|65|MSG_0116|NOTE: Proceed will auto rename duplicate files to \n
-src/application.c|S|660|12|29|MSG_0117|  name (2).ext\n
-src/application.c|S|661|12|29|MSG_0118|  name (3).ext\n
-src/application.c|S|662|12|23|MSG_0119|and so on.
-src/application.c|S|667|16|28|MSG_0120|MultiRename
-src/application.c|S|668|16|31|MSG_0121|Proceed|Cancel
-src/application.c|S|681|10|16|MSG_0122| (%d)
-src/application.c|S|703|12|24|MSG_0123|MultiRename
-src/application.c|S|704|12|19|MSG_0124|Cancel
-src/application.c|S|705|12|75|MSG_0125|Error, failed to automatically create name for duplicate file!
-src/application.c|S|717|12|24|MSG_0126|MultiRename
-src/application.c|S|718|12|19|MSG_0127|Cancel
-src/application.c|S|719|12|77|MSG_0128|Error, auto-renamed file name would be too long for file system!
-src/application.c|S|848|21|24|MSG_0129|Ok
-src/application.c|S|849|35|41|MSG_0130|> 107
-src/application.c|S|850|28|34|MSG_0131|> 102
-src/application.c|S|851|36|41|MSG_0132|> 32
-src/application.c|S|852|29|34|MSG_0133|> 27
-src/application.c|S|854|31|35|MSG_0134|Cmd
-src/application.c|S|950|46|55|MSG_0135|<Error!>
-src/application.c|S|1041|13|47|MSG_0136|insertRangeMaskString() failed.\n
-src/application.c|S|1116|51|55|MSG_0137|[N]
-src/application.c|S|1139|10|40|MSG_0138|MultiRename: Select name part
-src/application.c|S|1140|10|13|MSG_0139|Ok
-src/application.c|S|1141|10|75|MSG_0140|This tool is only available if you have files in the processing 
-src/application.c|S|1142|10|16|MSG_0141|list.
-src/application.c|S|1148|51|57|MSG_0142|[YMD]
-src/application.c|S|1153|51|57|MSG_0143|[hms]
-src/application.c|S|1158|51|55|MSG_0144|[C]
-src/application.c|S|1163|56|60|MSG_0145|[E]
-src/application.c|S|1186|10|45|MSG_0146|MultiRename: Select extension part
-src/application.c|S|1187|10|13|MSG_0147|Ok
-src/application.c|S|1188|10|80|MSG_0148|This tool is only available if you have files in the processing list 
-src/application.c|S|1189|10|68|MSG_0149|and if at least one of them has an extension like '.iff'.
-src/application.c|S|1195|56|60|MSG_0150|[C]
-src/application.c|S|1229|16|28|MSG_0151|MultiRename
-src/application.c|S|1230|16|31|MSG_0152|Ok|Show errors
-src/application.c|S|1231|16|57|MSG_0153|Failed to rename some of the input files
-src/application.c|S|1253|12|24|MSG_0154|MultiRename
-src/application.c|S|1254|12|28|MSG_0155|Continue|Cancel
-src/application.c|S|1255|12|78|MSG_0156|Continue to create a new project will clear the processing list\n
-src/application.c|S|1256|12|54|MSG_0157|and set the masks to a default value.\n\n
-src/application.c|S|1257|12|29|MSG_0158|Continue anyway?
-src/application.c|S|1291|13|51|MSG_0159|Failed to re-create the files list.\n
-src/application.c|S|1333|15|38|MSG_0160|Select files to rename
-src/application.c|S|1347|10|22|MSG_0161|MultiRename
-src/application.c|S|1348|10|13|MSG_0162|Ok
-src/application.c|S|1436|17|50|MSG_0163|Failed to apply selected range\n
-src/application.c|S|1452|53|59|MSG_0164|State
-src/application.c|S|1455|53|58|MSG_0165|Type
-src/application.c|S|1460|53|62|MSG_0166|Old name
-src/application.c|S|1463|53|62|MSG_0167|New name
-src/application.c|S|1470|27|32|MSG_0168|Name
-src/application.c|S|1474|32|36|MSG_0169|[N]
-src/application.c|S|1481|26|35|MSG_0170|[N] Name
-src/application.c|S|1484|26|37|MSG_0171|[YMD] Date
-src/application.c|S|1494|26|41|MSG_0172|[N#-#] Part...
-src/application.c|S|1499|26|37|MSG_0173|[hms] Time
-src/application.c|S|1505|24|36|MSG_0174|[C] Counter
-src/application.c|S|1513|27|37|MSG_0175|Extension
-src/application.c|S|1517|32|36|MSG_0176|[E]
-src/application.c|S|1522|24|33|MSG_0177|[E] Ext.
-src/application.c|S|1527|24|39|MSG_0178|[E#-#] Part...
-src/application.c|S|1532|24|36|MSG_0179|[C] Counter
-src/application.c|S|1540|27|42|MSG_0180|Define counter
-src/application.c|S|1552|74|81|MSG_0181|Start:
-src/application.c|S|1565|27|32|MSG_0182|Step
-src/application.c|S|1566|74|80|MSG_0183|Step:
-src/application.c|S|1580|74|82|MSG_0184|Places:
-src/application.c|S|1611|29|45|MSG_0185|Processing list
-src/application.c|S|1627|28|41|MSG_0186|Start rename
-src/main.c|S|102|48|66|MSG_0187|intuition.library
-src/main.c|S|104|13|53|MSG_0188|Failed to open intuition.library v47.\n
-src/main.c|S|108|35|48|MSG_0189|window.class
-src/main.c|S|110|13|48|MSG_0190|Failed to open window.class v47.\n
-src/main.c|S|114|35|57|MSG_0191|gadgets/layout.gadget
-src/main.c|S|116|13|49|MSG_0192|Failed to open layout.gadget v47.\n
-src/main.c|S|120|34|53|MSG_0193|images/bevel.image
-src/main.c|S|122|13|47|MSG_0194|Failed to open bevel.image v47.\n
-src/main.c|S|126|35|57|MSG_0195|gadgets/button.gadget
-src/main.c|S|128|13|49|MSG_0196|Failed to open button.gadget v47.\n
-src/main.c|S|132|36|59|MSG_0197|gadgets/chooser.gadget
-src/main.c|S|134|13|50|MSG_0198|Failed to open chooser.gadget v47.\n
-src/main.c|S|138|36|59|MSG_0199|gadgets/integer.gadget
-src/main.c|S|140|13|50|MSG_0200|Failed to open integer.gadget v47.\n
-src/main.c|S|144|40|67|MSG_0201|gadgets/listbrowser.gadget
-src/main.c|S|146|13|54|MSG_0202|Failed to open listbrowser.gadget v47.\n
-src/main.c|S|150|34|53|MSG_0203|images/label.image
-src/main.c|S|152|13|47|MSG_0204|Failed to open label.image v47.\n
-src/main.c|S|156|35|57|MSG_0205|gadgets/slider.gadget
-src/main.c|S|158|13|49|MSG_0206|Failed to open slider.gadget v47.\n
-src/main.c|S|162|35|57|MSG_0207|gadgets/string.gadget
-src/main.c|S|164|13|49|MSG_0208|Failed to open string.gadget v47.\n
-src/rename.c|S|54|28|34|MSG_0209|.info
-src/rename.c|S|56|28|34|MSG_0210|.info
-src/rename.c|S|139|17|69|MSG_0211|Failed to append token count for item '%10du: %s'\n
-src/range_mask.c|S|28|6|16|MSG_0212|[%c%d-%d]
+src/file_nodes.c|S|103|19|23|MSG_TYPE_IS_DIRECTORY|DIR
+src/notifications.c|S|111|13|39|MSG_LOG_SELECTED_PATH|Selected path is '%s'\n\n
+src/notifications.c|S|116|13|65|MSG_LOG_SKIPPED_WRONG_PATHS|Skipped %lu input file(s) because of wrong paths:\n
+src/notifications.c|S|133|8|76|MSG_LOG_SKIPPED_OVERLONG_PATHS|Skipped %lu input file(s) because of over long / truncated paths:\n
+src/notifications.c|S|150|13|77|MSG_LOG_SKIPPED_DATESTAMP|Skipped %lu input file(s) because their date stamp couldn't be split into parts:\n
+src/notifications.c|S|169|8|71|MSG_LOG_SKIPPED_EXAMINE|Skipped %lu input file(s) because they couldn't be examined:\n
+src/notifications.c|S|184|13|64|MSG_LOG_SKIPPED_LOCK|Failed to add (lock) %lu input file(s) / dir(s):\n
+src/notifications.c|S|201|8|69|MSG_LOG_SKIPPED_LINKS|Skipped %lu input file(s) because links are not supported:\n
+src/notifications.c|S|216|13|79|MSG_LOG_SKIPPED_ALREADY_IN_LIST|Skipped %lu input file(s) because they are already in processing list:\n
+src/notifications.c|S|233|13|53|MSG_LOG_RENAME_FAILED|Rename failed for %lu new file names:\n
+src/range_select_window.c|S|145|27|41|MSG_LONGEST_ITEM|Longest item:
+src/range_select_window.c|S|160|72|78|MSG_FROM|From:
+src/range_select_window.c|S|173|72|76|MSG_TO|To:
+src/range_select_window.c|S|180|72|90|MSG_SELECTION_RESULT|Selection result:
+src/range_select_window.c|S|187|72|85|MSG_RESULT_MASK|Result mask:
+src/range_select_window.c|S|194|26|29|MSG_OK_GAD|Ok
+src/range_select_window.c|S|201|26|33|MSG_CANCEL_GAD|Cancel
+src/range_select_window.c|E|233|34|64|MSG_NAME_PART_WINDOW_TITLE|MultiRename: Select name part
+src/range_select_window.c|E|234|39|74|MSG_EXT_PART_WINDOW_TITLE|MultiRename: Select extension part
+src/application.c|D|69|20|78|MSG_ABOUT_1|\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n
+src/application.c|E|71|4|61|MSG_ABOUT_2|This release of MultiRename may be freely distributed.\n
+src/application.c|E|72|4|57|MSG_ABOUT_3|It may not be commercially distributed without the\n
+src/application.c|E|73|4|41|MSG_ABOUT_4|explicit permission of the author.\n
+src/application.c|S|180|49|70|MSG_SETTINGS_ALLOW_LONG_NAMES|Allow long filenames
+src/application.c|S|181|49|60|MSG_SETTINGS_SKIP_ICONS|Skip icons
+src/application.c|S|197|18|26|MSG_PROJECT_MENU|Project
+src/application.c|S|198|20|24|MSG_PROJECT_NEW|New
+src/application.c|S|199|20|33|MSG_PROJECT_ADD_FILES|Add files...
+src/application.c|S|201|20|26|MSG_PROJECT_ABOUT|About
+src/application.c|S|203|20|25|MSG_PROJECT_|Quit
+src/application.c|S|204|18|27|MSG_SETTINGS_MENU|Settings
+src/application.c|S|205|20|41|MSG_SETTINGS_ALLOW_LONG_NAMES|Allow long filenames
+src/application.c|S|206|20|31|MSG_SETTINGS_SKIP_ICONS|Skip icons
+src/application.c|S|280|15|51|MSG_FAILED_LOCK_PUBSCREEN|Failed to lock public screen '%s'\n
+src/application.c|S|289|15|55|MSG_FAILED_LOCK_DEFAULT_PUBSCREEN|Failed to lock default public screen.\n
+src/application.c|S|375|31|69|MSG_FAILED_CREATE_ABOUT_MSG|Failed to create the about message.\n
+src/application.c|S|381|29|73|MSG_FAILED_CREATE_RANGESEL_WINDOW|Failed to create the range select window.\n
+src/application.c|S|387|27|75|MSG_FAILED_CREATE_MAIN_WINDOW|Failed to create the application main window.\n
+src/application.c|S|394|25|52|MSG_FAILED_CREATE_LAYOUT|Failed to create layout.\n
+src/application.c|S|400|23|56|MSG_FAILED_PARSE_ARGS|Failed to parse the arguments.\n
+src/application.c|S|406|21|56|MSG_FAILED_CREATE_FILES_LIST|Failed to create the files list.\n
+src/application.c|S|412|19|64|MSG_FAILED_CREATE_LOG_OBJECT|Failed to create the notifications object.\n
+src/application.c|S|418|17|77|MSG_FAILED_MSG_PORT|Failed to create the message port for window drag'n drop.\n
+src/application.c|S|424|15|52|MSG_FAILED_OPEN_LOCALE|Failed to open the default Locale.\n
+src/application.c|S|430|13|72|MSG_FAILED_ALLOC_APP_MEMORY|Failed to allocate memory for application instance data.\n
+src/application.c|S|521|13|38|MSG_FAILED_OPEN_WINDOW|Failed to open window.\n
+src/application.c|S|534|32|49|MSG_MAIN_WINDOW|MultiRename in [
+src/application.c|S|600|12|27|MSG_OK_SHOW_GAD|Ok|Show errors
+src/application.c|S|601|12|50|MSG_LOGREQ_FAILED_TO_ADD|Failed to add some of the input files
+src/application.c|S|628|8|11|MSG_OK_GAD|Ok
+src/application.c|S|629|8|28|MSG_NO_FILES_TO_RENAME|No files to rename.
+src/application.c|S|638|8|15|MSG_CANCEL_GAD|Cancel
+src/application.c|S|639|8|50|MSG_FAILED_CREATE_TOKENS|Error, failed to create file name tokens!
+src/application.c|S|657|12|56|MSG_WARN_DUPLICATES_1|Warning, duplicate names! Proceed anyway?\n
+src/application.c|S|659|12|65|MSG_WARN_DUPLICATES_2|NOTE: Proceed will auto rename duplicate files to \n
+src/application.c|S|660|12|29|MSG_WARN_DUPLICATES_3|  name (2).ext\n
+src/application.c|S|661|12|29|MSG_WARN_DUPLICATES_4|  name (3).ext\n
+src/application.c|S|662|12|23|MSG_WARN_DUPLICATES_5|and so on.
+src/application.c|S|668|16|31|MSG_PROCEED_CANCEL_GAD|Proceed|Cancel
+src/application.c|S|704|12|19|MSG_CANCEL_GAD|Cancel
+src/application.c|S|705|12|75|MSG_ERROR_AUTOCREATE_NAMES|Error, failed to automatically create name for duplicate file!
+src/application.c|S|718|12|19|MSG_CANCEL_GAD|Cancel
+src/application.c|S|719|12|77|MSG_ERROR_AUTOCREATED_NAMES_TOO_LONG|Error, auto-renamed file name would be too long for file system!
+src/application.c|S|848|21|24|MSG_STATE_OK|Ok
+src/application.c|S|854|31|35|MSG_STATE_COMMAND_ERROR|Cmd
+src/application.c|S|950|46|55|MSG_NAME_ERROR|<Error!>
+src/application.c|S|1139|10|40|MSG_NAME_TOOL_NEEDS_ITEMS_TITLE|MultiRename: Select name part
+src/application.c|S|1140|10|13|MSG_OK_GAD|Ok
+src/application.c|S|1141|10|75|MSG_NAME_TOOL_NEEDS_ITEMS|This tool is only available if you have files in the processing list.
+src/application.c|S|1186|10|45|MSG_EXT_TOOL_NEEDS_ITEMS_TITLE|MultiRename: Select extension part
+src/application.c|S|1187|10|13|MSG_OK_GAD|Ok
+src/application.c|S|1188|10|80|MSG_EXT_TOOL_NEEDS_ITEMS_AND_EXT|This tool is only available if you have files in the processing list and if at least one of them has an extension like '.iff'.
+src/application.c|S|1230|16|31|MSG_OK_SHOW_ERRORS_GAD|Ok|Show errors
+src/application.c|S|1231|16|57|MSG_RENAME_FAILED_FOR_SOME|Failed to rename some of the input files
+src/application.c|S|1254|12|28|MSG_CONTINUE_CANCEL_GAD|Continue|Cancel
+src/application.c|S|1255|12|78|MSG_CONTINUE_WILL_SCRATCH_1|Continue to create a new project will clear the processing list\n
+src/application.c|S|1256|12|54|MSG_CONTINUE_WILL_SCRATCH_2|and set the masks to a default value.\n\n
+src/application.c|S|1257|12|29|MSG_CONTINUE_WILL_SCRATCH_3|Continue anyway?
+src/application.c|S|1291|13|51|MSG_FAILED_RECREATE_FILES_LIST|Failed to re-create the files list.\n
+src/application.c|S|1333|15|38|MSG_FILESELECTOR_TITLE|Select files to rename
+src/application.c|S|1348|10|13|MSG_OK_GAD|Ok
+src/application.c|S|1436|17|50|MSG_FAILED_APPLY_RANGE|Failed to apply selected range\n
+src/application.c|S|1452|53|59|MSG_COLUMN_TITLE_STATE|State
+src/application.c|S|1455|53|58|MSG_COLUMN_TITLE_TYPE|Type
+src/application.c|S|1460|53|62|MSG_COLUMN_TITLE_OLD_NAME|Old name
+src/application.c|S|1463|53|62|MSG_COLUMN_TITLE_NEW_NAME|New name
+src/application.c|S|1470|27|32|MSG_NAME_GROUP|Name
+src/application.c|S|1481|26|35|MSG_NAME_NAME_GAD|[N] Name
+src/application.c|S|1484|26|37|MSG_NAME_DATE_GAD|[YMD] Date
+src/application.c|S|1494|26|41|MSG_NAME_PART_GAD|[N#-#] Part...
+src/application.c|S|1499|26|37|MSG_NAME_TIME_GAD|[hms] Time
+src/application.c|S|1505|24|36|MSG_NAME_COUNTER_GAD|[C] Counter
+src/application.c|S|1513|27|37|MSG_EXTENSION_GROUP|Extension
+src/application.c|S|1522|24|33|MSG_EXT_EXT_GAD|[E] Ext.
+src/application.c|S|1527|24|39|MSG_EXT_PART_GAD|[E#-#] Part...
+src/application.c|S|1532|24|36|MSG_EXT_COUNTER_GAD|[C] Counter
+src/application.c|S|1540|27|42|MSG_COUNTER_GROUP|Define counter
+src/application.c|S|1552|74|81|MSG_COUNTER_START_GAD|Start:
+src/application.c|S|1566|74|80|MSG_COUNTER_STEP_GAD|Step:
+src/application.c|S|1580|74|82|MSG_COUNTER_PLACES_GAD|Places:
+src/application.c|S|1611|29|45|MSG_PROCESSING_LIST_GROUP|Processing list
+src/application.c|S|1627|28|41|MSG_START_RENAME_GAD|Start rename
+src/main.c|S|104|13|53|MSG_FAILED_TO_OPEN_INTUITION|Failed to open intuition.library v47.\n
+src/main.c|S|110|13|48|MSG_FAILED_TO_OPEN_WINCLASS|Failed to open window.class v47.\n
+src/main.c|S|116|13|49|MSG_FAILED_TO_OPEN_LAYOUTGAD|Failed to open layout.gadget v47.\n
+src/main.c|S|122|13|47|MSG_FAILED_TO_OPEN_BEVELIMG|Failed to open bevel.image v47.\n
+src/main.c|S|128|13|49|MSG_FAILED_TO_OPEN_BUTTONGAD|Failed to open button.gadget v47.\n
+src/main.c|S|134|13|50|MSG_FAILED_TO_OPEN_CHOOSERGAD|Failed to open chooser.gadget v47.\n
+src/main.c|S|140|13|50|MSG_FAILED_TO_OPEN_INTEGERGAD|Failed to open integer.gadget v47.\n
+src/main.c|S|146|13|54|MSG_FAILED_TO_OPEN_LISTBROWSERGAD|Failed to open listbrowser.gadget v47.\n
+src/main.c|S|152|13|47|MSG_FAILED_TO_OPEN_LABELIMG|Failed to open label.image v47.\n
+src/main.c|S|158|13|49|MSG_FAILED_TO_OPEN_SLIDERGAD|Failed to open slider.gadget v47.\n
+src/main.c|S|164|13|49|MSG_FAILED_TO_OPEN_STRINGGAD|Failed to open string.gadget v47.\n
