@@ -63,6 +63,9 @@ $(OBJDIR)requester.o : src/requester.c
 $(OBJDIR)string_tools.o : src/string_tools.c
 	$(CC) nolink src/string_tools.c
 
+$(OBJDIR)translation.o : src/translation.c
+	$(CC) nolink src/translation.c
+
 $(OBJDIR)ui_tools.o : src/ui_tools.c
 	$(CC) nolink src/ui_tools.c
 
@@ -73,10 +76,47 @@ OBJS = $(OBJS) $(OBJDIR)range_mask.o $(OBJDIR)range_select_window.o
 OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_counter.o
 OBJS = $(OBJS) $(OBJDIR)rename_parser.o $(OBJDIR)rename.o
 OBJS = $(OBJS) $(OBJDIR)requester.o $(OBJDIR)string_tools.o
-OBJS = $(OBJS) $(OBJDIR)ui_tools.o
+OBJS = $(OBJS) $(OBJDIR)translation.o $(OBJDIR)ui_tools.o
 
 $(EXE) : $(OBJS)
 	$(LD) link $(OBJS)
+
+
+# target localize PATCH
+# NOTE: Manually do step 1 before:
+#  	Create the localize_file by running
+# 		'localize *.c > localize_file'
+#	and then edit it by
+#	1) Only keep the lines that should be translated
+#   2) Change the string
+localize:
+	localize localize_file PATCH TEMPLATE "tr(pApp->pLocaleInfo, %I)"
+
+
+# target translations
+
+translations: CatComp/$(EXE).cd
+	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_de.ct
+	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_es.ct
+	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_fr.ct
+
+# target catalog-header
+catalog-header: CatComp/$(EXE).cd
+	CatComp CatComp/$(EXE).cd CFILE src/$(EXE)_catalog.h NOARRAY NOCODE
+
+
+# target catalogs
+
+catalogs: CatComp/$(EXE).cd CatComp/$(EXE)_de.ct CatComp/$(EXE)_es.ct CatComp/$(EXE)_fr.ct
+  -Makedir Catalogs
+  CatComp CatComp/$(EXE).cd CatComp/$(EXE)_de.ct CATALOG $(EXE)_de.catalog
+  -Makedir catalogs/deutsch
+  -Copy $(EXE)_de.catalog Catalogs/deutsch/$(EXE).catalog FORCE
+  -Delete $(EXE)_de.catalog
+  CatComp CatComp/$(EXE).cd CatComp/$(EXE)_fr.ct CATALOG $(EXE)_fr.catalog
+  -Makedir catalogs/français
+  -Copy $(EXE)_fr.catalog Catalogs/français/$(EXE).catalog FORCE
+  -Delete $(EXE)_fr.catalog
 
 # target 'clean'
 
