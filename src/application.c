@@ -62,7 +62,7 @@
 #include "string_tools.h"
 #include "ui_tools.h"
 
-#include "MultiRename_rev.h"
+#include "multirename_rev.h"
 
 /// Defines
 
@@ -361,7 +361,8 @@ Application *createApplication(int argc, char **argv)
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
-                  if ((pApp->pRangeSelectWindow = createRangeSelectWindow(pApp->pPubScreen)))
+                  if ((pApp->pRangeSelectWindow =
+                          createRangeSelectWindow(pApp->pPubScreen)))
                   {
                     if ((pApp->pAboutMessage = createAboutMessage()))
                     {
