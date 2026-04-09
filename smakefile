@@ -90,14 +90,13 @@ $(EXE) : $(OBJS)
 #	1) Only keep the lines that should be translated
 #   2) Change the string
 localize:
-	localize localize_file PATCH TEMPLATE "tr(pApp->pLocaleInfo, %I)"
+	localize localize_file PATCH TEMPLATE "tr(pApp->pLocaleInfo, %I)" MERGECATALOG CatComp/MultiRename.cd
 
 
 # target translations
 
 translations: CatComp/$(EXE).cd
 	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_de.ct
-	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_es.ct
 	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_fr.ct
 
 # target catalog-header
