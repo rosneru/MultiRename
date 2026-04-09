@@ -1,12 +1,12 @@
 src/file_nodes.c|S|103|19|23|MSG_TYPE_IS_DIRECTORY|DIR
 src/notifications.c|S|111|13|39|MSG_LOG_SELECTED_PATH|Selected path is '%s'\n\n
-src/notifications.c|S|116|13|65|MSG_LOG_SKIPPED_WRONG_PATHS|Skipped %lu input file(s) because of wrong paths:\n
-src/notifications.c|S|133|8|76|MSG_LOG_SKIPPED_OVERLONG_PATHS|Skipped %lu input file(s) because of over long / truncated paths:\n
-src/notifications.c|S|150|13|77|MSG_LOG_SKIPPED_DATESTAMP|Skipped %lu input file(s) because their date stamp couldn't be split into parts:\n
-src/notifications.c|S|169|8|71|MSG_LOG_SKIPPED_EXAMINE|Skipped %lu input file(s) because they couldn't be examined:\n
-src/notifications.c|S|184|13|64|MSG_LOG_SKIPPED_LOCK|Failed to add (lock) %lu input file(s) / dir(s):\n
-src/notifications.c|S|201|8|69|MSG_LOG_SKIPPED_LINKS|Skipped %lu input file(s) because links are not supported:\n
-src/notifications.c|S|216|13|79|MSG_LOG_SKIPPED_ALREADY_IN_LIST|Skipped %lu input file(s) because they are already in processing list:\n
+src/notifications.c|S|116|13|65|MSG_LOG_WRONG_PATHS|Skipped %lu input file(s) because of wrong paths:\n
+src/notifications.c|S|133|8|76|MSG_LOG_OVERLONG_PATHS|Skipped %lu input file(s) because of over long / truncated paths:\n
+src/notifications.c|S|150|13|77|MSG_LOG_DATESTAMP|Skipped %lu input file(s) because their date stamp couldn't be split into parts:\n
+src/notifications.c|S|169|8|71|MSG_LOG_EXAMINE|Skipped %lu input file(s) because they couldn't be examined:\n
+src/notifications.c|S|184|13|64|MSG_LOG_LOCK|Failed to add (lock) %lu input file(s) / dir(s):\n
+src/notifications.c|S|201|8|69|MSG_LOG_LINKS|Skipped %lu input file(s) because links are not supported:\n
+src/notifications.c|S|216|13|79|MSG_LOG_ALREADY_IN_LIST|Skipped %lu input file(s) because they are already in processing list:\n
 src/notifications.c|S|233|13|53|MSG_LOG_RENAME_FAILED|Rename failed for %lu new file names:\n
 src/range_select_window.c|S|145|27|41|MSG_LONGEST_ITEM|Longest item:
 src/range_select_window.c|S|160|72|78|MSG_FROM|From:
@@ -21,7 +21,7 @@ src/application.c|D|69|20|78|MSG_ABOUT_1|\n\nCopyright(c) 2025 Uwe Rosner (u.ros
 src/application.c|E|71|4|61|MSG_ABOUT_2|This release of MultiRename may be freely distributed.\n
 src/application.c|E|72|4|57|MSG_ABOUT_3|It may not be commercially distributed without the\n
 src/application.c|E|73|4|41|MSG_ABOUT_4|explicit permission of the author.\n
-src/application.c|S|180|49|70|MSG_SETTINGS_ALLOW_LONG_NAMES|Allow long filenames
+src/application.c|S|180|49|70|MSG_SETTINGS_LONG_NAMES|Allow long filenames
 src/application.c|S|181|49|60|MSG_SETTINGS_SKIP_ICONS|Skip icons
 src/application.c|S|197|18|26|MSG_PROJECT_MENU|Project
 src/application.c|S|198|20|24|MSG_PROJECT_NEW|New
@@ -29,24 +29,24 @@ src/application.c|S|199|20|33|MSG_PROJECT_ADD_FILES|Add files...
 src/application.c|S|201|20|26|MSG_PROJECT_ABOUT|About
 src/application.c|S|203|20|25|MSG_PROJECT_|Quit
 src/application.c|S|204|18|27|MSG_SETTINGS_MENU|Settings
-src/application.c|S|205|20|41|MSG_SETTINGS_ALLOW_LONG_NAMES|Allow long filenames
+src/application.c|S|205|20|41|MSG_SETTINGS_LONG_NAMES|Allow long filenames
 src/application.c|S|206|20|31|MSG_SETTINGS_SKIP_ICONS|Skip icons
 src/application.c|S|280|15|51|MSG_FAILED_LOCK_PUBSCREEN|Failed to lock public screen '%s'\n
-src/application.c|S|289|15|55|MSG_FAILED_LOCK_DEFAULT_PUBSCREEN|Failed to lock default public screen.\n
+src/application.c|S|289|15|55|MSG_FAILED_LOCK_DEF_PUBSCR|Failed to lock default public screen.\n
 src/application.c|S|375|31|69|MSG_FAILED_CREATE_ABOUT_MSG|Failed to create the about message.\n
-src/application.c|S|381|29|73|MSG_FAILED_CREATE_RANGESEL_WINDOW|Failed to create the range select window.\n
-src/application.c|S|387|27|75|MSG_FAILED_CREATE_MAIN_WINDOW|Failed to create the application main window.\n
+src/application.c|S|381|29|73|MSG_FAILED_CREATE_RANGE_WIN|Failed to create the range select window.\n
+src/application.c|S|387|27|75|MSG_FAILED_CREATE_MAIN_WIN|Failed to create the application main window.\n
 src/application.c|S|394|25|52|MSG_FAILED_CREATE_LAYOUT|Failed to create layout.\n
 src/application.c|S|400|23|56|MSG_FAILED_PARSE_ARGS|Failed to parse the arguments.\n
-src/application.c|S|406|21|56|MSG_FAILED_CREATE_FILES_LIST|Failed to create the files list.\n
-src/application.c|S|412|19|64|MSG_FAILED_CREATE_LOG_OBJECT|Failed to create the notifications object.\n
+src/application.c|S|406|21|56|MSG_FAILED_CREATE_FILE_LST|Failed to create the files list.\n
+src/application.c|S|412|19|64|MSG_FAILED_CREATE_LOG|Failed to create the notifications object.\n
 src/application.c|S|418|17|77|MSG_FAILED_MSG_PORT|Failed to create the message port for window drag'n drop.\n
 src/application.c|S|424|15|52|MSG_FAILED_OPEN_LOCALE|Failed to open the default Locale.\n
 src/application.c|S|430|13|72|MSG_FAILED_ALLOC_APP_MEMORY|Failed to allocate memory for application instance data.\n
 src/application.c|S|521|13|38|MSG_FAILED_OPEN_WINDOW|Failed to open window.\n
 src/application.c|S|534|32|49|MSG_MAIN_WINDOW|MultiRename in [
 src/application.c|S|600|12|27|MSG_OK_SHOW_GAD|Ok|Show errors
-src/application.c|S|601|12|50|MSG_LOGREQ_FAILED_TO_ADD|Failed to add some of the input files
+src/application.c|S|601|12|50|MSG_FAILED_TO_ADD_FILES|Failed to add some of the input files
 src/application.c|S|628|8|11|MSG_OK_GAD|Ok
 src/application.c|S|629|8|28|MSG_NO_FILES_TO_RENAME|No files to rename.
 src/application.c|S|638|8|15|MSG_CANCEL_GAD|Cancel
@@ -60,16 +60,16 @@ src/application.c|S|668|16|31|MSG_PROCEED_CANCEL_GAD|Proceed|Cancel
 src/application.c|S|704|12|19|MSG_CANCEL_GAD|Cancel
 src/application.c|S|705|12|75|MSG_ERROR_AUTOCREATE_NAMES|Error, failed to automatically create name for duplicate file!
 src/application.c|S|718|12|19|MSG_CANCEL_GAD|Cancel
-src/application.c|S|719|12|77|MSG_ERROR_AUTOCREATED_NAMES_TOO_LONG|Error, auto-renamed file name would be too long for file system!
+src/application.c|S|719|12|77|MSG_ERROR_NAMES_TOO_LONG|Error, auto-renamed file name would be too long for file system!
 src/application.c|S|848|21|24|MSG_STATE_OK|Ok
 src/application.c|S|854|31|35|MSG_STATE_COMMAND_ERROR|Cmd
 src/application.c|S|950|46|55|MSG_NAME_ERROR|<Error!>
-src/application.c|S|1139|10|40|MSG_NAME_TOOL_NEEDS_ITEMS_TITLE|MultiRename: Select name part
+src/application.c|S|1139|10|40|MSG_NAME_TOOL_ITEMS_TITLE|MultiRename: Select name part
 src/application.c|S|1140|10|13|MSG_OK_GAD|Ok
 src/application.c|S|1141|10|75|MSG_NAME_TOOL_NEEDS_ITEMS|This tool is only available if you have files in the processing list.
-src/application.c|S|1186|10|45|MSG_EXT_TOOL_NEEDS_ITEMS_TITLE|MultiRename: Select extension part
+src/application.c|S|1186|10|45|MSG_EXT_TOOL_ITEMS_TITLE|MultiRename: Select extension part
 src/application.c|S|1187|10|13|MSG_OK_GAD|Ok
-src/application.c|S|1188|10|80|MSG_EXT_TOOL_NEEDS_ITEMS_AND_EXT|This tool is only available if you have files in the processing list and if at least one of them has an extension like '.iff'.
+src/application.c|S|1188|10|80|MSG_EXT_TOOL_ITEMS_AND_EXT|This tool is only available if you have files in the processing list and if at least one of them has an extension like '.iff'.
 src/application.c|S|1230|16|31|MSG_OK_SHOW_ERRORS_GAD|Ok|Show errors
 src/application.c|S|1231|16|57|MSG_RENAME_FAILED_FOR_SOME|Failed to rename some of the input files
 src/application.c|S|1254|12|28|MSG_CONTINUE_CANCEL_GAD|Continue|Cancel
@@ -100,14 +100,14 @@ src/application.c|S|1566|74|80|MSG_COUNTER_STEP_GAD|Step:
 src/application.c|S|1580|74|82|MSG_COUNTER_PLACES_GAD|Places:
 src/application.c|S|1611|29|45|MSG_PROCESSING_LIST_GROUP|Processing list
 src/application.c|S|1627|28|41|MSG_START_RENAME_GAD|Start rename
-src/main.c|S|104|13|53|MSG_FAILED_TO_OPEN_INTUITION|Failed to open intuition.library v47.\n
-src/main.c|S|110|13|48|MSG_FAILED_TO_OPEN_WINCLASS|Failed to open window.class v47.\n
-src/main.c|S|116|13|49|MSG_FAILED_TO_OPEN_LAYOUTGAD|Failed to open layout.gadget v47.\n
-src/main.c|S|122|13|47|MSG_FAILED_TO_OPEN_BEVELIMG|Failed to open bevel.image v47.\n
-src/main.c|S|128|13|49|MSG_FAILED_TO_OPEN_BUTTONGAD|Failed to open button.gadget v47.\n
-src/main.c|S|134|13|50|MSG_FAILED_TO_OPEN_CHOOSERGAD|Failed to open chooser.gadget v47.\n
-src/main.c|S|140|13|50|MSG_FAILED_TO_OPEN_INTEGERGAD|Failed to open integer.gadget v47.\n
-src/main.c|S|146|13|54|MSG_FAILED_TO_OPEN_LISTBROWSERGAD|Failed to open listbrowser.gadget v47.\n
-src/main.c|S|152|13|47|MSG_FAILED_TO_OPEN_LABELIMG|Failed to open label.image v47.\n
-src/main.c|S|158|13|49|MSG_FAILED_TO_OPEN_SLIDERGAD|Failed to open slider.gadget v47.\n
-src/main.c|S|164|13|49|MSG_FAILED_TO_OPEN_STRINGGAD|Failed to open string.gadget v47.\n
+src/main.c|S|104|13|53|MSG_FAILED_OPEN_INTUITION|Failed to open intuition.library v47.\n
+src/main.c|S|110|13|48|MSG_FAILED_OPEN_WINCLASS|Failed to open window.class v47.\n
+src/main.c|S|116|13|49|MSG_FAILED_OPEN_LAYOUTGAD|Failed to open layout.gadget v47.\n
+src/main.c|S|122|13|47|MSG_FAILED_OPEN_BEVELIMG|Failed to open bevel.image v47.\n
+src/main.c|S|128|13|49|MSG_FAILED_OPEN_BUTTONGAD|Failed to open button.gadget v47.\n
+src/main.c|S|134|13|50|MSG_FAILED_OPEN_CHOOSERGAD|Failed to open chooser.gadget v47.\n
+src/main.c|S|140|13|50|MSG_FAILED_OPEN_INTEGERGAD|Failed to open integer.gadget v47.\n
+src/main.c|S|146|13|54|MSG_FAILED_OPEN_LSTBRWSGAD|Failed to open listbrowser.gadget v47.\n
+src/main.c|S|152|13|47|MSG_FAILED_OPEN_LABELIMG|Failed to open label.image v47.\n
+src/main.c|S|158|13|49|MSG_FAILED_OPEN_SLIDERGAD|Failed to open slider.gadget v47.\n
+src/main.c|S|164|13|49|MSG_FAILED_OPEN_STRINGGAD|Failed to open string.gadget v47.\n
