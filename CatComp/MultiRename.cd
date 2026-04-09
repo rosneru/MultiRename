@@ -314,17 +314,17 @@ Failed to open slider.gadget v47.\n
 MSG_FAILED_TO_OPEN_STRINGGAD (//)
 Failed to open string.gadget v47.\n
 ;
-MSG_SEARCH_REPLACE_GROUP
+MSG_SEARCH_REPLACE_GROUP (//)
 Search & Replace
 ;
-MSG_SEARCH_FOR_GAD
+MSG_SEARCH_FOR_GAD (//)
 Search For
 ;
-MSG_REPLACE_WITH_GAD
+MSG_REPLACE_WITH_GAD (//)
 Replace With
 ;
-MSG_PROJECT_LOAD_NAMES_FROM_FILE
+MSG_PROJECT_LOAD_NAMES_FROM_FILE (//)
 Load names from file...
 ;
-MSG_WRONG_NUMBER_OF_LINES
+MSG_WRONG_NUMBER_OF_LINES (//)
 File contains wrong number of lines: %lu, should be %lu!

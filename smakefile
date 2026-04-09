@@ -3,7 +3,8 @@
 
 # paths are relative to the project directory (current directory during make)
 
-EXE    = MultiRename_sas
+APP    = MultiRename
+EXE    = $(APP)_sas
 OBJDIR = build-sas/
 
 # compiler and linker
@@ -95,27 +96,27 @@ localize:
 
 # target translations
 
-translations: CatComp/$(EXE).cd
-	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_de.ct
-	CatComp CatComp/$(EXE).cd CTFILE CatComp/$(EXE)_fr.ct
+translations: CatComp/$(APP).cd
+	CatComp CatComp/$(APP).cd CTFILE CatComp/$(APP)_de.ct
+	CatComp CatComp/$(APP).cd CTFILE CatComp/$(APP)_fr.ct
 
 # target catalog-header
-catalog-header: CatComp/$(EXE).cd
-	CatComp CatComp/$(EXE).cd CFILE src/$(EXE)_catalog.h NOARRAY NOCODE
+catalog-header: CatComp/$(APP).cd
+	CatComp CatComp/$(APP).cd CFILE src/$(APP)_catalog.h NOARRAY NOCODE
 
 
 # target catalogs
 
-catalogs: CatComp/$(EXE).cd CatComp/$(EXE)_de.ct CatComp/$(EXE)_es.ct CatComp/$(EXE)_fr.ct
+catalogs: CatComp/$(APP).cd CatComp/$(APP)_de.ct CatComp/$(APP)_fr.ct
   -Makedir Catalogs
-  CatComp CatComp/$(EXE).cd CatComp/$(EXE)_de.ct CATALOG $(EXE)_de.catalog
+  CatComp CatComp/$(APP).cd CatComp/$(APP)_de.ct CATALOG $(APP)_de.catalog
   -Makedir catalogs/deutsch
-  -Copy $(EXE)_de.catalog Catalogs/deutsch/$(EXE).catalog FORCE
-  -Delete $(EXE)_de.catalog
-  CatComp CatComp/$(EXE).cd CatComp/$(EXE)_fr.ct CATALOG $(EXE)_fr.catalog
+  -Copy $(APP)_de.catalog Catalogs/deutsch/$(APP).catalog FORCE
+  -Delete $(APP)_de.catalog
+  CatComp CatComp/$(APP).cd CatComp/$(APP)_fr.ct CATALOG $(APP)_fr.catalog
   -Makedir catalogs/français
-  -Copy $(EXE)_fr.catalog Catalogs/français/$(EXE).catalog FORCE
-  -Delete $(EXE)_fr.catalog
+  -Copy $(APP)_fr.catalog Catalogs/français/$(APP).catalog FORCE
+  -Delete $(APP)_fr.catalog
 
 # target 'clean'
 
