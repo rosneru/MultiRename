@@ -355,47 +355,47 @@ MSG_START_RENAME_GAD
 ; Start rename
 ;
 MSG_FAILED_OPEN_INTUI
-Das Ã–ffnen von intuition.library v47 ist fehlgeschlagen..\n
+Konnte intuition.library v47 nicht öffnen.\n
 ; Failed to open intuition.library v47.\n
 ;
 MSG_FAILED_OPEN_WINCLASS
-Das Ã–ffnen von window.class v47 ist fehlgeschlagen.\n
+Konnte window.class v47 nicht öffnen.\n
 ; Failed to open window.class v47.\n
 ;
 MSG_FAILED_OPEN_LAYOUTGAD
-Das Ã–ffnen von layout.gadget v47 ist fehlgeschlagen.\n
+Konnte layout.gadget v47 nicht öffnen.\n
 ; Failed to open layout.gadget v47.\n
 ;
 MSG_FAILED_OPEN_BEVELIMG
-Das Ã–ffnen von bevel.image v47 ist fehlgeschlagen.\n
+Konnte bevel.image v47 nicht öffnen.\n
 ; Failed to open bevel.image v47.\n
 ;
 MSG_FAILED_OPEN_BUTTONGAD
-Das Ã–ffnen von button.gadget v47 ist fehlgeschlagen.\n
+Konnte button.gadget v47 nicht öffnen.\n
 ; Failed to open button.gadget v47.\n
 ;
 MSG_FAILED_OPEN_CHOOSERGAD
-Das Ã–ffnen von chooser.gadget v47 ist fehlgeschlagen.\n
+Konnte chooser.gadget v47 nicht öffnen.\n
 ; Failed to open chooser.gadget v47.\n
 ;
 MSG_FAILED_OPEN_INTEGERGAD
-Das Ã–ffnen von integer.gadget v47 ist fehlgeschlagen.\n
+Konnte integer.gadget v47 nicht öffnen.\n
 ; Failed to open integer.gadget v47.\n
 ;
 MSG_FAILED_OPEN_LSTBRWSGAD
-Das Ã–ffnen von listbrowser.gadget v47 ist fehlgeschlagen.\n
+Konnte listbrowser.gadget v47 nicht öffnen.\n
 ; Failed to open listbrowser.gadget v47.\n
 ;
 MSG_FAILED_OPEN_LABELIMG
-Das Ã–ffnen von label.image v47 ist fehlgeschlagen.\n
+Konnte label.image v47 nicht öffnen.\n
 ; Failed to open label.image v47.\n
 ;
 MSG_FAILED_OPEN_SLIDERGAD
-Das Ã–ffnen von slider.gadget v47 ist fehlgeschlagen.\n
+Konnte slider.gadget v47 nicht öffnen.\n
 ; Failed to open slider.gadget v47.\n
 ;
 MSG_FAILED_OPEN_STRINGGAD
-Das Ã–ffnen von string.gadget v47 ist fehlgeschlagen.\n
+Konnte string.gadget v47 nicht öffnen.\n
 ; Failed to open string.gadget v47.\n
 ;
 MSG_SEARCH_REPLACE_GROUP

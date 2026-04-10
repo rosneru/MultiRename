@@ -336,13 +336,15 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
 ///
 /// Public function implementations
 
-Application *createApplication(int argc, char **argv)
+Application *createApplication(
+  int argc, char **argv, struct LocaleInfo* pLocaleInfo)
 {
   Object *pMainLayout;
   Application *pApp;
 
   if ((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
+    pApp->pLocaleInfo = pLocaleInfo;
     if ((pApp->pLocale = OpenLocale(NULL)))
     {
       if ((pApp->pAppWindowPort = CreateMsgPort()))
@@ -351,18 +353,19 @@ Application *createApplication(int argc, char **argv)
         {
           if ((pApp->pFiles = createFileNodes()))
           {
-            if ((pApp->pParsedArgs = createParsedArgs(argc,
-                   argv,
-                   pApp->pFiles,
-                   pApp->pLocale,
-                   pApp->pNotifications)))
+            if ((pApp->pParsedArgs = createParsedArgs(
+              argc,
+              argv,
+              pApp->pFiles,
+              pApp->pLocale,
+              pApp->pNotifications)))
             {
               if ((pMainLayout = createLayout(pApp->pFiles->pList)))
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
-                  if ((pApp->pRangeSelectWindow =
-                          createRangeSelectWindow(pApp->pPubScreen)))
+                  if ((pApp->pRangeSelectWindow = createRangeSelectWindow(
+                    pApp->pPubScreen)))
                   {
                     if ((pApp->pAboutMessage = createAboutMessage()))
                     {
@@ -373,62 +376,62 @@ Application *createApplication(int argc, char **argv)
                     }
                     else
                     {
-                      PutStr("Failed to create the about message.\n");
+                      PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_ABOUTMSG));
                       disposeApplication(pApp);
                     }
                   }
                   else
                   {
-                    PutStr("Failed to create the range select window.\n");
+                    PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_RANGEWIN));
                     disposeApplication(pApp);
                   }
                 }
                 else
                 {
-                  PutStr("Failed to create the application main window.\n");
+                  PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_MAINWIN));
                   DisposeObject(pMainLayout);
                   disposeApplication(pApp);
                 }
               }
               else
               {
-                PutStr("Failed to create layout.\n");
+                PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_LAYOUT));
                 disposeApplication(pApp);
               }
             }
             else
             {
-              PutStr("Failed to parse the arguments.\n");
+              PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_PARSE_ARGS));
               disposeApplication(pApp);
             }
           }
           else
           {
-            PutStr("Failed to create the files list.\n");
+            PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_FILE_LST));
             disposeApplication(pApp);
           }
         }
         else
         {
-          PutStr("Failed to create the notifications object.\n");
+          PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_LOG));
           disposeApplication(pApp);
         }
       }
       else
       {
-        PutStr("Failed to create the message port for window drag'n drop.\n");
+        PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_MSG_PORT));
         disposeApplication(pApp);
       }
     }
     else
     {
-      PutStr("Failed to open the default Locale.\n");
+      PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_LOCALE));
       disposeApplication(pApp);
     }
   }
   else
   {
-    PutStr("Failed to allocate memory for application instance data.\n");
+    PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_ALLOC_INST_MEM));
   }
 
   return NULL;

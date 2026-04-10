@@ -14,6 +14,8 @@
 #include "range_mask.h"
 #include "range_select_window.h"
 
+#include "translation.h"
+
 #define TEMP_BUF_SIZE 1024
 
 typedef struct Application
@@ -38,9 +40,11 @@ typedef struct Application
   char TempBuf[TEMP_BUF_SIZE + 1];
   long NameGadgetBufferPos;
   long ExtGadgetBufferPos;
+  struct LocaleInfo* pLocaleInfo;
 } Application;
 
-Application *createApplication(int argc, char **argv);
+Application *createApplication(
+  int argc, char **argv, struct LocaleInfo* pLocaleInfo);
 void disposeApplication(Application *pApp);
 
 BOOL runApplication(Application *pApp);

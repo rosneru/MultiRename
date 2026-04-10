@@ -74,7 +74,7 @@ int main(int argc, char **argv)
   struct LocaleInfo localeInfo;
   if (openLibs(&localeInfo))
   {
-    if ((pApp = createApplication(argc, argv)))
+    if ((pApp = createApplication(argc, argv, &localeInfo)))
     {
       if (runApplication(pApp))
       {
