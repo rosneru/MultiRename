@@ -124,4 +124,4 @@ clean:
 	-delete $(EXE)
 	-delete $(EXE).info
 	-delete $(EXE).lnk
-	-delete $(OBJDIR)\*.o
+	-delete $(OBJDIR)\#?.o
