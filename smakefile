@@ -114,8 +114,8 @@ catalogs: CatComp/$(APP).cd CatComp/$(APP)_de.ct CatComp/$(APP)_fr.ct
   -Copy $(APP)_de.catalog Catalogs/deutsch/$(APP).catalog FORCE
   -Delete $(APP)_de.catalog
   CatComp CatComp/$(APP).cd CatComp/$(APP)_fr.ct CATALOG $(APP)_fr.catalog
-  -Makedir catalogs/franÃ§ais
-  -Copy $(APP)_fr.catalog Catalogs/franÃ§ais/$(APP).catalog FORCE
+  -Makedir catalogs/français
+  -Copy $(APP)_fr.catalog Catalogs/français/$(APP).catalog FORCE
   -Delete $(APP)_fr.catalog
 
 # target 'clean'

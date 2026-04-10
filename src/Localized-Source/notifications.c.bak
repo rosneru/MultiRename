@@ -116,7 +116,7 @@ void printNotifications(struct List *pList)
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH)))
   {
-    Printf("tr(pApp->pLocaleInfo, MSG_LOG_WRONG_PATHS) count);
+    Printf("tr(pApp->pLocaleInfo, MSG_LOG_SKIPPED_WRONG_PATHS) count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -133,7 +133,7 @@ void printNotifications(struct List *pList)
     (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
   {
     Printf(
-      "tr(pApp->pLocaleInfo, MSG_LOG_OVERLONG_PATHS)
+      "tr(pApp->pLocaleInfo, MSG_LOG_SKIPPED_OVERLONG_PATHS)
       count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -150,7 +150,7 @@ void printNotifications(struct List *pList)
   if (0 < (count = getNotificationCountByType(
              pList, NNT_SKIPPED_FAILED_DATETIMEPARTS)))
   {
-    Printf("tr(pApp->pLocaleInfo, MSG_LOG_DATESTAMP)           "split into parts:\n",
+    Printf("tr(pApp->pLocaleInfo, MSG_LOG_SKIPPED_DATESTAMP)           "split into parts:\n",
       count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
@@ -168,7 +168,7 @@ void printNotifications(struct List *pList)
     (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
   {
     Printf(
-      "tr(pApp->pLocaleInfo, MSG_LOG_EXAMINE) count);
+      "tr(pApp->pLocaleInfo, MSG_LOG_SKIPPED_EXAMINE) count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -183,7 +183,7 @@ void printNotifications(struct List *pList)
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
   {
-    Printf("tr(pApp->pLocaleInfo, MSG_LOG_LOCK) count);
+    Printf("tr(pApp->pLocaleInfo, MSG_LOG_SKIPPED_LOCK) count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -200,7 +200,7 @@ void printNotifications(struct List *pList)
              pList, NNT_SKIPPED_LINKS_NOT_SUPPORTED)))
   {
     Printf(
-      "tr(pApp->pLocaleInfo, MSG_LOG_LINKS) count);
+      "tr(pApp->pLocaleInfo, MSG_LOG_SKIPPED_LINKS) count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
@@ -215,7 +215,7 @@ void printNotifications(struct List *pList)
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_DUPLICATE)))
   {
-    Printf("tr(pApp->pLocaleInfo, MSG_LOG_ALREADY_IN_LST)           "list:\n",
+    Printf("tr(pApp->pLocaleInfo, MSG_LOG_SKIPPED_ALREADY_IN_LIST)           "list:\n",
       count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)

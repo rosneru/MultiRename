@@ -104,67 +104,67 @@ BOOL openLibs(void)
   if (!(IntuitionBase =
           (struct IntuitionBase *)OpenLibrary("intuition.library", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_INTUI);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_INTUITION);
     return FALSE;
   }
 
   if (!(WindowBase = OpenLibrary("window.class", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_WINCLASS);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_WINCLASS);
     return FALSE;
   }
 
   if (!(LayoutBase = OpenLibrary("gadgets/layout.gadget", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_LAYOUTGAD);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_LAYOUTGAD);
     return FALSE;
   }
 
   if (!(BevelBase = OpenLibrary("images/bevel.image", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_BEVELIMG);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_BEVELIMG);
     return FALSE;
   }
 
   if (!(ButtonBase = OpenLibrary("gadgets/button.gadget", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_BUTTONGAD);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_BUTTONGAD);
     return FALSE;
   }
 
   if (!(ChooserBase = OpenLibrary("gadgets/chooser.gadget", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_CHOOSERGAD);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_CHOOSERGAD);
     return FALSE;
   }
 
   if (!(IntegerBase = OpenLibrary("gadgets/integer.gadget", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_INTEGERGAD);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_INTEGERGAD);
     return FALSE;
   }
 
   if (!(ListBrowserBase = OpenLibrary("gadgets/listbrowser.gadget", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_LSTBRWSGAD);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_LISTBROWSERGAD);
     return FALSE;
   }
 
   if (!(LabelBase = OpenLibrary("images/label.image", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_LABELIMG);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_LABELIMG);
     return FALSE;
   }
 
   if (!(SliderBase = OpenLibrary("gadgets/slider.gadget", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_SLIDERGAD);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_SLIDERGAD);
     return FALSE;
   }
 
   if (!(StringBase = OpenLibrary("gadgets/string.gadget", 47)))
   {
-    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_STRINGGAD);
+    PutStr("tr(pApp->pLocaleInfo, MSG_FAILED_TO_OPEN_STRINGGAD);
     return FALSE;
   }
 

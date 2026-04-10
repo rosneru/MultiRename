@@ -1,4 +1,4 @@
-## version $VER: MultiRename.catalog 01.00 (09.04.26)
+## version $VER: MultiRename.catalog 01.00 (10.04.26)
 ## codeset 0
 ## language deutsch
 ;
@@ -10,31 +10,31 @@ MSG_LOG_SELECTED_PATH
 
 ; Selected path is '%s'\n\n
 ;
-MSG_LOG_SKIPPED_WRONG_PATHS
+MSG_LOG_WRONG_PATHS
 
 ; Skipped %lu input file(s) because of wrong paths:\n
 ;
-MSG_LOG_SKIPPED_OVERLONG_PATHS
+MSG_LOG_OVERLONG_PATHS
 
 ; Skipped %lu input file(s) because of over long / truncated paths:\n
 ;
-MSG_LOG_SKIPPED_DATESTAMP
+MSG_LOG_DATESTAMP
 
 ; Skipped %lu input file(s) because their date stamp couldn't be split into parts:\n
 ;
-MSG_LOG_SKIPPED_EXAMINE
+MSG_LOG_EXAMINE
 
 ; Skipped %lu input file(s) because they couldn't be examined:\n
 ;
-MSG_LOG_SKIPPED_LOCK
+MSG_LOG_LOCK
 
 ; Failed to add (lock) %lu input file(s) / dir(s):\n
 ;
-MSG_LOG_SKIPPED_LINKS
+MSG_LOG_LINKS
 
 ; Skipped %lu input file(s) because links are not supported:\n
 ;
-MSG_LOG_SKIPPED_ALREADY_IN_LIST
+MSG_LOG_ALREADY_IN_LST
 
 ; Skipped %lu input file(s) because they are already in processing list:\n
 ;
@@ -74,7 +74,7 @@ MSG_ABOUT_1
 
 ; \n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n
 ;
-MSG_SETTINGS_ALLOW_LONG_NAMES
+MSG_SETTINGS_LONG_NAMES
 
 ; Allow long filenames
 ;
@@ -98,7 +98,7 @@ MSG_PROJECT_ABOUT
 
 ; About
 ;
-MSG_PROJECT_
+MSG_PROJECT_QUIT
 
 ; Quit
 ;
@@ -106,23 +106,23 @@ MSG_SETTINGS_MENU
 
 ; Settings
 ;
-MSG_FAILED_LOCK_PUBSCREEN
+MSG_FAILED_LOCK_PUBSCR
 
 ; Failed to lock public screen '%s'\n
 ;
-MSG_FAILED_LOCK_DEFAULT_PUBSCREEN
+MSG_FAILED_LOCK_DEF_PUBSCR
 
 ; Failed to lock default public screen.\n
 ;
-MSG_FAILED_CREATE_ABOUT_MSG
+MSG_FAILED_CREATE_ABOUTMSG
 
 ; Failed to create the about message.\n
 ;
-MSG_FAILED_CREATE_RANGESEL_WINDOW
+MSG_FAILED_CREATE_RANGEWIN
 
 ; Failed to create the range select window.\n
 ;
-MSG_FAILED_CREATE_MAIN_WINDOW
+MSG_FAILED_CREATE_MAINWIN
 
 ; Failed to create the application main window.\n
 ;
@@ -134,11 +134,11 @@ MSG_FAILED_PARSE_ARGS
 
 ; Failed to parse the arguments.\n
 ;
-MSG_FAILED_CREATE_FILES_LIST
+MSG_FAILED_CREATE_FILE_LST
 
 ; Failed to create the files list.\n
 ;
-MSG_FAILED_CREATE_LOG_OBJECT
+MSG_FAILED_CREATE_LOG
 
 ; Failed to create the notifications object.\n
 ;
@@ -150,7 +150,7 @@ MSG_FAILED_OPEN_LOCALE
 
 ; Failed to open the default Locale.\n
 ;
-MSG_FAILED_ALLOC_APP_MEMORY
+MSG_FAILED_ALLOC_INST_MEM
 
 ; Failed to allocate memory for application instance data.\n
 ;
@@ -166,7 +166,7 @@ MSG_OK_SHOW_GAD
 
 ; Ok
 ;
-MSG_LOGREQ_FAILED_TO_ADD
+MSG_FAILED_TO_ADD_FILES
 
 ; Failed to add some of the input files
 ;
@@ -206,7 +206,7 @@ MSG_ERROR_AUTOCREATE_NAMES
 
 ; Error, failed to automatically create name for duplicate file!
 ;
-MSG_ERROR_AUTOCREATED_NAMES_TOO_LONG
+MSG_ERROR_NAMES_TOO_LONG
 
 ; Error, auto-renamed file name would be too long for file system!
 ;
@@ -222,7 +222,7 @@ MSG_NAME_ERROR
 
 ; <Error!>
 ;
-MSG_NAME_TOOL_NEEDS_ITEMS_TITLE
+MSG_NAME_TOOL_ITEMS_TITLE
 
 ; MultiRename: Select name part
 ;
@@ -230,11 +230,11 @@ MSG_NAME_TOOL_NEEDS_ITEMS
 
 ; This tool is only available if you have files in the processing list.
 ;
-MSG_EXT_TOOL_NEEDS_ITEMS_TITLE
+MSG_EXT_TOOL_ITEMS_TITLE
 
 ; MultiRename: Select extension part
 ;
-MSG_EXT_TOOL_NEEDS_ITEMS_AND_EXT
+MSG_EXT_TOOL_ITEMS_AND_EXT
 
 ; This tool is only available if you have files in the processing list and if at least one of them has an extension like '.iff'.
 ;
@@ -262,7 +262,7 @@ MSG_CONTINUE_WILL_SCRATCH_3
 
 ; Continue anyway?
 ;
-MSG_FAILED_RECREATE_FILES_LIST
+MSG_FAILED_RECREATE_FILES_LST
 
 ; Failed to re-create the files list.\n
 ;
@@ -274,19 +274,19 @@ MSG_FAILED_APPLY_RANGE
 
 ; Failed to apply selected range\n
 ;
-MSG_COLUMN_TITLE_STATE
+MSG_COL_TITLE_STATE
 
 ; State
 ;
-MSG_COLUMN_TITLE_TYPE
+MSG_COL_TITLE_TYPE
 
 ; Type
 ;
-MSG_COLUMN_TITLE_OLD_NAME
+MSG_COL_TITLE_OLD_NAME
 
 ; Old name
 ;
-MSG_COLUMN_TITLE_NEW_NAME
+MSG_COL_TITLE_NEW_NAME
 
 ; New name
 ;
@@ -310,7 +310,7 @@ MSG_NAME_TIME_GAD
 
 ; [hms] Time
 ;
-MSG_NAME_COUNTER_GAD
+MSG_NAME_CNT_GAD
 
 ; [C] Counter
 ;
@@ -326,27 +326,27 @@ MSG_EXT_PART_GAD
 
 ; [E#-#] Part...
 ;
-MSG_EXT_COUNTER_GAD
+MSG_EXT_CNT_GAD
 
 ; [C] Counter
 ;
-MSG_COUNTER_GROUP
+MSG_CNT_GROUP
 
 ; Define counter
 ;
-MSG_COUNTER_START_GAD
+MSG_CNT_START_GAD
 
 ; Start:
 ;
-MSG_COUNTER_STEP_GAD
+MSG_CNT_STEP_GAD
 
 ; Step:
 ;
-MSG_COUNTER_PLACES_GAD
+MSG_CNT_PLACES_GAD
 
 ; Places:
 ;
-MSG_PROCESSING_LIST_GROUP
+MSG_PROC_LST_GROUP
 
 ; Processing list
 ;
@@ -354,48 +354,48 @@ MSG_START_RENAME_GAD
 
 ; Start rename
 ;
-MSG_FAILED_TO_OPEN_INTUITION
-Das Öffnen von intuition.library v47 ist fehlgeschlagen..\n
+MSG_FAILED_OPEN_INTUI
+Das Ã–ffnen von intuition.library v47 ist fehlgeschlagen..\n
 ; Failed to open intuition.library v47.\n
 ;
-MSG_FAILED_TO_OPEN_WINCLASS
-Das Öffnen von window.class v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_WINCLASS
+Das Ã–ffnen von window.class v47 ist fehlgeschlagen.\n
 ; Failed to open window.class v47.\n
 ;
-MSG_FAILED_TO_OPEN_LAYOUTGAD
-Das Öffnen von layout.gadget v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_LAYOUTGAD
+Das Ã–ffnen von layout.gadget v47 ist fehlgeschlagen.\n
 ; Failed to open layout.gadget v47.\n
 ;
-MSG_FAILED_TO_OPEN_BEVELIMG
-Das Öffnen von bevel.image v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_BEVELIMG
+Das Ã–ffnen von bevel.image v47 ist fehlgeschlagen.\n
 ; Failed to open bevel.image v47.\n
 ;
-MSG_FAILED_TO_OPEN_BUTTONGAD
-Das Öffnen von button.gadget v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_BUTTONGAD
+Das Ã–ffnen von button.gadget v47 ist fehlgeschlagen.\n
 ; Failed to open button.gadget v47.\n
 ;
-MSG_FAILED_TO_OPEN_CHOOSERGAD
-Das Öffnen von chooser.gadget v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_CHOOSERGAD
+Das Ã–ffnen von chooser.gadget v47 ist fehlgeschlagen.\n
 ; Failed to open chooser.gadget v47.\n
 ;
-MSG_FAILED_TO_OPEN_INTEGERGAD
-Das Öffnen von integer.gadget v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_INTEGERGAD
+Das Ã–ffnen von integer.gadget v47 ist fehlgeschlagen.\n
 ; Failed to open integer.gadget v47.\n
 ;
-MSG_FAILED_TO_OPEN_LISTBROWSERGAD
-Das Öffnen von listbrowser.gadget v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_LSTBRWSGAD
+Das Ã–ffnen von listbrowser.gadget v47 ist fehlgeschlagen.\n
 ; Failed to open listbrowser.gadget v47.\n
 ;
-MSG_FAILED_TO_OPEN_LABELIMG
-Das Öffnen von label.image v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_LABELIMG
+Das Ã–ffnen von label.image v47 ist fehlgeschlagen.\n
 ; Failed to open label.image v47.\n
 ;
-MSG_FAILED_TO_OPEN_SLIDERGAD
-Das Öffnen von slider.gadget v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_SLIDERGAD
+Das Ã–ffnen von slider.gadget v47 ist fehlgeschlagen.\n
 ; Failed to open slider.gadget v47.\n
 ;
-MSG_FAILED_TO_OPEN_STRINGGAD
-Das Öffnen von string.gadget v47 ist fehlgeschlagen.\n
+MSG_FAILED_OPEN_STRINGGAD
+Das Ã–ffnen von string.gadget v47 ist fehlgeschlagen.\n
 ; Failed to open string.gadget v47.\n
 ;
 MSG_SEARCH_REPLACE_GROUP
@@ -410,7 +410,7 @@ MSG_REPLACE_WITH_GAD
 
 ; Replace With
 ;
-MSG_PROJECT_LOAD_NAMES_FROM_FILE
+MSG_PROJECT_LOAD_FROM_FILE
 
 ; Load names from file...
 ;
