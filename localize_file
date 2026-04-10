@@ -6,7 +6,7 @@ src/notifications.c|S|150|13|77|MSG_LOG_DATESTAMP|Skipped %lu input file(s) beca
 src/notifications.c|S|169|8|71|MSG_LOG_EXAMINE|Skipped %lu input file(s) because they couldn't be examined:\n
 src/notifications.c|S|184|13|64|MSG_LOG_LOCK|Failed to add (lock) %lu input file(s) / dir(s):\n
 src/notifications.c|S|201|8|69|MSG_LOG_LINKS|Skipped %lu input file(s) because links are not supported:\n
-src/notifications.c|S|216|13|79|MSG_LOG_ALREADY_IN_LIST|Skipped %lu input file(s) because they are already in processing list:\n
+src/notifications.c|S|216|13|79|MSG_LOG_ALREADY_IN_LST|Skipped %lu input file(s) because they are already in processing list:\n
 src/notifications.c|S|233|13|53|MSG_LOG_RENAME_FAILED|Rename failed for %lu new file names:\n
 src/range_select_window.c|S|145|27|41|MSG_LONGEST_ITEM|Longest item:
 src/range_select_window.c|S|160|72|78|MSG_FROM|From:
@@ -15,8 +15,8 @@ src/range_select_window.c|S|180|72|90|MSG_SELECTION_RESULT|Selection result:
 src/range_select_window.c|S|187|72|85|MSG_RESULT_MASK|Result mask:
 src/range_select_window.c|S|194|26|29|MSG_OK_GAD|Ok
 src/range_select_window.c|S|201|26|33|MSG_CANCEL_GAD|Cancel
-src/range_select_window.c|E|233|34|64|MSG_NAME_PART_WINDOW_TITLE|MultiRename: Select name part
-src/range_select_window.c|E|234|39|74|MSG_EXT_PART_WINDOW_TITLE|MultiRename: Select extension part
+src/range_select_window.c|E|233|34|64|MSG_NAME_PART_WIN_TITLE|MultiRename: Select name part
+src/range_select_window.c|E|234|39|74|MSG_EXT_PART_WIN_TITLE|MultiRename: Select extension part
 src/application.c|D|69|20|78|MSG_ABOUT_1|\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n
 src/application.c|E|71|4|61|MSG_ABOUT_2|This release of MultiRename may be freely distributed.\n
 src/application.c|E|72|4|57|MSG_ABOUT_3|It may not be commercially distributed without the\n
@@ -27,22 +27,22 @@ src/application.c|S|197|18|26|MSG_PROJECT_MENU|Project
 src/application.c|S|198|20|24|MSG_PROJECT_NEW|New
 src/application.c|S|199|20|33|MSG_PROJECT_ADD_FILES|Add files...
 src/application.c|S|201|20|26|MSG_PROJECT_ABOUT|About
-src/application.c|S|203|20|25|MSG_PROJECT_|Quit
+src/application.c|S|203|20|25|MSG_PROJECT_QUIT|Quit
 src/application.c|S|204|18|27|MSG_SETTINGS_MENU|Settings
 src/application.c|S|205|20|41|MSG_SETTINGS_LONG_NAMES|Allow long filenames
 src/application.c|S|206|20|31|MSG_SETTINGS_SKIP_ICONS|Skip icons
-src/application.c|S|280|15|51|MSG_FAILED_LOCK_PUBSCREEN|Failed to lock public screen '%s'\n
+src/application.c|S|280|15|51|MSG_FAILED_LOCK_PUBSCR|Failed to lock public screen '%s'\n
 src/application.c|S|289|15|55|MSG_FAILED_LOCK_DEF_PUBSCR|Failed to lock default public screen.\n
-src/application.c|S|375|31|69|MSG_FAILED_CREATE_ABOUT_MSG|Failed to create the about message.\n
-src/application.c|S|381|29|73|MSG_FAILED_CREATE_RANGE_WIN|Failed to create the range select window.\n
-src/application.c|S|387|27|75|MSG_FAILED_CREATE_MAIN_WIN|Failed to create the application main window.\n
+src/application.c|S|375|31|69|MSG_FAILED_CREATE_ABOUTMSG|Failed to create the about message.\n
+src/application.c|S|381|29|73|MSG_FAILED_CREATE_RANGEWIN|Failed to create the range select window.\n
+src/application.c|S|387|27|75|MSG_FAILED_CREATE_MAINWIN|Failed to create the application main window.\n
 src/application.c|S|394|25|52|MSG_FAILED_CREATE_LAYOUT|Failed to create layout.\n
 src/application.c|S|400|23|56|MSG_FAILED_PARSE_ARGS|Failed to parse the arguments.\n
 src/application.c|S|406|21|56|MSG_FAILED_CREATE_FILE_LST|Failed to create the files list.\n
 src/application.c|S|412|19|64|MSG_FAILED_CREATE_LOG|Failed to create the notifications object.\n
 src/application.c|S|418|17|77|MSG_FAILED_MSG_PORT|Failed to create the message port for window drag'n drop.\n
 src/application.c|S|424|15|52|MSG_FAILED_OPEN_LOCALE|Failed to open the default Locale.\n
-src/application.c|S|430|13|72|MSG_FAILED_ALLOC_APP_MEMORY|Failed to allocate memory for application instance data.\n
+src/application.c|S|430|13|72|MSG_FAILED_ALLOC_INST_MEM|Failed to allocate memory for application instance data.\n
 src/application.c|S|521|13|38|MSG_FAILED_OPEN_WINDOW|Failed to open window.\n
 src/application.c|S|534|32|49|MSG_MAIN_WINDOW|MultiRename in [
 src/application.c|S|600|12|27|MSG_OK_SHOW_GAD|Ok|Show errors
@@ -76,31 +76,31 @@ src/application.c|S|1254|12|28|MSG_CONTINUE_CANCEL_GAD|Continue|Cancel
 src/application.c|S|1255|12|78|MSG_CONTINUE_WILL_SCRATCH_1|Continue to create a new project will clear the processing list\n
 src/application.c|S|1256|12|54|MSG_CONTINUE_WILL_SCRATCH_2|and set the masks to a default value.\n\n
 src/application.c|S|1257|12|29|MSG_CONTINUE_WILL_SCRATCH_3|Continue anyway?
-src/application.c|S|1291|13|51|MSG_FAILED_RECREATE_FILES_LIST|Failed to re-create the files list.\n
+src/application.c|S|1291|13|51|MSG_FAILED_RECREATE_FILES_LST|Failed to re-create the files list.\n
 src/application.c|S|1333|15|38|MSG_FILESELECTOR_TITLE|Select files to rename
 src/application.c|S|1348|10|13|MSG_OK_GAD|Ok
 src/application.c|S|1436|17|50|MSG_FAILED_APPLY_RANGE|Failed to apply selected range\n
-src/application.c|S|1452|53|59|MSG_COLUMN_TITLE_STATE|State
-src/application.c|S|1455|53|58|MSG_COLUMN_TITLE_TYPE|Type
-src/application.c|S|1460|53|62|MSG_COLUMN_TITLE_OLD_NAME|Old name
-src/application.c|S|1463|53|62|MSG_COLUMN_TITLE_NEW_NAME|New name
+src/application.c|S|1452|53|59|MSG_COL_TITLE_STATE|State
+src/application.c|S|1455|53|58|MSG_COL_TITLE_TYPE|Type
+src/application.c|S|1460|53|62|MSG_COL_TITLE_OLD_NAME|Old name
+src/application.c|S|1463|53|62|MSG_COL_TITLE_NEW_NAME|New name
 src/application.c|S|1470|27|32|MSG_NAME_GROUP|Name
 src/application.c|S|1481|26|35|MSG_NAME_NAME_GAD|[N] Name
 src/application.c|S|1484|26|37|MSG_NAME_DATE_GAD|[YMD] Date
 src/application.c|S|1494|26|41|MSG_NAME_PART_GAD|[N#-#] Part...
 src/application.c|S|1499|26|37|MSG_NAME_TIME_GAD|[hms] Time
-src/application.c|S|1505|24|36|MSG_NAME_COUNTER_GAD|[C] Counter
+src/application.c|S|1505|24|36|MSG_NAME_CNT_GAD|[C] Counter
 src/application.c|S|1513|27|37|MSG_EXTENSION_GROUP|Extension
 src/application.c|S|1522|24|33|MSG_EXT_EXT_GAD|[E] Ext.
 src/application.c|S|1527|24|39|MSG_EXT_PART_GAD|[E#-#] Part...
-src/application.c|S|1532|24|36|MSG_EXT_COUNTER_GAD|[C] Counter
-src/application.c|S|1540|27|42|MSG_COUNTER_GROUP|Define counter
-src/application.c|S|1552|74|81|MSG_COUNTER_START_GAD|Start:
-src/application.c|S|1566|74|80|MSG_COUNTER_STEP_GAD|Step:
-src/application.c|S|1580|74|82|MSG_COUNTER_PLACES_GAD|Places:
-src/application.c|S|1611|29|45|MSG_PROCESSING_LIST_GROUP|Processing list
+src/application.c|S|1532|24|36|MSG_EXT_CNT_GAD|[C] Counter
+src/application.c|S|1540|27|42|MSG_CNT_GROUP|Define counter
+src/application.c|S|1552|74|81|MSG_CNT_START_GAD|Start:
+src/application.c|S|1566|74|80|MSG_CNT_STEP_GAD|Step:
+src/application.c|S|1580|74|82|MSG_CNT_PLACES_GAD|Places:
+src/application.c|S|1611|29|45|MSG_PROC_LST_GROUP|Processing list
 src/application.c|S|1627|28|41|MSG_START_RENAME_GAD|Start rename
-src/main.c|S|104|13|53|MSG_FAILED_OPEN_INTUITION|Failed to open intuition.library v47.\n
+src/main.c|S|104|13|53|MSG_FAILED_OPEN_INTUI|Failed to open intuition.library v47.\n
 src/main.c|S|110|13|48|MSG_FAILED_OPEN_WINCLASS|Failed to open window.class v47.\n
 src/main.c|S|116|13|49|MSG_FAILED_OPEN_LAYOUTGAD|Failed to open layout.gadget v47.\n
 src/main.c|S|122|13|47|MSG_FAILED_OPEN_BEVELIMG|Failed to open bevel.image v47.\n
