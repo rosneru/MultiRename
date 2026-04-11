@@ -343,7 +343,7 @@ MSG_EXT_CNT_GAD
 ; [C] Counter
 ;
 MSG_CNT_GROUP
-Zähler festlegen
+Definiere Zähler
 ; Define counter
 ;
 MSG_CNT_START_GAD
