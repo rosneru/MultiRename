@@ -46,7 +46,10 @@ STRPTR tr(struct LocaleInfo * li, LONG stringNum)
   {
     struct Library * LocaleBase = li->li_LocaleBase;
     result = GetCatalogStr(li->li_Catalog, stringNum, builtin);
-printf("GetCatalogStr: %s\n", result);
+    if(result == NULL)
+    {
+      result = builtin;
+    }
   }
   else
   {
