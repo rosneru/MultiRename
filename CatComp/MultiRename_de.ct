@@ -1,357 +1,369 @@
-## version $VER: MultiRename.catalog 01.00 (10.04.26)
+## version $VER: MultiRename.catalog 01.00 (11.04.26)
 ## codeset 0
 ## language deutsch
 ;
 MSG_TYPE_IS_DIRECTORY
-
+DIR
 ; DIR
 ;
 MSG_LOG_SELECTED_PATH
-
+Ausgewähltes Verzeichnis ist '%s'\n\n
 ; Selected path is '%s'\n\n
 ;
 MSG_LOG_WRONG_PATHS
-
-; Skipped %lu input file(s) because of wrong paths:\n
+%d Eingabedatei(en) wurden aufgrund falscher Pfade übersprungen:\n
+; Skipped %d input file(s) because of wrong paths:\n
 ;
 MSG_LOG_OVERLONG_PATHS
-
-; Skipped %lu input file(s) because of over long / truncated paths:\n
+%d Eingabedatei(en) wurden aufgrund zu langer oder abgeschnittener Pfade übersprungen:\n
+; Skipped %d input file(s) because of over long / truncated paths:\n
 ;
 MSG_LOG_DATESTAMP
-
-; Skipped %lu input file(s) because their date stamp couldn't be split into parts:\n
+%d Eingabedatei(en) wurden übersprungen, weil ihr Datum nicht gelesen werden konnte:\n
+; Skipped %d input file(s) because their date stamp couldn't be split into parts:\n
 ;
 MSG_LOG_EXAMINE
-
-; Skipped %lu input file(s) because they couldn't be examined:\n
+%d Eingabedatei(en) wurden übersprungen, da kein 'Examine' möglich:\n
+; Skipped %d input file(s) because they couldn't be examined:\n
 ;
 MSG_LOG_LOCK
-
-; Failed to add (lock) %lu input file(s) / dir(s):\n
+%d Eingabedatei(en) wurden übersprungen, da kein 'Lock' möglich:\n
+; Skipped %d input file(s) because they couldn't be locked:\n
 ;
 MSG_LOG_LINKS
-
-; Skipped %lu input file(s) because links are not supported:\n
+%d Eingabedatei(en) wurden übersprungen, da Links nicht unterstützt werden:\n
+; Skipped %d input file(s) because links are not supported:\n
 ;
 MSG_LOG_ALREADY_IN_LST
-
-; Skipped %lu input file(s) because they are already in processing list:\n
+%d Eingabedatei(en) wurden übersprungen, da sie bereits in der Verarbeitungsliste sind:\n
+; Skipped %d input file(s) because they are already in processing list:\n
 ;
 MSG_LOG_RENAME_FAILED
-
-; Rename failed for %lu new file names:\n
+Umbenennen für %d neue Dateinamen fehlgeschlagen:\n
+; Rename failed for %d new file names:\n
 ;
 MSG_LONGEST_ITEM
-
+Längster Eintrag:
 ; Longest item:
 ;
 MSG_FROM
-
+Von:
 ; From:
 ;
 MSG_TO
-
+Nach:
 ; To:
 ;
 MSG_SELECTION_RESULT
-
+Auswahlergebnis:
 ; Selection result:
 ;
 MSG_RESULT_MASK
-
+Ergebnismaske:
 ; Result mask:
 ;
 MSG_OK_GAD
-
+Ok
 ; Ok
 ;
 MSG_CANCEL_GAD
-
+Abbrechen
 ; Cancel
 ;
+MSG_NAME_PART_WIN_TITLE
+MultiRename: Bereich aus Namen wählen
+; MultiRename: Select name part
+;
+MSG_EXT_PART_WIN_TITLE
+MultiRename: Bereich aus Erweiterung wählen
+; MultiRename: Select extension part
+;
 MSG_ABOUT_1
-
-; \n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n
+Diese Version von MultiRename darf frei weitergegeben werden.\n
+; This release of MultiRename may be freely distributed.\n
+;
+MSG_ABOUT_2
+Ohne ausdrückliche Zustimmung des Autors darf sie nicht\n
+; It may not be commercially distributed without the\n
+;
+MSG_ABOUT_3
+kommerziell verbreitet werden.\n
+; explicit permission of the author.\n
 ;
 MSG_SETTINGS_LONG_NAMES
-
+Lange Dateinamen erlauben
 ; Allow long filenames
 ;
 MSG_SETTINGS_SKIP_ICONS
-
+Icons auslassen
 ; Skip icons
 ;
 MSG_PROJECT_MENU
-
+Projekt
 ; Project
 ;
 MSG_PROJECT_NEW
-
+Neu
 ; New
 ;
 MSG_PROJECT_ADD_FILES
-
+Dateien hinzufügen...
 ; Add files...
 ;
 MSG_PROJECT_ABOUT
-
+Über
 ; About
 ;
 MSG_PROJECT_QUIT
-
+Beenden
 ; Quit
 ;
 MSG_SETTINGS_MENU
-
+Einstellungen
 ; Settings
 ;
 MSG_FAILED_LOCK_PUBSCR
-
+Konnte Public Screen '%s' nicht sperren.\n
 ; Failed to lock public screen '%s'\n
 ;
 MSG_FAILED_LOCK_DEF_PUBSCR
-
+Konnte den Standard - Public Screen nicht sperren.\n
 ; Failed to lock default public screen.\n
 ;
 MSG_FAILED_CREATE_ABOUTMSG
-
+Konnte die Meldung für den "Über"-Dialog nicht erstellen.\n
 ; Failed to create the about message.\n
 ;
 MSG_FAILED_CREATE_RANGEWIN
-
+Konnte das Fenster zur Bereichsauswahl nicht erstellen.\n
 ; Failed to create the range select window.\n
 ;
 MSG_FAILED_CREATE_MAINWIN
-
+Konnte das Hauptfenster der Anwendung nicht erstellen.\n
 ; Failed to create the application main window.\n
 ;
 MSG_FAILED_CREATE_LAYOUT
-
+Konnte Layout nicht erstellen.\n
 ; Failed to create layout.\n
 ;
 MSG_FAILED_PARSE_ARGS
-
+Konnte die Argumente nicht auswerten.\n
 ; Failed to parse the arguments.\n
 ;
 MSG_FAILED_CREATE_FILE_LST
-
+Konnte die Verarbeitungsliste nicht erstellen.\n
 ; Failed to create the files list.\n
 ;
 MSG_FAILED_CREATE_LOG
-
+Konnte das Log nicht erstellen.\n
 ; Failed to create the notifications object.\n
 ;
 MSG_FAILED_MSG_PORT
-
+Konnte den Message-Port für Window - Drag'n'Drop nicht erstellen.\n
 ; Failed to create the message port for window drag'n drop.\n
 ;
 MSG_FAILED_OPEN_LOCALE
-
+Konnte die Standard-Locale nicht öffnen.\n
 ; Failed to open the default Locale.\n
 ;
 MSG_FAILED_ALLOC_INST_MEM
-
+Konnte Speicher für die Anwendungs-Daten nicht reservieren.\n
 ; Failed to allocate memory for application instance data.\n
 ;
 MSG_FAILED_OPEN_WINDOW
-
+Konnte Fenster nicht öffnen.\n
 ; Failed to open window.\n
 ;
 MSG_MAIN_WINDOW
-
+MultiRename in [
 ; MultiRename in [
 ;
 MSG_OK_SHOW_GAD
-
+Ok
 ; Ok
 ;
 MSG_FAILED_TO_ADD_FILES
-
+Einige Eingabedateien konnten nicht hinzugefügt werden
 ; Failed to add some of the input files
 ;
 MSG_NO_FILES_TO_RENAME
-
+Keine Dateien zum Umbenennen.
 ; No files to rename.
 ;
 MSG_FAILED_CREATE_TOKENS
-
+Fehler beim Erstellen der Dateinamen-Tokens!
 ; Error, failed to create file name tokens!
 ;
 MSG_WARN_DUPLICATES_1
-
+Warnung, doppelte Namen! Trotzdem fortfahren?\n
 ; Warning, duplicate names! Proceed anyway?\n
 ;
 MSG_WARN_DUPLICATES_2
-
+HINWEIS: 'Fortfahren' benennt doppelte Dateien automatisch um zu \n
 ; NOTE: Proceed will auto rename duplicate files to \n
 ;
 MSG_WARN_DUPLICATES_3
-
-;   name (2).ext\n
-;
-MSG_WARN_DUPLICATES_4
-
-;   name (3).ext\n
-;
-MSG_WARN_DUPLICATES_5
-
+und so weiter.
 ; and so on.
 ;
 MSG_PROCEED_CANCEL_GAD
-
+Fortfahren
 ; Proceed
 ;
 MSG_ERROR_AUTOCREATE_NAMES
-
+Name für doppelte Datei konnte nicht automatisch erstellt werden!
 ; Error, failed to automatically create name for duplicate file!
 ;
 MSG_ERROR_NAMES_TOO_LONG
-
+Automatisch erstellter Dateiname zu lang für das Dateisystem!
 ; Error, auto-renamed file name would be too long for file system!
 ;
 MSG_STATE_OK
-
+Ok
 ; Ok
 ;
 MSG_STATE_COMMAND_ERROR
-
+Cmd
 ; Cmd
 ;
 MSG_NAME_ERROR
-
+<Fehler!>
 ; <Error!>
 ;
 MSG_NAME_TOOL_ITEMS_TITLE
-
+MultiRename: Bereich aus Namen wählen
 ; MultiRename: Select name part
 ;
 MSG_NAME_TOOL_NEEDS_ITEMS
-
+Dieses Werkzeug ist nur verfügbar, wenn Dateien in der Verarbeitungsliste sind.
 ; This tool is only available if you have files in the processing list.
 ;
 MSG_EXT_TOOL_ITEMS_TITLE
-
+MultiRename: Bereich aus Erweiterung wählen
 ; MultiRename: Select extension part
 ;
-MSG_EXT_TOOL_ITEMS_AND_EXT
-
-; This tool is only available if you have files in the processing list and if at least one of them has an extension like '.iff'.
+MSG_ITEMS_AND_EXT_NEEDED_1
+Dieses Werkzeug ist nur verfügbar, wenn Dateien in der Verarbeitungsliste sind\n
+; This tool is only available if you have files in the processing list\n
+;
+MSG_ITEMS_AND_EXT_NEEDED_2
+und wenn mindestens eine davon eine Erweiterung wie '.iff' hat.
+; and if at least one of them has an extension like '.iff'.
 ;
 MSG_OK_SHOW_ERRORS_GAD
-
+Ok
 ; Ok
 ;
 MSG_RENAME_FAILED_FOR_SOME
-
+Umbenennen für einige Eingabedateien fehlgeschlagen
 ; Failed to rename some of the input files
 ;
 MSG_CONTINUE_CANCEL_GAD
-
+Weiter
 ; Continue
 ;
 MSG_CONTINUE_WILL_SCRATCH_1
-
+Bei 'Fortfahren' wird ein neues Projekt erstellt, die Verarbeitungsliste geleert\n
 ; Continue to create a new project will clear the processing list\n
 ;
 MSG_CONTINUE_WILL_SCRATCH_2
-
+und die Masken auf ihre Standardwerte eingestellt.\n\n
 ; and set the masks to a default value.\n\n
 ;
 MSG_CONTINUE_WILL_SCRATCH_3
-
+Trotzdem fortfahren?
 ; Continue anyway?
 ;
-MSG_FAILED_RECREATE_FILES_LST
-
+MSG_FAILED_RECR_FILE_LST
+Konnte die Verarbeitungsliste nicht neu erstellen.\n
 ; Failed to re-create the files list.\n
 ;
 MSG_FILESELECTOR_TITLE
-
+Dateien zum Umbenennen auswählen
 ; Select files to rename
 ;
 MSG_FAILED_APPLY_RANGE
-
+Fehler beim Anwenden des ausgewählten Bereiches\n
 ; Failed to apply selected range\n
 ;
 MSG_COL_TITLE_STATE
-
+Status
 ; State
 ;
 MSG_COL_TITLE_TYPE
-
+Typ
 ; Type
 ;
 MSG_COL_TITLE_OLD_NAME
-
+Alter Name
 ; Old name
 ;
 MSG_COL_TITLE_NEW_NAME
-
+Neuer Name
 ; New name
 ;
 MSG_NAME_GROUP
-
+Name
 ; Name
 ;
 MSG_NAME_NAME_GAD
-
+[N] Name
 ; [N] Name
 ;
 MSG_NAME_DATE_GAD
-
+[YMD] Datum
 ; [YMD] Date
 ;
 MSG_NAME_PART_GAD
-
+[N#-#] Teil...
 ; [N#-#] Part...
 ;
 MSG_NAME_TIME_GAD
-
+[hms] Zeit
 ; [hms] Time
 ;
 MSG_NAME_CNT_GAD
-
+[C] Zähler
 ; [C] Counter
 ;
 MSG_EXTENSION_GROUP
-
+Erweiterung
 ; Extension
 ;
 MSG_EXT_EXT_GAD
-
+[E] Erw.
 ; [E] Ext.
 ;
 MSG_EXT_PART_GAD
-
+[E#-#] Teil...
 ; [E#-#] Part...
 ;
 MSG_EXT_CNT_GAD
-
+[C] Zähler
 ; [C] Counter
 ;
 MSG_CNT_GROUP
-
+Zähler festlegen
 ; Define counter
 ;
 MSG_CNT_START_GAD
-
+Start:
 ; Start:
 ;
 MSG_CNT_STEP_GAD
-
+Schritt:
 ; Step:
 ;
 MSG_CNT_PLACES_GAD
-
+Stellen:
 ; Places:
 ;
 MSG_PROC_LST_GROUP
-
+Verarbeitungsliste
 ; Processing list
 ;
 MSG_START_RENAME_GAD
-
+Umbenennen
 ; Start rename
 ;
 MSG_FAILED_OPEN_INTUI
@@ -399,22 +411,22 @@ Konnte string.gadget v47 nicht öffnen.\n
 ; Failed to open string.gadget v47.\n
 ;
 MSG_SEARCH_REPLACE_GROUP
-
+Suchen & Ersetzen
 ; Search & Replace
 ;
 MSG_SEARCH_FOR_GAD
-
+Suchen nach
 ; Search For
 ;
 MSG_REPLACE_WITH_GAD
-
+Ersetzen durch
 ; Replace With
 ;
 MSG_PROJECT_LOAD_FROM_FILE
-
+Namen aus Datei laden...
 ; Load names from file...
 ;
 MSG_WRONG_NUMBER_OF_LINES
-
-; File contains wrong number of lines: %lu, should be %lu!
+Die Datei enthält die falsche Anzahl Zeilen: %d statt %d!
+; File contains wrong number of lines: %d, should be %d!
 ;

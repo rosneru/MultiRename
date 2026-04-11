@@ -49,93 +49,96 @@
 #define MSG_RESULT_MASK 14
 #define MSG_OK_GAD 15
 #define MSG_CANCEL_GAD 16
-#define MSG_ABOUT_1 17
-#define MSG_SETTINGS_LONG_NAMES 18
-#define MSG_SETTINGS_SKIP_ICONS 19
-#define MSG_PROJECT_MENU 20
-#define MSG_PROJECT_NEW 21
-#define MSG_PROJECT_ADD_FILES 22
-#define MSG_PROJECT_ABOUT 23
-#define MSG_PROJECT_QUIT 24
-#define MSG_SETTINGS_MENU 25
-#define MSG_FAILED_LOCK_PUBSCR 26
-#define MSG_FAILED_LOCK_DEF_PUBSCR 27
-#define MSG_FAILED_CREATE_ABOUTMSG 28
-#define MSG_FAILED_CREATE_RANGEWIN 29
-#define MSG_FAILED_CREATE_MAINWIN 30
-#define MSG_FAILED_CREATE_LAYOUT 31
-#define MSG_FAILED_PARSE_ARGS 32
-#define MSG_FAILED_CREATE_FILE_LST 33
-#define MSG_FAILED_CREATE_LOG 34
-#define MSG_FAILED_MSG_PORT 35
-#define MSG_FAILED_OPEN_LOCALE 36
-#define MSG_FAILED_ALLOC_INST_MEM 37
-#define MSG_FAILED_OPEN_WINDOW 38
-#define MSG_MAIN_WINDOW 39
-#define MSG_OK_SHOW_GAD 40
-#define MSG_FAILED_TO_ADD_FILES 41
-#define MSG_NO_FILES_TO_RENAME 42
-#define MSG_FAILED_CREATE_TOKENS 43
-#define MSG_WARN_DUPLICATES_1 44
-#define MSG_WARN_DUPLICATES_2 45
-#define MSG_WARN_DUPLICATES_3 46
-#define MSG_WARN_DUPLICATES_4 47
-#define MSG_WARN_DUPLICATES_5 48
-#define MSG_PROCEED_CANCEL_GAD 49
-#define MSG_ERROR_AUTOCREATE_NAMES 50
-#define MSG_ERROR_NAMES_TOO_LONG 51
-#define MSG_STATE_OK 52
-#define MSG_STATE_COMMAND_ERROR 53
-#define MSG_NAME_ERROR 54
-#define MSG_NAME_TOOL_ITEMS_TITLE 55
-#define MSG_NAME_TOOL_NEEDS_ITEMS 56
-#define MSG_EXT_TOOL_ITEMS_TITLE 57
-#define MSG_EXT_TOOL_ITEMS_AND_EXT 58
-#define MSG_OK_SHOW_ERRORS_GAD 59
-#define MSG_RENAME_FAILED_FOR_SOME 60
-#define MSG_CONTINUE_CANCEL_GAD 61
-#define MSG_CONTINUE_WILL_SCRATCH_1 62
-#define MSG_CONTINUE_WILL_SCRATCH_2 63
-#define MSG_CONTINUE_WILL_SCRATCH_3 64
-#define MSG_FAILED_RECREATE_FILES_LST 65
-#define MSG_FILESELECTOR_TITLE 66
-#define MSG_FAILED_APPLY_RANGE 67
-#define MSG_COL_TITLE_STATE 68
-#define MSG_COL_TITLE_TYPE 69
-#define MSG_COL_TITLE_OLD_NAME 70
-#define MSG_COL_TITLE_NEW_NAME 71
-#define MSG_NAME_GROUP 72
-#define MSG_NAME_NAME_GAD 73
-#define MSG_NAME_DATE_GAD 74
-#define MSG_NAME_PART_GAD 75
-#define MSG_NAME_TIME_GAD 76
-#define MSG_NAME_CNT_GAD 77
-#define MSG_EXTENSION_GROUP 78
-#define MSG_EXT_EXT_GAD 79
-#define MSG_EXT_PART_GAD 80
-#define MSG_EXT_CNT_GAD 81
-#define MSG_CNT_GROUP 82
-#define MSG_CNT_START_GAD 83
-#define MSG_CNT_STEP_GAD 84
-#define MSG_CNT_PLACES_GAD 85
-#define MSG_PROC_LST_GROUP 86
-#define MSG_START_RENAME_GAD 87
-#define MSG_FAILED_OPEN_INTUI 88
-#define MSG_FAILED_OPEN_WINCLASS 89
-#define MSG_FAILED_OPEN_LAYOUTGAD 90
-#define MSG_FAILED_OPEN_BEVELIMG 91
-#define MSG_FAILED_OPEN_BUTTONGAD 92
-#define MSG_FAILED_OPEN_CHOOSERGAD 93
-#define MSG_FAILED_OPEN_INTEGERGAD 94
-#define MSG_FAILED_OPEN_LSTBRWSGAD 95
-#define MSG_FAILED_OPEN_LABELIMG 96
-#define MSG_FAILED_OPEN_SLIDERGAD 97
-#define MSG_FAILED_OPEN_STRINGGAD 98
-#define MSG_SEARCH_REPLACE_GROUP 99
-#define MSG_SEARCH_FOR_GAD 100
-#define MSG_REPLACE_WITH_GAD 101
-#define MSG_PROJECT_LOAD_FROM_FILE 102
-#define MSG_WRONG_NUMBER_OF_LINES 103
+#define MSG_NAME_PART_WIN_TITLE 17
+#define MSG_EXT_PART_WIN_TITLE 18
+#define MSG_ABOUT_1 19
+#define MSG_ABOUT_2 20
+#define MSG_ABOUT_3 21
+#define MSG_SETTINGS_LONG_NAMES 22
+#define MSG_SETTINGS_SKIP_ICONS 23
+#define MSG_PROJECT_MENU 24
+#define MSG_PROJECT_NEW 25
+#define MSG_PROJECT_ADD_FILES 26
+#define MSG_PROJECT_ABOUT 27
+#define MSG_PROJECT_QUIT 28
+#define MSG_SETTINGS_MENU 29
+#define MSG_FAILED_LOCK_PUBSCR 30
+#define MSG_FAILED_LOCK_DEF_PUBSCR 31
+#define MSG_FAILED_CREATE_ABOUTMSG 32
+#define MSG_FAILED_CREATE_RANGEWIN 33
+#define MSG_FAILED_CREATE_MAINWIN 34
+#define MSG_FAILED_CREATE_LAYOUT 35
+#define MSG_FAILED_PARSE_ARGS 36
+#define MSG_FAILED_CREATE_FILE_LST 37
+#define MSG_FAILED_CREATE_LOG 38
+#define MSG_FAILED_MSG_PORT 39
+#define MSG_FAILED_OPEN_LOCALE 40
+#define MSG_FAILED_ALLOC_INST_MEM 41
+#define MSG_FAILED_OPEN_WINDOW 42
+#define MSG_MAIN_WINDOW 43
+#define MSG_OK_SHOW_GAD 44
+#define MSG_FAILED_TO_ADD_FILES 45
+#define MSG_NO_FILES_TO_RENAME 46
+#define MSG_FAILED_CREATE_TOKENS 47
+#define MSG_WARN_DUPLICATES_1 48
+#define MSG_WARN_DUPLICATES_2 49
+#define MSG_WARN_DUPLICATES_3 50
+#define MSG_PROCEED_CANCEL_GAD 51
+#define MSG_ERROR_AUTOCREATE_NAMES 52
+#define MSG_ERROR_NAMES_TOO_LONG 53
+#define MSG_STATE_OK 54
+#define MSG_STATE_COMMAND_ERROR 55
+#define MSG_NAME_ERROR 56
+#define MSG_NAME_TOOL_ITEMS_TITLE 57
+#define MSG_NAME_TOOL_NEEDS_ITEMS 58
+#define MSG_EXT_TOOL_ITEMS_TITLE 59
+#define MSG_ITEMS_AND_EXT_NEEDED_1 60
+#define MSG_ITEMS_AND_EXT_NEEDED_2 61
+#define MSG_OK_SHOW_ERRORS_GAD 62
+#define MSG_RENAME_FAILED_FOR_SOME 63
+#define MSG_CONTINUE_CANCEL_GAD 64
+#define MSG_CONTINUE_WILL_SCRATCH_1 65
+#define MSG_CONTINUE_WILL_SCRATCH_2 66
+#define MSG_CONTINUE_WILL_SCRATCH_3 67
+#define MSG_FAILED_RECR_FILE_LST 68
+#define MSG_FILESELECTOR_TITLE 69
+#define MSG_FAILED_APPLY_RANGE 70
+#define MSG_COL_TITLE_STATE 71
+#define MSG_COL_TITLE_TYPE 72
+#define MSG_COL_TITLE_OLD_NAME 73
+#define MSG_COL_TITLE_NEW_NAME 74
+#define MSG_NAME_GROUP 75
+#define MSG_NAME_NAME_GAD 76
+#define MSG_NAME_DATE_GAD 77
+#define MSG_NAME_PART_GAD 78
+#define MSG_NAME_TIME_GAD 79
+#define MSG_NAME_CNT_GAD 80
+#define MSG_EXTENSION_GROUP 81
+#define MSG_EXT_EXT_GAD 82
+#define MSG_EXT_PART_GAD 83
+#define MSG_EXT_CNT_GAD 84
+#define MSG_CNT_GROUP 85
+#define MSG_CNT_START_GAD 86
+#define MSG_CNT_STEP_GAD 87
+#define MSG_CNT_PLACES_GAD 88
+#define MSG_PROC_LST_GROUP 89
+#define MSG_START_RENAME_GAD 90
+#define MSG_FAILED_OPEN_INTUI 91
+#define MSG_FAILED_OPEN_WINCLASS 92
+#define MSG_FAILED_OPEN_LAYOUTGAD 93
+#define MSG_FAILED_OPEN_BEVELIMG 94
+#define MSG_FAILED_OPEN_BUTTONGAD 95
+#define MSG_FAILED_OPEN_CHOOSERGAD 96
+#define MSG_FAILED_OPEN_INTEGERGAD 97
+#define MSG_FAILED_OPEN_LSTBRWSGAD 98
+#define MSG_FAILED_OPEN_LABELIMG 99
+#define MSG_FAILED_OPEN_SLIDERGAD 100
+#define MSG_FAILED_OPEN_STRINGGAD 101
+#define MSG_SEARCH_REPLACE_GROUP 102
+#define MSG_SEARCH_FOR_GAD 103
+#define MSG_REPLACE_WITH_GAD 104
+#define MSG_PROJECT_LOAD_FROM_FILE 105
+#define MSG_WRONG_NUMBER_OF_LINES 106
 
 #endif /* CATCOMP_NUMBERS */
 
@@ -147,14 +150,14 @@
 
 #define MSG_TYPE_IS_DIRECTORY_STR "DIR"
 #define MSG_LOG_SELECTED_PATH_STR "Selected path is '%s'\n\n"
-#define MSG_LOG_WRONG_PATHS_STR "Skipped %lu input file(s) because of wrong paths:\n"
-#define MSG_LOG_OVERLONG_PATHS_STR "Skipped %lu input file(s) because of over long / truncated paths:\n"
-#define MSG_LOG_DATESTAMP_STR "Skipped %lu input file(s) because their date stamp couldn't be split into parts:\n"
-#define MSG_LOG_EXAMINE_STR "Skipped %lu input file(s) because they couldn't be examined:\n"
-#define MSG_LOG_LOCK_STR "Failed to add (lock) %lu input file(s) / dir(s):\n"
-#define MSG_LOG_LINKS_STR "Skipped %lu input file(s) because links are not supported:\n"
-#define MSG_LOG_ALREADY_IN_LST_STR "Skipped %lu input file(s) because they are already in processing list:\n"
-#define MSG_LOG_RENAME_FAILED_STR "Rename failed for %lu new file names:\n"
+#define MSG_LOG_WRONG_PATHS_STR "Skipped %d input file(s) because of wrong paths:\n"
+#define MSG_LOG_OVERLONG_PATHS_STR "Skipped %d input file(s) because of over long / truncated paths:\n"
+#define MSG_LOG_DATESTAMP_STR "Skipped %d input file(s) because their date stamp couldn't be split into parts:\n"
+#define MSG_LOG_EXAMINE_STR "Skipped %d input file(s) because they couldn't be examined:\n"
+#define MSG_LOG_LOCK_STR "Skipped %d input file(s) because they couldn't be locked:\n"
+#define MSG_LOG_LINKS_STR "Skipped %d input file(s) because links are not supported:\n"
+#define MSG_LOG_ALREADY_IN_LST_STR "Skipped %d input file(s) because they are already in processing list:\n"
+#define MSG_LOG_RENAME_FAILED_STR "Rename failed for %d new file names:\n"
 #define MSG_LONGEST_ITEM_STR "Longest item:"
 #define MSG_FROM_STR "From:"
 #define MSG_TO_STR "To:"
@@ -162,7 +165,11 @@
 #define MSG_RESULT_MASK_STR "Result mask:"
 #define MSG_OK_GAD_STR "Ok"
 #define MSG_CANCEL_GAD_STR "Cancel"
-#define MSG_ABOUT_1_STR "\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n"
+#define MSG_NAME_PART_WIN_TITLE_STR "MultiRename: Select name part"
+#define MSG_EXT_PART_WIN_TITLE_STR "MultiRename: Select extension part"
+#define MSG_ABOUT_1_STR "This release of MultiRename may be freely distributed.\n"
+#define MSG_ABOUT_2_STR "It may not be commercially distributed without the\n"
+#define MSG_ABOUT_3_STR "explicit permission of the author.\n"
 #define MSG_SETTINGS_LONG_NAMES_STR "Allow long filenames"
 #define MSG_SETTINGS_SKIP_ICONS_STR "Skip icons"
 #define MSG_PROJECT_MENU_STR "Project"
@@ -191,9 +198,7 @@
 #define MSG_FAILED_CREATE_TOKENS_STR "Error, failed to create file name tokens!"
 #define MSG_WARN_DUPLICATES_1_STR "Warning, duplicate names! Proceed anyway?\n"
 #define MSG_WARN_DUPLICATES_2_STR "NOTE: Proceed will auto rename duplicate files to \n"
-#define MSG_WARN_DUPLICATES_3_STR "  name (2).ext\n"
-#define MSG_WARN_DUPLICATES_4_STR "  name (3).ext\n"
-#define MSG_WARN_DUPLICATES_5_STR "and so on."
+#define MSG_WARN_DUPLICATES_3_STR "and so on."
 #define MSG_PROCEED_CANCEL_GAD_STR "Proceed"
 #define MSG_ERROR_AUTOCREATE_NAMES_STR "Error, failed to automatically create name for duplicate file!"
 #define MSG_ERROR_NAMES_TOO_LONG_STR "Error, auto-renamed file name would be too long for file system!"
@@ -203,14 +208,15 @@
 #define MSG_NAME_TOOL_ITEMS_TITLE_STR "MultiRename: Select name part"
 #define MSG_NAME_TOOL_NEEDS_ITEMS_STR "This tool is only available if you have files in the processing list."
 #define MSG_EXT_TOOL_ITEMS_TITLE_STR "MultiRename: Select extension part"
-#define MSG_EXT_TOOL_ITEMS_AND_EXT_STR "This tool is only available if you have files in the processing list and if at least one of them has an extension like '.iff'."
+#define MSG_ITEMS_AND_EXT_NEEDED_1_STR "This tool is only available if you have files in the processing list\n"
+#define MSG_ITEMS_AND_EXT_NEEDED_2_STR "and if at least one of them has an extension like '.iff'."
 #define MSG_OK_SHOW_ERRORS_GAD_STR "Ok"
 #define MSG_RENAME_FAILED_FOR_SOME_STR "Failed to rename some of the input files"
 #define MSG_CONTINUE_CANCEL_GAD_STR "Continue"
 #define MSG_CONTINUE_WILL_SCRATCH_1_STR "Continue to create a new project will clear the processing list\n"
 #define MSG_CONTINUE_WILL_SCRATCH_2_STR "and set the masks to a default value.\n\n"
 #define MSG_CONTINUE_WILL_SCRATCH_3_STR "Continue anyway?"
-#define MSG_FAILED_RECREATE_FILES_LST_STR "Failed to re-create the files list.\n"
+#define MSG_FAILED_RECR_FILE_LST_STR "Failed to re-create the files list.\n"
 #define MSG_FILESELECTOR_TITLE_STR "Select files to rename"
 #define MSG_FAILED_APPLY_RANGE_STR "Failed to apply selected range\n"
 #define MSG_COL_TITLE_STATE_STR "State"
@@ -248,7 +254,7 @@
 #define MSG_SEARCH_FOR_GAD_STR "Search For"
 #define MSG_REPLACE_WITH_GAD_STR "Replace With"
 #define MSG_PROJECT_LOAD_FROM_FILE_STR "Load names from file..."
-#define MSG_WRONG_NUMBER_OF_LINES_STR "File contains wrong number of lines: %lu, should be %lu!"
+#define MSG_WRONG_NUMBER_OF_LINES_STR "File contains wrong number of lines: %d, should be %d!"
 
 #endif /* CATCOMP_STRINGS */
 
@@ -264,22 +270,22 @@ static const char CatCompBlock[] =
     MSG_TYPE_IS_DIRECTORY_STR "\x00"
     "\x00\x00\x00\x01\x00\x18"
     MSG_LOG_SELECTED_PATH_STR "\x00"
-    "\x00\x00\x00\x02\x00\x34"
-    MSG_LOG_WRONG_PATHS_STR "\x00\x00"
-    "\x00\x00\x00\x03\x00\x44"
-    MSG_LOG_OVERLONG_PATHS_STR "\x00\x00"
+    "\x00\x00\x00\x02\x00\x32"
+    MSG_LOG_WRONG_PATHS_STR "\x00"
+    "\x00\x00\x00\x03\x00\x42"
+    MSG_LOG_OVERLONG_PATHS_STR "\x00"
     "\x00\x00\x00\x04\x00\x52"
-    MSG_LOG_DATESTAMP_STR "\x00"
+    MSG_LOG_DATESTAMP_STR "\x00\x00"
     "\x00\x00\x00\x05\x00\x3E"
-    MSG_LOG_EXAMINE_STR "\x00"
-    "\x00\x00\x00\x06\x00\x32"
-    MSG_LOG_LOCK_STR "\x00"
+    MSG_LOG_EXAMINE_STR "\x00\x00"
+    "\x00\x00\x00\x06\x00\x3C"
+    MSG_LOG_LOCK_STR "\x00\x00"
     "\x00\x00\x00\x07\x00\x3C"
-    MSG_LOG_LINKS_STR "\x00"
+    MSG_LOG_LINKS_STR "\x00\x00"
     "\x00\x00\x00\x08\x00\x48"
-    MSG_LOG_ALREADY_IN_LST_STR "\x00"
-    "\x00\x00\x00\x09\x00\x28"
-    MSG_LOG_RENAME_FAILED_STR "\x00\x00"
+    MSG_LOG_ALREADY_IN_LST_STR "\x00\x00"
+    "\x00\x00\x00\x09\x00\x26"
+    MSG_LOG_RENAME_FAILED_STR "\x00"
     "\x00\x00\x00\x0A\x00\x0E"
     MSG_LONGEST_ITEM_STR "\x00"
     "\x00\x00\x00\x0B\x00\x06"
@@ -294,179 +300,185 @@ static const char CatCompBlock[] =
     MSG_OK_GAD_STR "\x00\x00"
     "\x00\x00\x00\x10\x00\x08"
     MSG_CANCEL_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x11\x00\x36"
+    "\x00\x00\x00\x11\x00\x1E"
+    MSG_NAME_PART_WIN_TITLE_STR "\x00"
+    "\x00\x00\x00\x12\x00\x24"
+    MSG_EXT_PART_WIN_TITLE_STR "\x00\x00"
+    "\x00\x00\x00\x13\x00\x38"
     MSG_ABOUT_1_STR "\x00"
-    "\x00\x00\x00\x12\x00\x16"
+    "\x00\x00\x00\x14\x00\x34"
+    MSG_ABOUT_2_STR "\x00"
+    "\x00\x00\x00\x15\x00\x24"
+    MSG_ABOUT_3_STR "\x00"
+    "\x00\x00\x00\x16\x00\x16"
     MSG_SETTINGS_LONG_NAMES_STR "\x00\x00"
-    "\x00\x00\x00\x13\x00\x0C"
+    "\x00\x00\x00\x17\x00\x0C"
     MSG_SETTINGS_SKIP_ICONS_STR "\x00\x00"
-    "\x00\x00\x00\x14\x00\x08"
+    "\x00\x00\x00\x18\x00\x08"
     MSG_PROJECT_MENU_STR "\x00"
-    "\x00\x00\x00\x15\x00\x04"
+    "\x00\x00\x00\x19\x00\x04"
     MSG_PROJECT_NEW_STR "\x00"
-    "\x00\x00\x00\x16\x00\x0E"
+    "\x00\x00\x00\x1A\x00\x0E"
     MSG_PROJECT_ADD_FILES_STR "\x00\x00"
-    "\x00\x00\x00\x17\x00\x06"
+    "\x00\x00\x00\x1B\x00\x06"
     MSG_PROJECT_ABOUT_STR "\x00"
-    "\x00\x00\x00\x18\x00\x06"
+    "\x00\x00\x00\x1C\x00\x06"
     MSG_PROJECT_QUIT_STR "\x00\x00"
-    "\x00\x00\x00\x19\x00\x0A"
+    "\x00\x00\x00\x1D\x00\x0A"
     MSG_SETTINGS_MENU_STR "\x00\x00"
-    "\x00\x00\x00\x1A\x00\x24"
+    "\x00\x00\x00\x1E\x00\x24"
     MSG_FAILED_LOCK_PUBSCR_STR "\x00\x00"
-    "\x00\x00\x00\x1B\x00\x28"
+    "\x00\x00\x00\x1F\x00\x28"
     MSG_FAILED_LOCK_DEF_PUBSCR_STR "\x00\x00"
-    "\x00\x00\x00\x1C\x00\x26"
+    "\x00\x00\x00\x20\x00\x26"
     MSG_FAILED_CREATE_ABOUTMSG_STR "\x00\x00"
-    "\x00\x00\x00\x1D\x00\x2C"
+    "\x00\x00\x00\x21\x00\x2C"
     MSG_FAILED_CREATE_RANGEWIN_STR "\x00\x00"
-    "\x00\x00\x00\x1E\x00\x30"
+    "\x00\x00\x00\x22\x00\x30"
     MSG_FAILED_CREATE_MAINWIN_STR "\x00\x00"
-    "\x00\x00\x00\x1F\x00\x1A"
+    "\x00\x00\x00\x23\x00\x1A"
     MSG_FAILED_CREATE_LAYOUT_STR "\x00"
-    "\x00\x00\x00\x20\x00\x20"
+    "\x00\x00\x00\x24\x00\x20"
     MSG_FAILED_PARSE_ARGS_STR "\x00"
-    "\x00\x00\x00\x21\x00\x22"
+    "\x00\x00\x00\x25\x00\x22"
     MSG_FAILED_CREATE_FILE_LST_STR "\x00"
-    "\x00\x00\x00\x22\x00\x2C"
+    "\x00\x00\x00\x26\x00\x2C"
     MSG_FAILED_CREATE_LOG_STR "\x00"
-    "\x00\x00\x00\x23\x00\x3C"
+    "\x00\x00\x00\x27\x00\x3C"
     MSG_FAILED_MSG_PORT_STR "\x00\x00"
-    "\x00\x00\x00\x24\x00\x24"
+    "\x00\x00\x00\x28\x00\x24"
     MSG_FAILED_OPEN_LOCALE_STR "\x00"
-    "\x00\x00\x00\x25\x00\x3A"
+    "\x00\x00\x00\x29\x00\x3A"
     MSG_FAILED_ALLOC_INST_MEM_STR "\x00"
-    "\x00\x00\x00\x26\x00\x18"
+    "\x00\x00\x00\x2A\x00\x18"
     MSG_FAILED_OPEN_WINDOW_STR "\x00"
-    "\x00\x00\x00\x27\x00\x12"
+    "\x00\x00\x00\x2B\x00\x12"
     MSG_MAIN_WINDOW_STR "\x00\x00"
-    "\x00\x00\x00\x28\x00\x04"
+    "\x00\x00\x00\x2C\x00\x04"
     MSG_OK_SHOW_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x29\x00\x26"
+    "\x00\x00\x00\x2D\x00\x26"
     MSG_FAILED_TO_ADD_FILES_STR "\x00"
-    "\x00\x00\x00\x2A\x00\x14"
+    "\x00\x00\x00\x2E\x00\x14"
     MSG_NO_FILES_TO_RENAME_STR "\x00"
-    "\x00\x00\x00\x2B\x00\x2A"
+    "\x00\x00\x00\x2F\x00\x2A"
     MSG_FAILED_CREATE_TOKENS_STR "\x00"
-    "\x00\x00\x00\x2C\x00\x2C"
+    "\x00\x00\x00\x30\x00\x2C"
     MSG_WARN_DUPLICATES_1_STR "\x00\x00"
-    "\x00\x00\x00\x2D\x00\x34"
+    "\x00\x00\x00\x31\x00\x34"
     MSG_WARN_DUPLICATES_2_STR "\x00"
-    "\x00\x00\x00\x2E\x00\x10"
-    MSG_WARN_DUPLICATES_3_STR "\x00"
-    "\x00\x00\x00\x2F\x00\x10"
-    MSG_WARN_DUPLICATES_4_STR "\x00"
-    "\x00\x00\x00\x30\x00\x0C"
-    MSG_WARN_DUPLICATES_5_STR "\x00\x00"
-    "\x00\x00\x00\x31\x00\x08"
+    "\x00\x00\x00\x32\x00\x0C"
+    MSG_WARN_DUPLICATES_3_STR "\x00\x00"
+    "\x00\x00\x00\x33\x00\x08"
     MSG_PROCEED_CANCEL_GAD_STR "\x00"
-    "\x00\x00\x00\x32\x00\x40"
+    "\x00\x00\x00\x34\x00\x40"
     MSG_ERROR_AUTOCREATE_NAMES_STR "\x00\x00"
-    "\x00\x00\x00\x33\x00\x42"
+    "\x00\x00\x00\x35\x00\x42"
     MSG_ERROR_NAMES_TOO_LONG_STR "\x00\x00"
-    "\x00\x00\x00\x34\x00\x04"
+    "\x00\x00\x00\x36\x00\x04"
     MSG_STATE_OK_STR "\x00\x00"
-    "\x00\x00\x00\x35\x00\x04"
+    "\x00\x00\x00\x37\x00\x04"
     MSG_STATE_COMMAND_ERROR_STR "\x00"
-    "\x00\x00\x00\x36\x00\x0A"
+    "\x00\x00\x00\x38\x00\x0A"
     MSG_NAME_ERROR_STR "\x00\x00"
-    "\x00\x00\x00\x37\x00\x1E"
+    "\x00\x00\x00\x39\x00\x1E"
     MSG_NAME_TOOL_ITEMS_TITLE_STR "\x00"
-    "\x00\x00\x00\x38\x00\x46"
+    "\x00\x00\x00\x3A\x00\x46"
     MSG_NAME_TOOL_NEEDS_ITEMS_STR "\x00"
-    "\x00\x00\x00\x39\x00\x24"
+    "\x00\x00\x00\x3B\x00\x24"
     MSG_EXT_TOOL_ITEMS_TITLE_STR "\x00\x00"
-    "\x00\x00\x00\x3A\x00\x80"
-    MSG_EXT_TOOL_ITEMS_AND_EXT_STR "\x00\x00"
-    "\x00\x00\x00\x3B\x00\x04"
+    "\x00\x00\x00\x3C\x00\x46"
+    MSG_ITEMS_AND_EXT_NEEDED_1_STR "\x00"
+    "\x00\x00\x00\x3D\x00\x3A"
+    MSG_ITEMS_AND_EXT_NEEDED_2_STR "\x00"
+    "\x00\x00\x00\x3E\x00\x04"
     MSG_OK_SHOW_ERRORS_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x3C\x00\x2A"
+    "\x00\x00\x00\x3F\x00\x2A"
     MSG_RENAME_FAILED_FOR_SOME_STR "\x00\x00"
-    "\x00\x00\x00\x3D\x00\x0A"
+    "\x00\x00\x00\x40\x00\x0A"
     MSG_CONTINUE_CANCEL_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x3E\x00\x42"
+    "\x00\x00\x00\x41\x00\x42"
     MSG_CONTINUE_WILL_SCRATCH_1_STR "\x00\x00"
-    "\x00\x00\x00\x3F\x00\x28"
+    "\x00\x00\x00\x42\x00\x28"
     MSG_CONTINUE_WILL_SCRATCH_2_STR "\x00"
-    "\x00\x00\x00\x40\x00\x12"
+    "\x00\x00\x00\x43\x00\x12"
     MSG_CONTINUE_WILL_SCRATCH_3_STR "\x00\x00"
-    "\x00\x00\x00\x41\x00\x26"
-    MSG_FAILED_RECREATE_FILES_LST_STR "\x00\x00"
-    "\x00\x00\x00\x42\x00\x18"
+    "\x00\x00\x00\x44\x00\x26"
+    MSG_FAILED_RECR_FILE_LST_STR "\x00\x00"
+    "\x00\x00\x00\x45\x00\x18"
     MSG_FILESELECTOR_TITLE_STR "\x00\x00"
-    "\x00\x00\x00\x43\x00\x20"
+    "\x00\x00\x00\x46\x00\x20"
     MSG_FAILED_APPLY_RANGE_STR "\x00"
-    "\x00\x00\x00\x44\x00\x06"
+    "\x00\x00\x00\x47\x00\x06"
     MSG_COL_TITLE_STATE_STR "\x00"
-    "\x00\x00\x00\x45\x00\x06"
-    MSG_COL_TITLE_TYPE_STR "\x00\x00"
-    "\x00\x00\x00\x46\x00\x0A"
-    MSG_COL_TITLE_OLD_NAME_STR "\x00\x00"
-    "\x00\x00\x00\x47\x00\x0A"
-    MSG_COL_TITLE_NEW_NAME_STR "\x00\x00"
     "\x00\x00\x00\x48\x00\x06"
-    MSG_NAME_GROUP_STR "\x00\x00"
+    MSG_COL_TITLE_TYPE_STR "\x00\x00"
     "\x00\x00\x00\x49\x00\x0A"
+    MSG_COL_TITLE_OLD_NAME_STR "\x00\x00"
+    "\x00\x00\x00\x4A\x00\x0A"
+    MSG_COL_TITLE_NEW_NAME_STR "\x00\x00"
+    "\x00\x00\x00\x4B\x00\x06"
+    MSG_NAME_GROUP_STR "\x00\x00"
+    "\x00\x00\x00\x4C\x00\x0A"
     MSG_NAME_NAME_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x4A\x00\x0C"
-    MSG_NAME_DATE_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x4B\x00\x10"
-    MSG_NAME_PART_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x4C\x00\x0C"
-    MSG_NAME_TIME_GAD_STR "\x00\x00"
     "\x00\x00\x00\x4D\x00\x0C"
+    MSG_NAME_DATE_GAD_STR "\x00\x00"
+    "\x00\x00\x00\x4E\x00\x10"
+    MSG_NAME_PART_GAD_STR "\x00\x00"
+    "\x00\x00\x00\x4F\x00\x0C"
+    MSG_NAME_TIME_GAD_STR "\x00\x00"
+    "\x00\x00\x00\x50\x00\x0C"
     MSG_NAME_CNT_GAD_STR "\x00"
-    "\x00\x00\x00\x4E\x00\x0A"
+    "\x00\x00\x00\x51\x00\x0A"
     MSG_EXTENSION_GROUP_STR "\x00"
-    "\x00\x00\x00\x4F\x00\x0A"
+    "\x00\x00\x00\x52\x00\x0A"
     MSG_EXT_EXT_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x50\x00\x10"
+    "\x00\x00\x00\x53\x00\x10"
     MSG_EXT_PART_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x51\x00\x0C"
+    "\x00\x00\x00\x54\x00\x0C"
     MSG_EXT_CNT_GAD_STR "\x00"
-    "\x00\x00\x00\x52\x00\x10"
+    "\x00\x00\x00\x55\x00\x10"
     MSG_CNT_GROUP_STR "\x00\x00"
-    "\x00\x00\x00\x53\x00\x08"
+    "\x00\x00\x00\x56\x00\x08"
     MSG_CNT_START_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x54\x00\x06"
+    "\x00\x00\x00\x57\x00\x06"
     MSG_CNT_STEP_GAD_STR "\x00"
-    "\x00\x00\x00\x55\x00\x08"
+    "\x00\x00\x00\x58\x00\x08"
     MSG_CNT_PLACES_GAD_STR "\x00"
-    "\x00\x00\x00\x56\x00\x10"
+    "\x00\x00\x00\x59\x00\x10"
     MSG_PROC_LST_GROUP_STR "\x00"
-    "\x00\x00\x00\x57\x00\x0E"
+    "\x00\x00\x00\x5A\x00\x0E"
     MSG_START_RENAME_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x58\x00\x28"
+    "\x00\x00\x00\x5B\x00\x28"
     MSG_FAILED_OPEN_INTUI_STR "\x00\x00"
-    "\x00\x00\x00\x59\x00\x22"
+    "\x00\x00\x00\x5C\x00\x22"
     MSG_FAILED_OPEN_WINCLASS_STR "\x00"
-    "\x00\x00\x00\x5A\x00\x24"
-    MSG_FAILED_OPEN_LAYOUTGAD_STR "\x00\x00"
-    "\x00\x00\x00\x5B\x00\x22"
-    MSG_FAILED_OPEN_BEVELIMG_STR "\x00\x00"
-    "\x00\x00\x00\x5C\x00\x24"
-    MSG_FAILED_OPEN_BUTTONGAD_STR "\x00\x00"
     "\x00\x00\x00\x5D\x00\x24"
+    MSG_FAILED_OPEN_LAYOUTGAD_STR "\x00\x00"
+    "\x00\x00\x00\x5E\x00\x22"
+    MSG_FAILED_OPEN_BEVELIMG_STR "\x00\x00"
+    "\x00\x00\x00\x5F\x00\x24"
+    MSG_FAILED_OPEN_BUTTONGAD_STR "\x00\x00"
+    "\x00\x00\x00\x60\x00\x24"
     MSG_FAILED_OPEN_CHOOSERGAD_STR "\x00"
-    "\x00\x00\x00\x5E\x00\x24"
-    MSG_FAILED_OPEN_INTEGERGAD_STR "\x00"
-    "\x00\x00\x00\x5F\x00\x28"
-    MSG_FAILED_OPEN_LSTBRWSGAD_STR "\x00"
-    "\x00\x00\x00\x60\x00\x22"
-    MSG_FAILED_OPEN_LABELIMG_STR "\x00\x00"
     "\x00\x00\x00\x61\x00\x24"
+    MSG_FAILED_OPEN_INTEGERGAD_STR "\x00"
+    "\x00\x00\x00\x62\x00\x28"
+    MSG_FAILED_OPEN_LSTBRWSGAD_STR "\x00"
+    "\x00\x00\x00\x63\x00\x22"
+    MSG_FAILED_OPEN_LABELIMG_STR "\x00\x00"
+    "\x00\x00\x00\x64\x00\x24"
     MSG_FAILED_OPEN_SLIDERGAD_STR "\x00\x00"
-    "\x00\x00\x00\x62\x00\x24"
+    "\x00\x00\x00\x65\x00\x24"
     MSG_FAILED_OPEN_STRINGGAD_STR "\x00\x00"
-    "\x00\x00\x00\x63\x00\x12"
+    "\x00\x00\x00\x66\x00\x12"
     MSG_SEARCH_REPLACE_GROUP_STR "\x00\x00"
-    "\x00\x00\x00\x64\x00\x0C"
+    "\x00\x00\x00\x67\x00\x0C"
     MSG_SEARCH_FOR_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x65\x00\x0E"
+    "\x00\x00\x00\x68\x00\x0E"
     MSG_REPLACE_WITH_GAD_STR "\x00\x00"
-    "\x00\x00\x00\x66\x00\x18"
+    "\x00\x00\x00\x69\x00\x18"
     MSG_PROJECT_LOAD_FROM_FILE_STR "\x00"
-    "\x00\x00\x00\x67\x00\x3A"
+    "\x00\x00\x00\x6A\x00\x38"
     MSG_WRONG_NUMBER_OF_LINES_STR "\x00\x00"
 };
 

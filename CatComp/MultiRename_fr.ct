@@ -1,6 +1,6 @@
-## version $VER: MultiRename.catalog 01.00 (09.04.26)
-## codeset 0
-## language français
+## version $VER: XX.catalog XX.XX (XX.XX.XX)
+## codeset X
+## language X
 ;
 MSG_TYPE_IS_DIRECTORY
 
@@ -12,35 +12,35 @@ MSG_LOG_SELECTED_PATH
 ;
 MSG_LOG_WRONG_PATHS
 
-; Skipped %lu input file(s) because of wrong paths:\n
+; Skipped %d input file(s) because of wrong paths:\n
 ;
 MSG_LOG_OVERLONG_PATHS
 
-; Skipped %lu input file(s) because of over long / truncated paths:\n
+; Skipped %d input file(s) because of over long / truncated paths:\n
 ;
 MSG_LOG_DATESTAMP
 
-; Skipped %lu input file(s) because their date stamp couldn't be split into parts:\n
+; Skipped %d input file(s) because their date stamp couldn't be split into parts:\n
 ;
 MSG_LOG_EXAMINE
 
-; Skipped %lu input file(s) because they couldn't be examined:\n
+; Skipped %d input file(s) because they couldn't be examined:\n
 ;
 MSG_LOG_LOCK
 
-; Failed to add (lock) %lu input file(s) / dir(s):\n
+; Skipped %d input file(s) because they couldn't be locked:\n
 ;
 MSG_LOG_LINKS
 
-; Skipped %lu input file(s) because links are not supported:\n
+; Skipped %d input file(s) because links are not supported:\n
 ;
 MSG_LOG_ALREADY_IN_LST
 
-; Skipped %lu input file(s) because they are already in processing list:\n
+; Skipped %d input file(s) because they are already in processing list:\n
 ;
 MSG_LOG_RENAME_FAILED
 
-; Rename failed for %lu new file names:\n
+; Rename failed for %d new file names:\n
 ;
 MSG_LONGEST_ITEM
 
@@ -70,9 +70,25 @@ MSG_CANCEL_GAD
 
 ; Cancel
 ;
+MSG_NAME_PART_WIN_TITLE
+
+; MultiRename: Select name part
+;
+MSG_EXT_PART_WIN_TITLE
+
+; MultiRename: Select extension part
+;
 MSG_ABOUT_1
 
-; \n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n
+; This release of MultiRename may be freely distributed.\n
+;
+MSG_ABOUT_2
+
+; It may not be commercially distributed without the\n
+;
+MSG_ABOUT_3
+
+; explicit permission of the author.\n
 ;
 MSG_SETTINGS_LONG_NAMES
 
@@ -188,14 +204,6 @@ MSG_WARN_DUPLICATES_2
 ;
 MSG_WARN_DUPLICATES_3
 
-;   name (2).ext\n
-;
-MSG_WARN_DUPLICATES_4
-
-;   name (3).ext\n
-;
-MSG_WARN_DUPLICATES_5
-
 ; and so on.
 ;
 MSG_PROCEED_CANCEL_GAD
@@ -234,9 +242,13 @@ MSG_EXT_TOOL_ITEMS_TITLE
 
 ; MultiRename: Select extension part
 ;
-MSG_EXT_TOOL_ITEMS_AND_EXT
+MSG_ITEMS_AND_EXT_NEEDED_1
 
-; This tool is only available if you have files in the processing list and if at least one of them has an extension like '.iff'.
+; This tool is only available if you have files in the processing list\n
+;
+MSG_ITEMS_AND_EXT_NEEDED_2
+
+; and if at least one of them has an extension like '.iff'.
 ;
 MSG_OK_SHOW_ERRORS_GAD
 
@@ -262,7 +274,7 @@ MSG_CONTINUE_WILL_SCRATCH_3
 
 ; Continue anyway?
 ;
-MSG_FAILED_RECREATE_FILES_LST
+MSG_FAILED_RECR_FILE_LST
 
 ; Failed to re-create the files list.\n
 ;
@@ -416,5 +428,5 @@ MSG_PROJECT_LOAD_FROM_FILE
 ;
 MSG_WRONG_NUMBER_OF_LINES
 
-; File contains wrong number of lines: %lu, should be %lu!
+; File contains wrong number of lines: %d, should be %d!
 ;
