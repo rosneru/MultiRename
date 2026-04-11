@@ -62,6 +62,8 @@
 #include "string_tools.h"
 #include "ui_tools.h"
 
+#define CATCOMP_NUMBERS
+#include "multirename_catalog.h"
 #include "multirename_rev.h"
 
 /// Defines
@@ -139,7 +141,7 @@ void intuiEventLoop(Application *pApp);
 /**
  * Create layout for main window.
  */
-Object *createLayout(struct List *pFilesList);
+Object *createLayout(struct List *pFilesList, struct LocaleInfo* pLocaleInfo);
 
 ///
 /// Private variables
@@ -360,7 +362,8 @@ Application *createApplication(
               pApp->pLocale,
               pApp->pNotifications)))
             {
-              if ((pMainLayout = createLayout(pApp->pFiles->pList)))
+              if ((pMainLayout = createLayout(
+                pApp->pFiles->pList, pLocaleInfo)))
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
@@ -1443,7 +1446,7 @@ void intuiEventLoop(Application *pApp)
   }
 }
 
-Object *createLayout(struct List *pFilesList)
+Object *createLayout(struct List *pFilesList, struct LocaleInfo* pLocaleInfo)
 {
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL,
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
@@ -1453,25 +1456,25 @@ Object *createLayout(struct List *pFilesList)
   m_pColumnInfo = AllocLBColumnInfo(4,
                                     LBCIA_Column, 0,
                                       LBCIA_Sortable, FALSE,
-                                      LBCIA_Title, "State",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_STATE),
                                     LBCIA_Column, 1,
                                       LBCIA_Sortable, FALSE,
-                                      LBCIA_Title, "Type",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_TYPE),
                                     LBCIA_Column, 2,
                                       LBCIA_AutoSort, TRUE,
                                       LBCIA_SortArrow, TRUE,
                                       LBCIA_SortDirection, LBMSORT_FORWARD,
-                                      LBCIA_Title, "Old name",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_OLD_NAME),
                                     LBCIA_Column, 3,
                                       LBCIA_Sortable, FALSE,
-                                      LBCIA_Title, "New name",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_NEW_NAME),
                                     TAG_DONE);
 
   pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_Label, (ULONG)"Name",
+    LAYOUT_Label, tr(pLocaleInfo, MSG_NAME_GROUP),
     LAYOUT_AddChild, m_ppGadgets[GID_STR_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_NAME,
       GA_RelVerify, TRUE,
@@ -1482,10 +1485,10 @@ Object *createLayout(struct List *pFilesList)
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"[N] Name",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_NAME_GAD),
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_DATE] = NewObject(BUTTON_GetClass(), NULL,
-        GA_Text, (ULONG)"[YMD] Date",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_DATE_GAD),
         GA_ID, GID_BTN_NAME_DATE,
         GA_RelVerify, TRUE,
       TAG_DONE),
@@ -1495,18 +1498,18 @@ Object *createLayout(struct List *pFilesList)
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_PART] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_PART,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"[N#-#] Part...",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_PART_GAD),
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_TIME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_TIME,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"[hms] Time",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_TIME_GAD),
       TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_NAME_COUNTER,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[C] Counter",
+      GA_Text, tr(pLocaleInfo, MSG_NAME_CNT_GAD),
     TAG_DONE),
   TAG_DONE);
 
@@ -1514,7 +1517,7 @@ Object *createLayout(struct List *pFilesList)
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_Label, (ULONG)"Extension",
+    LAYOUT_Label, tr(pLocaleInfo, MSG_CNT_GROUP),
     LAYOUT_AddChild, m_ppGadgets[GID_STR_EXTENSION] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_EXTENSION,
       GA_RelVerify, TRUE,
@@ -1523,17 +1526,17 @@ Object *createLayout(struct List *pFilesList)
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[E] Ext.",
+      GA_Text, tr(pLocaleInfo, MSG_EXT_EXT_GAD),
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_PART] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_PART,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[E#-#] Part...",
+      GA_Text, tr(pLocaleInfo, MSG_EXT_PART_GAD),
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_COUNTER,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[C] Counter",
+      GA_Text, tr(pLocaleInfo, MSG_EXT_CNT_GAD),
     TAG_DONE),
   TAG_DONE),
 
@@ -1541,7 +1544,7 @@ Object *createLayout(struct List *pFilesList)
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_Label, (ULONG)"Define counter",
+    LAYOUT_Label, tr(pLocaleInfo, MSG_CNT_GROUP),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_AddChild, m_ppGadgets[GID_INT_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
@@ -1553,7 +1556,9 @@ Object *createLayout(struct List *pFilesList)
         INTEGER_Minimum, 0,
         INTEGER_Maximum, 10,
       TAG_DONE),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Start:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, 
+        LABEL_Text, tr(pLocaleInfo, MSG_CNT_START_GAD),
+      TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -1566,8 +1571,10 @@ Object *createLayout(struct List *pFilesList)
         INTEGER_Minimum, 1,
         INTEGER_Maximum, 10,
       TAG_DONE),
-      LABEL_Text, (ULONG)"Step",
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Step:", TAG_DONE),
+      LABEL_Text, tr(pLocaleInfo, MSG_CNT_START_GAD),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+        LABEL_Text, tr(pLocaleInfo, MSG_CNT_STEP_GAD),
+      TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -1581,7 +1588,9 @@ Object *createLayout(struct List *pFilesList)
         CHOOSER_AutoFit, TRUE,
         CHOOSER_PopUp, TRUE,
       TAG_DONE),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Places:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+        LABEL_Text, tr(pLocaleInfo, MSG_CNT_PLACES_GAD),
+      TAG_DONE),
     TAG_DONE),
   TAG_DONE);
 
@@ -1612,7 +1621,7 @@ Object *createLayout(struct List *pFilesList)
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
-      LAYOUT_Label, (ULONG)"Processing list",
+      LAYOUT_Label, tr(pLocaleInfo, MSG_PROC_LST_GROUP),
       LAYOUT_AddChild, m_ppGadgets[GID_LBR_PROCESSING_LIST] = NewObject(LISTBROWSER_GetClass(), NULL,
         GA_ID, GID_LBR_PROCESSING_LIST,
         GA_RelVerify, TRUE,
@@ -1628,7 +1637,7 @@ Object *createLayout(struct List *pFilesList)
         LAYOUT_AddChild, m_ppGadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_START,
           GA_RelVerify, TRUE,
-          GA_Text, (ULONG)"Start rename",
+          GA_Text, tr(pLocaleInfo, MSG_START_RENAME_GAD),
         TAG_DONE),
         CHILD_WeightedWidth, 0,
       TAG_DONE),
