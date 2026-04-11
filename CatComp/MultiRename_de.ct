@@ -83,11 +83,11 @@ Diese Version von MultiRename darf frei weitergegeben werden.\n
 ; This release of MultiRename may be freely distributed.\n
 ;
 MSG_ABOUT_2
-Ohne ausdrückliche Zustimmung des Autors darf sie nicht\n
+Kommerzielle Verbreitung nur mit ausdrücklicher Zustimmung des Autors.\n
 ; It may not be commercially distributed without the\n
 ;
 MSG_ABOUT_3
-kommerziell verbreitet werden.\n
+
 ; explicit permission of the author.\n
 ;
 MSG_SETTINGS_LONG_NAMES
@@ -111,8 +111,8 @@ Dateien hinzufügen...
 ; Add files...
 ;
 MSG_PROJECT_ABOUT
-Über
-; About
+Über...
+; About...
 ;
 MSG_PROJECT_QUIT
 Beenden

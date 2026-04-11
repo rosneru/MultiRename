@@ -14,8 +14,8 @@
 
 struct CatCompBlockType
 {
-	LONG	ccb_ID;
-	UWORD	ccb_StringSize;
+  LONG	ccb_ID;
+  UWORD	ccb_StringSize;
 };
 
 
@@ -25,33 +25,33 @@ struct CatCompBlockType
  */
 STRPTR tr(struct LocaleInfo * li, LONG stringNum)
 {
-	const struct CatCompBlockType * ccb = (APTR)CatCompBlock;
-	const struct CatCompBlockType * ccb_stop = (APTR)&((BYTE *)ccb)[sizeof(CatCompBlock)];
+  const struct CatCompBlockType * ccb = (APTR)CatCompBlock;
+  const struct CatCompBlockType * ccb_stop = (APTR)&((BYTE *)ccb)[sizeof(CatCompBlock)];
 
-	STRPTR builtin = NULL;
-	STRPTR result = NULL;
+  STRPTR builtin = NULL;
+  STRPTR result = NULL;
 
-	while(ccb < ccb_stop && ccb->ccb_StringSize > 0)
-	{
-		if(ccb->ccb_ID == stringNum)
-		{
-			builtin = (STRPTR)&ccb[1];
-			break;
-		}
+  while(ccb < ccb_stop && ccb->ccb_StringSize > 0)
+  {
+    if(ccb->ccb_ID == stringNum)
+    {
+      builtin = (STRPTR)&ccb[1];
+      break;
+    }
 
-		ccb = (struct CatCompBlockType *)&((BYTE *)ccb)[sizeof(*ccb) + ccb->ccb_StringSize];
-	}
+    ccb = (struct CatCompBlockType *)&((BYTE *)ccb)[sizeof(*ccb) + ccb->ccb_StringSize];
+  }
 
-	if(li != NULL && li->li_LocaleBase != NULL)
-	{
-		struct Library * LocaleBase = li->li_LocaleBase;
+  if(li != NULL && li->li_LocaleBase != NULL)
+  {
+    struct Library * LocaleBase = li->li_LocaleBase;
+    result = GetCatalogStr(li->li_Catalog, stringNum, builtin);
+printf("GetCatalogStr: %s\n", result);
+  }
+  else
+  {
+    result = builtin;
+  }
 
-		result = GetCatalogStr(li->li_Catalog, stringNum, builtin);
-	}
-	else
-	{
-		result = builtin;
-	}
-
-	return(result);
+  return(result);
 }

@@ -68,11 +68,7 @@
 
 /// Defines
 
-#define COPYRIGHT "\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n"
-#define DISTRIBUTION                                                           \
-  "This release of MultiRename may be freely distributed.\n"                   \
-  "It may not be commercially distributed without the\n"                       \
-  "explicit permission of the author.\n"
+#define COPYRIGHT "\n\nCopyright(c) 2026 Uwe Rosner (u.rosner@ymail.com)\n\n"
 
 ///
 /// Forwards / private function declarations
@@ -178,11 +174,6 @@ struct Hook m_AppHook;
 ///
 /// Helper implementation
 
-// clang-format off
-struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
-struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECKIT|MENUTOGGLE, 0, NULL};
-// clang-format on
-
 enum
 {
   MENU_PROJECT_NEW = 1,
@@ -194,6 +185,9 @@ enum
 };
 
 // clang-format off
+struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
+struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECKIT|MENUTOGGLE, 0, NULL};
+
 struct NewMenu mainWindowNewMenu[] =
 {
   { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
@@ -210,24 +204,6 @@ struct NewMenu mainWindowNewMenu[] =
 };
 // clang-format on
 
-STRPTR createAboutMessage(void)
-{
-  STRPTR pAboutMsg;
-  ULONG totalLength =
-    strlen(VERSTAG + 7) + strlen(COPYRIGHT) + strlen(DISTRIBUTION) + 1;
-
-  if (!(pAboutMsg = AllocVec(totalLength * sizeof(char), MEMF_CLEAR)))
-  {
-    return NULL;
-  }
-
-  strcpy(pAboutMsg, VERSTAG + 7);
-  strcat(pAboutMsg, COPYRIGHT);
-  strcat(pAboutMsg, DISTRIBUTION);
-
-  return pAboutMsg;
-}
-
 /**
  * In `createMainWindow` this function is set to a hook to be called by
  * Intuition/BOOPSI when app messages are received. These messages can
@@ -240,6 +216,25 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
 {
   Application *pApp = (Application *)pHook->h_Data;
   appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
+}
+
+
+void initMenuLabels(struct LocaleInfo* pLocaleInfo)
+{
+
+  mainWindowNewMenu[0].nm_Label = tr(pLocaleInfo, MSG_PROJECT_MENU);
+  mainWindowNewMenu[1].nm_Label = tr(pLocaleInfo, MSG_PROJECT_NEW);
+  mainWindowNewMenu[2].nm_Label = tr(pLocaleInfo, MSG_PROJECT_ADD_FILES);
+  // 3 is BARLABEL
+  mainWindowNewMenu[4].nm_Label = tr(pLocaleInfo, MSG_PROJECT_ABOUT);
+  // 5 is BARLABEL
+  mainWindowNewMenu[6].nm_Label = tr(pLocaleInfo, MSG_PROJECT_QUIT);
+  mainWindowNewMenu[7].nm_Label = tr(pLocaleInfo, MSG_SETTINGS_MENU);
+  mainWindowNewMenu[8].nm_Label = tr(pLocaleInfo, MSG_SETTINGS_LONG_NAMES);
+  mainWindowNewMenu[9].nm_Label = tr(pLocaleInfo, MSG_SETTINGS_SKIP_ICONS);
+
+  longFileNamesItem.nm_Label = tr(pLocaleInfo, MSG_SETTINGS_LONG_NAMES);
+  skipIconsItem.nm_Label = tr(pLocaleInfo, MSG_SETTINGS_SKIP_ICONS);
 }
 
 Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
@@ -335,6 +330,35 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   return pWindowObject;
 }
 
+STRPTR createAboutMessage(struct LocaleInfo* pLocaleInfo)
+{
+  STRPTR pAboutMsg;
+  ULONG totalLength;
+  STRPTR pDistrib1 = tr(pLocaleInfo, MSG_ABOUT_1);
+  STRPTR pDistrib2 = tr(pLocaleInfo, MSG_ABOUT_2);
+  STRPTR pDistrib3 = tr(pLocaleInfo, MSG_ABOUT_3);
+  
+  totalLength = strlen(VERSTAG + 7)
+              + strlen(COPYRIGHT)
+              + strlen(pDistrib1)
+              + strlen(pDistrib2)
+              + strlen(pDistrib3)
+              + 1;
+
+  if (!(pAboutMsg = AllocVec(totalLength * sizeof(char), MEMF_CLEAR)))
+  {
+    return NULL;
+  }
+
+  strcpy(pAboutMsg, VERSTAG + 7);
+  strcat(pAboutMsg, COPYRIGHT);
+  strcat(pAboutMsg, pDistrib1);
+  strcat(pAboutMsg, pDistrib2);
+  strcat(pAboutMsg, pDistrib3);
+
+  return pAboutMsg;
+}
+
 ///
 /// Public function implementations
 
@@ -343,6 +367,8 @@ Application *createApplication(
 {
   Object *pMainLayout;
   Application *pApp;
+
+  initMenuLabels(pLocaleInfo);
 
   if ((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
@@ -370,7 +396,7 @@ Application *createApplication(
                   if ((pApp->pRangeSelectWindow = createRangeSelectWindow(
                     pApp->pPubScreen)))
                   {
-                    if ((pApp->pAboutMessage = createAboutMessage()))
+                    if ((pApp->pAboutMessage = createAboutMessage(pLocaleInfo)))
                     {
                       // Mark the buffer positions as invalid
                       pApp->NameGadgetBufferPos = -1;
@@ -1571,7 +1597,6 @@ Object *createLayout(struct List *pFilesList, struct LocaleInfo* pLocaleInfo)
         INTEGER_Minimum, 1,
         INTEGER_Maximum, 10,
       TAG_DONE),
-      LABEL_Text, tr(pLocaleInfo, MSG_CNT_START_GAD),
       CHILD_Label, NewObject(LABEL_GetClass(), NULL,
         LABEL_Text, tr(pLocaleInfo, MSG_CNT_STEP_GAD),
       TAG_DONE),
