@@ -1247,7 +1247,7 @@ void menuFunctionProjectNew(Application *pApp)
           pApp->pIntuiWindow,
           "MultiRename",
           "tr(pApp->pLocaleInfo, MSG_CONTINUE_CANCEL_GAD)
-          "tr(pApp->pLocaleInfo, MSG_CONTINUE_WILL_SCRATCH_1)          "tr(pApp->pLocaleInfo, MSG_CONTINUE_WILL_SCRATCH_2)          "tr(pApp->pLocaleInfo, MSG_CONTINUE_WILL_SCRATCH_3))
+          "tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_1)          "tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_2)          "tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_3))
     {
       return;
     }

@@ -199,16 +199,16 @@ Warnung, doppelte Namen! Trotzdem fortfahren?\n
 ; Warning, duplicate names! Proceed anyway?\n
 ;
 MSG_WARN_DUPLICATES_2
-HINWEIS: 'Fortfahren' benennt doppelte Dateien automatisch um zu \n
-; NOTE: Proceed will auto rename duplicate files to \n
+'Fortfahren' benennt doppelte Dateien automatisch um zu \n
+; 'Proceed' will auto rename duplicate files to \n
 ;
 MSG_WARN_DUPLICATES_3
 und so weiter.
 ; and so on.
 ;
 MSG_PROCEED_CANCEL_GAD
-Fortfahren
-; Proceed
+Fortfahren|Abbrechen
+; Proceed|Cancel
 ;
 MSG_ERROR_AUTOCREATE_NAMES
 Name für doppelte Datei konnte nicht automatisch erstellt werden!
@@ -254,19 +254,15 @@ MSG_RENAME_FAILED_FOR_SOME
 Umbenennen für einige Eingabedateien fehlgeschlagen
 ; Failed to rename some of the input files
 ;
-MSG_CONTINUE_CANCEL_GAD
-Weiter
-; Continue
-;
-MSG_CONTINUE_WILL_SCRATCH_1
+MSG_PROCEED_WILL_SCRATCH_1
 Bei 'Fortfahren' wird ein neues Projekt erstellt, die Verarbeitungsliste geleert\n
 ; Continue to create a new project will clear the processing list\n
 ;
-MSG_CONTINUE_WILL_SCRATCH_2
+MSG_PROCEED_WILL_SCRATCH_2
 und die Masken auf ihre Standardwerte eingestellt.\n\n
 ; and set the masks to a default value.\n\n
 ;
-MSG_CONTINUE_WILL_SCRATCH_3
+MSG_PROCEED_WILL_SCRATCH_3
 Trotzdem fortfahren?
 ; Continue anyway?
 ;

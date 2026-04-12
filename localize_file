@@ -73,9 +73,9 @@ src/application.c|S|1188|10|80|MSG_EXT_TOOL_ITEMS_AND_EXT|This tool is only avai
 src/application.c|S|1230|16|31|MSG_OK_SHOW_ERRORS_GAD|Ok|Show errors
 src/application.c|S|1231|16|57|MSG_RENAME_FAILED_FOR_SOME|Failed to rename some of the input files
 src/application.c|S|1254|12|28|MSG_CONTINUE_CANCEL_GAD|Continue|Cancel
-src/application.c|S|1255|12|78|MSG_CONTINUE_WILL_SCRATCH_1|Continue to create a new project will clear the processing list\n
-src/application.c|S|1256|12|54|MSG_CONTINUE_WILL_SCRATCH_2|and set the masks to a default value.\n\n
-src/application.c|S|1257|12|29|MSG_CONTINUE_WILL_SCRATCH_3|Continue anyway?
+src/application.c|S|1255|12|78|MSG_PROCEED_WILL_SCRATCH_1|Continue to create a new project will clear the processing list\n
+src/application.c|S|1256|12|54|MSG_PROCEED_WILL_SCRATCH_2|and set the masks to a default value.\n\n
+src/application.c|S|1257|12|29|MSG_PROCEED_WILL_SCRATCH_3|Continue anyway?
 src/application.c|S|1291|13|51|MSG_FAILED_RECREATE_FILES_LST|Failed to re-create the files list.\n
 src/application.c|S|1333|15|38|MSG_FILESELECTOR_TITLE|Select files to rename
 src/application.c|S|1348|10|13|MSG_OK_GAD|Ok

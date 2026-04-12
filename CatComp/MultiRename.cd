@@ -149,13 +149,13 @@ MSG_WARN_DUPLICATES_1 (//)
 Warning, duplicate names! Proceed anyway?\n
 ;
 MSG_WARN_DUPLICATES_2 (//)
-NOTE: Proceed will auto rename duplicate files to \n
+'Proceed' will auto rename duplicate files to \n
 ;
 MSG_WARN_DUPLICATES_3 (//)
 and so on.
 ;
 MSG_PROCEED_CANCEL_GAD (//)
-Proceed
+Proceed|Cancel
 ;
 MSG_ERROR_AUTOCREATE_NAMES (//)
 Error, failed to automatically create name for duplicate file!
@@ -190,16 +190,13 @@ and if at least one of them has an extension like '.iff'.
 MSG_RENAME_FAILED_FOR_SOME (//)
 Failed to rename some of the input files
 ;
-MSG_CONTINUE_CANCEL_GAD (//)
-Continue
-;
-MSG_CONTINUE_WILL_SCRATCH_1 (//)
+MSG_PROCEED_WILL_SCRATCH_1 (//)
 Continue to create a new project will clear the processing list\n
 ;
-MSG_CONTINUE_WILL_SCRATCH_2 (//)
+MSG_PROCEED_WILL_SCRATCH_2 (//)
 and set the masks to a default value.\n\n
 ;
-MSG_CONTINUE_WILL_SCRATCH_3 (//)
+MSG_PROCEED_WILL_SCRATCH_3 (//)
 Continue anyway?
 ;
 MSG_FAILED_RECR_FILE_LST (//)

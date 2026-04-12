@@ -660,8 +660,8 @@ BOOL startRename(Application *pApp)
     showEasyRequest(pApp->pWinObject,
       pApp->pIntuiWindow,
       "MultiRename",
-      "Ok",
-      "No files to rename.");
+      tr(pApp->pLocaleInfo, MSG_OK_GAD),
+      tr(pApp->pLocaleInfo, MSG_NO_FILES_TO_RENAME));
     return FALSE;
   }
 
@@ -670,8 +670,8 @@ BOOL startRename(Application *pApp)
     showEasyRequest(pApp->pWinObject,
       pApp->pIntuiWindow,
       "MultiRename",
-      "Cancel",
-      "Error, failed to create file name tokens!");
+      tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
+      tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_TOKENS));
     return FALSE;
   }
 
@@ -689,18 +689,21 @@ BOOL startRename(Application *pApp)
         // already allocated 2k temporary buffer from `ParsedArgs`. It surely is
         // big enough for the 136 bytes message text + max. 107 bytes file name.
         sprintf(pApp->pParsedArgs->pTempPathBuf,
-          "Warning, duplicate names! Proceed anyway?\n"
+          "%s"
           "%s\n\n"
-          "NOTE: Proceed will auto rename duplicate files to \n"
+          "%s"
           "  name (2).ext\n"
           "  name (3).ext\n"
-          "and so on.",
-          pFileNode->NewName);
+          "%s",
+          tr(pApp->pLocaleInfo, MSG_WARN_DUPLICATES_1),
+          pFileNode->NewName,
+          tr(pApp->pLocaleInfo, MSG_WARN_DUPLICATES_2),
+          tr(pApp->pLocaleInfo, MSG_WARN_DUPLICATES_3));
 
         if (!showEasyRequest(pApp->pWinObject,
               pApp->pIntuiWindow,
               "MultiRename",
-              "Proceed|Cancel",
+              tr(pApp->pLocaleInfo, MSG_PROCEED_CANCEL_GAD),
               pApp->pParsedArgs->pTempPathBuf))
         {
           // User clicked on `Cancel`
@@ -736,8 +739,8 @@ BOOL startRename(Application *pApp)
         showEasyRequest(pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Cancel",
-          "Error, failed to automatically create name for duplicate file!");
+          tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
+          tr(pApp->pLocaleInfo, MSG_ERROR_AUTOCREATE_NAMES));
         freeTokenCounts(pTokenCounts);
         return FALSE;
       }
@@ -750,8 +753,8 @@ BOOL startRename(Application *pApp)
         showEasyRequest(pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Cancel",
-          "Error, auto-renamed file name would be too long for file system!");
+          tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
+          tr(pApp->pLocaleInfo, MSG_ERROR_NAMES_TOO_LONG));
         freeTokenCounts(pTokenCounts);
         return FALSE;
       }
