@@ -133,8 +133,8 @@ Failed to open window.\n
 MSG_MAIN_WINDOW (//)
 MultiRename in [
 ;
-MSG_OK_SHOW_GAD (//)
-Ok
+MSG_CONTINUE_SHOW_LOG_GAD (//)
+Continue|Show log
 ;
 MSG_FAILED_TO_ADD_FILES (//)
 Failed to add some of the input files

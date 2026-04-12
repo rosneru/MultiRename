@@ -20,6 +20,7 @@ BinPackArguments: false
 BinPackParameters: false
 AlignAfterOpenBracket: AlwaysBreak
 PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyBreakAssignment: 100000
 
 # Operatoren und Ausrichtung
 AlignOperands: false

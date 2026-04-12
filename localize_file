@@ -45,7 +45,7 @@ src/application.c|S|424|15|52|MSG_FAILED_OPEN_LOCALE|Failed to open the default 
 src/application.c|S|430|13|72|MSG_FAILED_ALLOC_INST_MEM|Failed to allocate memory for application instance data.\n
 src/application.c|S|521|13|38|MSG_FAILED_OPEN_WINDOW|Failed to open window.\n
 src/application.c|S|534|32|49|MSG_MAIN_WINDOW|MultiRename in [
-src/application.c|S|600|12|27|MSG_OK_SHOW_GAD|Ok|Show errors
+src/application.c|S|600|12|27|MSG_CONTINUE_SHOW_LOG_GAD|Ok|Show errors
 src/application.c|S|601|12|50|MSG_FAILED_TO_ADD_FILES|Failed to add some of the input files
 src/application.c|S|628|8|11|MSG_OK_GAD|Ok
 src/application.c|S|629|8|28|MSG_NO_FILES_TO_RENAME|No files to rename.

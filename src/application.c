@@ -210,14 +210,14 @@ struct NewMenu mainWindowNewMenu[] =
  * contain some WbArgs, e.g. files that have been dragged to app window.
  * This function adds these WbArgs/files to the processing list.
  */
-void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
+void __ASM__ __SAVE_DS__ AppMsgFunc(
+  __REG__(a0, struct Hook *pHook),
   __REG__(a2, Object *pWindow),
   __REG__(a1, struct AppMessage *pMsg))
 {
   Application *pApp = (Application *)pHook->h_Data;
   appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
 }
-
 
 void initMenuLabels(struct LocaleInfo* pLocaleInfo)
 {
@@ -254,8 +254,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
 
   if (pApp->pParsedArgs->AreLongNamesAllowed)
   {
-    if ((pNewMenuItem =
-            findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_LONGNAMES)))
+    if ((pNewMenuItem = findNewMenuItem(
+           mainWindowNewMenu, MENU_SETTINGS_LONGNAMES)))
     {
       pNewMenuItem->nm_Flags |= CHECKED;
     }
@@ -263,8 +263,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
 
   if (pApp->pParsedArgs->AreIconsSkipped)
   {
-    if ((pNewMenuItem =
-            findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_SKIPICONS)))
+    if ((pNewMenuItem = findNewMenuItem(
+           mainWindowNewMenu, MENU_SETTINGS_SKIPICONS)))
     {
       pNewMenuItem->nm_Flags |= CHECKED;
     }
@@ -274,7 +274,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   {
     if (!(pApp->pPubScreen = LockPubScreen(pApp->pParsedArgs->pPubScreenName)))
     {
-      Printf("Failed to lock public screen '%s'\n",
+      Printf(
+        tr(pApp->pLocaleInfo, MSG_FAILED_LOCK_PUBSCR),
         pApp->pParsedArgs->pPubScreenName);
       return NULL;
     }
@@ -283,7 +284,7 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   {
     if (!(pApp->pPubScreen = LockPubScreen(NULL)))
     {
-      PutStr("Failed to lock default public screen.\n");
+      PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_LOCK_DEF_PUBSCR));
       return NULL;
     }
   }
@@ -362,8 +363,8 @@ STRPTR createAboutMessage(struct LocaleInfo* pLocaleInfo)
 ///
 /// Public function implementations
 
-Application *createApplication(
-  int argc, char **argv, struct LocaleInfo* pLocaleInfo)
+Application* createApplication(
+  int argc, char **argv, struct LocaleInfo *pLocaleInfo)
 {
   Object *pMainLayout;
   Application *pApp;
@@ -382,19 +383,19 @@ Application *createApplication(
           if ((pApp->pFiles = createFileNodes()))
           {
             if ((pApp->pParsedArgs = createParsedArgs(
-              argc,
-              argv,
-              pApp->pFiles,
-              pApp->pLocale,
-              pApp->pNotifications)))
+                   argc,
+                   argv,
+                   pApp->pFiles,
+                   pApp->pLocale,
+                   pApp->pNotifications)))
             {
               if ((pMainLayout = createLayout(
-                pApp->pFiles->pList, pLocaleInfo)))
+                     pApp->pFiles->pList, pLocaleInfo)))
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
                   if ((pApp->pRangeSelectWindow = createRangeSelectWindow(
-                    pApp->pPubScreen)))
+                         pApp->pPubScreen)))
                   {
                     if ((pApp->pAboutMessage = createAboutMessage(pLocaleInfo)))
                     {
@@ -537,8 +538,8 @@ BOOL runApplication(Application *pApp)
   //  browser. In the `WM_OPEN` call below it will be attached and displayed.
   calculateNewNames(pApp);
 
-  if ((pApp->pIntuiWindow =
-          (struct Window *)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
+  if ((pApp->pIntuiWindow = (struct Window *)
+         DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
     updateMainWindowTitle(pApp);
     notifyUserAboutSkippedFiles(pApp);
@@ -551,7 +552,7 @@ BOOL runApplication(Application *pApp)
   }
   else
   {
-    PutStr("Failed to open window.\n");
+    PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_WINDOW));
   }
 
   return FALSE;
@@ -564,7 +565,7 @@ void updateMainWindowTitle(Application *pApp)
   // If a files directory is already set (e.e. a lock exists)
   if (getFilesDirLock(pApp->pFiles))
   {
-    strcpy(pApp->WindowTitle, "MultiRename in [");
+    strcpy(pApp->WindowTitle, tr(pApp->pLocaleInfo, MSG_MAIN_WINDOW));
     strcat(pApp->WindowTitle, getFilesDirPath(pApp->pFiles));
     strcat(pApp->WindowTitle, "]");
   }
@@ -627,11 +628,12 @@ void notifyUserAboutSkippedFiles(Application *pApp)
 {
   if (containsSkippedNotifications(pApp->pNotifications))
   {
-    if (!showEasyRequest(pApp->pWinObject,
+    if (!showEasyRequest(
+          pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Ok|Show errors",
-          "Failed to add some of the input files"))
+          tr(pApp->pLocaleInfo, MSG_CONTINUE_SHOW_LOG_GAD),
+          tr(pApp->pLocaleInfo, MSG_FAILED_TO_ADD_FILES)))
     {
       printNotifications(pApp->pNotifications);
     }
@@ -1543,7 +1545,7 @@ Object *createLayout(struct List *pFilesList, struct LocaleInfo* pLocaleInfo)
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_Label, tr(pLocaleInfo, MSG_CNT_GROUP),
+    LAYOUT_Label, tr(pLocaleInfo, MSG_EXTENSION_GROUP),
     LAYOUT_AddChild, m_ppGadgets[GID_STR_EXTENSION] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_EXTENSION,
       GA_RelVerify, TRUE,

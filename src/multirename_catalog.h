@@ -76,7 +76,7 @@
 #define MSG_FAILED_ALLOC_INST_MEM 41
 #define MSG_FAILED_OPEN_WINDOW 42
 #define MSG_MAIN_WINDOW 43
-#define MSG_OK_SHOW_GAD 44
+#define MSG_CONTINUE_SHOW_LOG_GAD 44
 #define MSG_FAILED_TO_ADD_FILES 45
 #define MSG_NO_FILES_TO_RENAME 46
 #define MSG_FAILED_CREATE_TOKENS 47
@@ -192,7 +192,7 @@
 #define MSG_FAILED_ALLOC_INST_MEM_STR "Failed to allocate memory for application instance data.\n"
 #define MSG_FAILED_OPEN_WINDOW_STR "Failed to open window.\n"
 #define MSG_MAIN_WINDOW_STR "MultiRename in ["
-#define MSG_OK_SHOW_GAD_STR "Ok"
+#define MSG_CONTINUE_SHOW_LOG_GAD_STR "Continue|Show log"
 #define MSG_FAILED_TO_ADD_FILES_STR "Failed to add some of the input files"
 #define MSG_NO_FILES_TO_RENAME_STR "No files to rename."
 #define MSG_FAILED_CREATE_TOKENS_STR "Error, failed to create file name tokens!"
@@ -354,8 +354,8 @@ static const char CatCompBlock[] =
     MSG_FAILED_OPEN_WINDOW_STR "\x00"
     "\x00\x00\x00\x2B\x00\x12"
     MSG_MAIN_WINDOW_STR "\x00\x00"
-    "\x00\x00\x00\x2C\x00\x04"
-    MSG_OK_SHOW_GAD_STR "\x00\x00"
+    "\x00\x00\x00\x2C\x00\x12"
+    MSG_CONTINUE_SHOW_LOG_GAD_STR "\x00"
     "\x00\x00\x00\x2D\x00\x26"
     MSG_FAILED_TO_ADD_FILES_STR "\x00"
     "\x00\x00\x00\x2E\x00\x14"

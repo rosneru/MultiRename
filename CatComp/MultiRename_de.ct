@@ -178,9 +178,9 @@ MSG_MAIN_WINDOW
 MultiRename in [
 ; MultiRename in [
 ;
-MSG_OK_SHOW_GAD
-Ok
-; Ok
+MSG_CONTINUE_SHOW_LOG_GAD
+Weiter|Log anzeigen
+; Continue|Show log
 ;
 MSG_FAILED_TO_ADD_FILES
 Einige Eingabedateien konnten nicht hinzugefügt werden

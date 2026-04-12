@@ -178,9 +178,9 @@ MSG_MAIN_WINDOW
 
 ; MultiRename in [
 ;
-MSG_OK_SHOW_GAD
+MSG_CONTINUE_SHOW_LOG_GAD
 
-; Ok
+; Continue|Show log
 ;
 MSG_FAILED_TO_ADD_FILES
 
