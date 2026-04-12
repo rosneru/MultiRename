@@ -187,9 +187,6 @@ This tool is only available if you have files in the processing list\n
 MSG_ITEMS_AND_EXT_NEEDED_2 (//)
 and if at least one of them has an extension like '.iff'.
 ;
-MSG_OK_SHOW_ERRORS_GAD (//)
-Ok
-;
 MSG_RENAME_FAILED_FOR_SOME (//)
 Failed to rename some of the input files
 ;

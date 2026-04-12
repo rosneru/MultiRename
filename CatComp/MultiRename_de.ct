@@ -250,10 +250,6 @@ MSG_ITEMS_AND_EXT_NEEDED_2
 und wenn mindestens eine davon eine Erweiterung wie '.iff' hat.
 ; and if at least one of them has an extension like '.iff'.
 ;
-MSG_OK_SHOW_ERRORS_GAD
-Ok
-; Ok
-;
 MSG_RENAME_FAILED_FOR_SOME
 Umbenennen für einige Eingabedateien fehlgeschlagen
 ; Failed to rename some of the input files
