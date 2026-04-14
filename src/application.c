@@ -73,7 +73,15 @@
 ///
 /// Forwards / private function declarations
 
-BOOL startRename(Application *pApp);
+enum StartRenameResult
+{
+  SRR_SUCCESS = 1,
+  SRR_CANCELLED,
+  SRR_ERROR_SEE_LOG,
+  SRR_ERROR_NOTIFIED
+};
+
+enum StartRenameResult startRename(Application *pApp);
 
 /**
  * Iterate the given array of WbArgs and (try to) add each file to the
@@ -642,7 +650,7 @@ void notifyUserAboutSkippedFiles(Application *pApp)
   }
 }
 
-BOOL startRename(Application *pApp)
+enum StartRenameResult startRename(Application *pApp)
 {
   ULONG fileCount;
   TokenCount *pTokenCounts;
@@ -662,7 +670,7 @@ BOOL startRename(Application *pApp)
       "MultiRename",
       tr(pApp->pLocaleInfo, MSG_OK_GAD),
       tr(pApp->pLocaleInfo, MSG_NO_FILES_TO_RENAME));
-    return FALSE;
+    return SRR_CANCELLED;
   }
 
   if (!(pTokenCounts = createTokenCounts(fileCount)))
@@ -672,7 +680,7 @@ BOOL startRename(Application *pApp)
       "MultiRename",
       tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
       tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_TOKENS));
-    return FALSE;
+    return SRR_ERROR_NOTIFIED;
   }
 
   fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
@@ -708,7 +716,7 @@ BOOL startRename(Application *pApp)
         {
           // User clicked on `Cancel`
           freeTokenCounts(pTokenCounts);
-          return FALSE;
+          return SRR_CANCELLED;
         }
 
         hasAlreadyAskedToProceed = TRUE;
@@ -742,7 +750,7 @@ BOOL startRename(Application *pApp)
           tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
           tr(pApp->pLocaleInfo, MSG_ERROR_AUTOCREATE_NAMES));
         freeTokenCounts(pTokenCounts);
-        return FALSE;
+        return SRR_ERROR_NOTIFIED;
       }
 
       // Check if name length (+ the possible '.info') is allowed by
@@ -756,7 +764,7 @@ BOOL startRename(Application *pApp)
           tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
           tr(pApp->pLocaleInfo, MSG_ERROR_NAMES_TOO_LONG));
         freeTokenCounts(pTokenCounts);
-        return FALSE;
+        return SRR_ERROR_NOTIFIED;
       }
 
       strcpy(pFileNode->NewName, pApp->TempBuf);
@@ -766,13 +774,18 @@ BOOL startRename(Application *pApp)
   // Change to files directory, perform the rename and change back to former
   // directory
   pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
-  renameSucceeded = renameFiles(
-    pApp->pFiles, pApp->pNotifications, pApp->pParsedArgs->AreIconsSkipped);
+  renameSucceeded = renameFiles(pApp->pFiles, 
+    pApp->pNotifications, pApp->pParsedArgs->AreIconsSkipped);
   CurrentDir(pFormerDirLock);
   freeTokenCounts(pTokenCounts);
   pApp->IsResetNeeded = TRUE;
 
-  return renameSucceeded;
+  if(!renameSucceeded)
+  {
+    return SRR_ERROR_SEE_LOG;
+  }
+
+  return SRR_SUCCESS;
 }
 
 void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
@@ -1136,7 +1149,7 @@ void insertCommandToStrGadget(
 
 static void handleGadgets(Application *pApp, ULONG result)
 {
-  BOOL renameSucceeded = FALSE;
+  enum StartRenameResult startRenameResult;
   FileNode *pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
@@ -1249,7 +1262,7 @@ static void handleGadgets(Application *pApp, ULONG result)
                       TAG_DONE);
       // clang-format on
 
-      renameSucceeded = startRename(pApp);
+      startRenameResult = startRename(pApp);
 
       // clang-format off
       SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
@@ -1259,8 +1272,12 @@ static void handleGadgets(Application *pApp, ULONG result)
                       TAG_DONE);
       // clang-format on
 
-      setAllGadgetsDisabledState(pApp, TRUE);
-      if (!renameSucceeded)
+      if (startRenameResult == SRR_SUCCESS)
+      {
+        setAllGadgetsDisabledState(pApp, TRUE);
+      }
+
+      if (startRenameResult == SRR_ERROR_SEE_LOG)
       {
         if (!showEasyRequest(pApp->pWinObject,
               pApp->pIntuiWindow,
