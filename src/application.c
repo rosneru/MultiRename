@@ -896,13 +896,13 @@ BOOL calculateNewNames(Application *pApp)
   STRPTR pName, pExt;
   FileNode *pFileNode;
   LONG counterStart, counterStep, counterPlacesId, counterPlacesValue;
-  STRPTR pTextOk = "Ok";
+  STRPTR pTextOk = tr(pApp->pLocaleInfo, MSG_STATE_OK);
   STRPTR pTruncatedLongNoIcons = "> 107";
   STRPTR pTruncatedLong = "> 102";
   STRPTR pTruncatedShortNoIcons = "> 32";
   STRPTR pTruncatedShort = "> 27";
   STRPTR pTextTruncated = NULL;
-  STRPTR pTextCommandError = "Cmd";
+  STRPTR pTextCommandError = tr(pApp->pLocaleInfo, MSG_STATE_COMMAND_ERROR);
   STRPTR pStateText;
   long maxAllowedNameLength;
 
@@ -998,7 +998,7 @@ BOOL calculateNewNames(Application *pApp)
                               LBNA_Column, 0,
                                 LBNCA_Text, pTextCommandError,
                               LBNA_Column, 3,
-                                LBNCA_Text, "<Error!>",
+                                LBNCA_Text, tr(pApp->pLocaleInfo, MSG_NAME_ERROR),
                               TAG_DONE);
       // clang-format on
     }
@@ -1089,7 +1089,7 @@ BOOL applySelectedRange(Application *pApp)
              &pApp->RangeMask, pApp->TempBuf, TEMP_BUF_SIZE, pText, bufferPos)))
   {
     // TODO: Notify user
-    printf("insertRangeMaskString() failed.\n");
+    printf("Internal error: insertRangeMaskString() failed.\n");
     return FALSE;
   }
 
