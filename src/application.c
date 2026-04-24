@@ -1187,10 +1187,9 @@ static void handleGadgets(Application *pApp, ULONG result)
     {
       showEasyRequest(pApp->pWinObject,
         pApp->pIntuiWindow,
-        "MultiRename: Select name part",
-        "Ok",
-        "This tool is only available if you have files in the processing "
-        "list.");
+        tr(pApp->pLocaleInfo, MSG_NAME_TOOL_ITEMS_TITLE),
+        tr(pApp->pLocaleInfo, MSG_OK_GAD),
+        tr(pApp->pLocaleInfo, MSG_NAME_TOOL_NEEDS_ITEMS));
     }
     break;
   }
@@ -1232,12 +1231,16 @@ static void handleGadgets(Application *pApp, ULONG result)
     }
     else
     {
+      strncpy(pApp->TempBuf,
+        tr(pApp->pLocaleInfo, MSG_ITEMS_AND_EXT_NEEDED_1), TEMP_BUF_SIZE);
+      strncat(pApp->TempBuf,
+        tr(pApp->pLocaleInfo, MSG_ITEMS_AND_EXT_NEEDED_2), TEMP_BUF_SIZE);
+
       showEasyRequest(pApp->pWinObject,
         pApp->pIntuiWindow,
-        "MultiRename: Select extension part",
-        "Ok",
-        "This tool is only available if you have files in the processing list "
-        "and if at least one of them has an extension like '.iff'.");
+        tr(pApp->pLocaleInfo, MSG_EXT_TOOL_ITEMS_TITLE),
+        tr(pApp->pLocaleInfo, MSG_OK_GAD),
+        pApp->TempBuf);
     }
     break;
   }
@@ -1282,8 +1285,8 @@ static void handleGadgets(Application *pApp, ULONG result)
         if (!showEasyRequest(pApp->pWinObject,
               pApp->pIntuiWindow,
               "MultiRename",
-              "Ok|Show errors",
-              "Failed to rename some of the input files"))
+              tr(pApp->pLocaleInfo, MSG_CONTINUE_SHOW_LOG_GAD),
+              tr(pApp->pLocaleInfo, MSG_RENAME_FAILED_FOR_SOME)))
         {
           printNotifications(pApp->pNotifications);
         }
