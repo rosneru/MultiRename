@@ -2,7 +2,7 @@ Short:        Rename multiple files
 Author:       Uwe Rosner
 Uploader:     u.rosner@ymail.com (Uwe Rosner)
 Type:         util/misc
-Version:      1.0
+Version:      1.1
 Architecture: m68k-amigaos >= 3.2.3
 Distribution: Aminet
 
@@ -16,12 +16,18 @@ according to a user defined pattern. It is inspired by the MultiRename tool of
 TotalCommander (Windows), but does not yet have all of its functions.
 
 To run it an Amiga with AmigaOS 3.2.3 (!) is needed: MultiRename uses BOOPSI
-objects (Reaction) and needs a recently updated function of 'string.gadget'
-which was released in the 3.2.3 update in April 2025.
+objects (Reaction) and needs a function of 'string.gadget' which was just added
+in the 3.2.3 update, released in April 2025.
 
 ======= 
 CHANGES
 =======
+
+1.1 (xx.06.2026)
+
+- Added localization support via locale.library
+- Added translation catalogs for French and German
+- Fixed that name / extension masks weren't reset on Project->New
 
 1.0 (06.10.2025)
 - Initial version

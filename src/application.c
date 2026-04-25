@@ -1347,6 +1347,16 @@ void menuFunctionProjectNew(Application *pApp)
                     NULL,
                     LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
                     TAG_DONE);
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
+                    pApp->pIntuiWindow,
+                    NULL,
+                    STRINGA_TextVal, (ULONG)"[N]",
+                    TAG_DONE);
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_EXTENSION],
+                    pApp->pIntuiWindow,
+                    NULL,
+                    STRINGA_TextVal, (ULONG)"[E]",
+                    TAG_DONE);
     // clang-format on
   }
   else
