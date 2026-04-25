@@ -229,7 +229,7 @@ void __ASM__ __SAVE_DS__ AppMsgFunc(
 
 void initMenuLabels(struct LocaleInfo* pLocaleInfo)
 {
-
+  // A 'pragmatic' way to localize the menu. Until I find something better..
   mainWindowNewMenu[0].nm_Label = tr(pLocaleInfo, MSG_PROJECT_MENU);
   mainWindowNewMenu[1].nm_Label = tr(pLocaleInfo, MSG_PROJECT_NEW);
   mainWindowNewMenu[2].nm_Label = tr(pLocaleInfo, MSG_PROJECT_ADD_FILES);
@@ -1404,7 +1404,7 @@ static void handleMenu(Application *pApp, ULONG result)
       if ((pFileReq = showMultiFileSelector(
              pApp->pWinObject,
              pApp->pIntuiWindow,
-             "Select files to rename",
+             tr(pApp->pLocaleInfo, MSG_FILESELECTOR_TITLE),
              getFilesDirPath(pApp->pFiles))))
       {
         appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
@@ -1508,7 +1508,7 @@ void intuiEventLoop(Application *pApp)
       }
       else
       {
-        printf("Failed to apply selected range\n");
+        printf("%s\n", tr(pApp->pLocaleInfo, MSG_FAILED_APPLY_RANGE));
       }
     }
   }
