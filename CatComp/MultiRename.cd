@@ -135,7 +135,7 @@ MultiRename in [
 ;
 MSG_CONTINUE_SHOW_LOG_GAD (//)
 Continue|Show log
-
+;
 MSG_FAILED_TO_ADD_FILES (//)
 Failed to add some of the input files
 ;
@@ -191,13 +191,13 @@ MSG_RENAME_FAILED_FOR_SOME (//)
 Failed to rename some of the input files
 ;
 MSG_PROCEED_WILL_SCRATCH_1 (//)
-Continue to create a new project will clear the processing list\n
+Creating a new project will clear the processing list\n
 ;
 MSG_PROCEED_WILL_SCRATCH_2 (//)
 and set the masks to a default value.\n\n
 ;
 MSG_PROCEED_WILL_SCRATCH_3 (//)
-Continue anyway?
+Proceed anyway?
 ;
 MSG_FAILED_RECR_FILE_LST (//)
 Failed to re-create the files list.\n

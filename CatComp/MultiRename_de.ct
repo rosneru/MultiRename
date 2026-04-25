@@ -1,4 +1,4 @@
-## version $VER: MultiRename.catalog 01.00 (11.04.26)
+## version $VER: MultiRename.catalog 01.00 (25.04.26)
 ## codeset 0
 ## language deutsch
 ;
@@ -255,16 +255,16 @@ Umbenennen für einige Eingabedateien fehlgeschlagen
 ; Failed to rename some of the input files
 ;
 MSG_PROCEED_WILL_SCRATCH_1
-Bei 'Fortfahren' wird ein neues Projekt erstellt, die Verarbeitungsliste geleert\n
-; Continue to create a new project will clear the processing list\n
+Beim Erstellen eines neuen Projekts wird die Bearbeitungsliste geleert\n
+; Creating a new project will clear the processing list\n
 ;
 MSG_PROCEED_WILL_SCRATCH_2
-und die Masken auf ihre Standardwerte eingestellt.\n\n
+und die Masken auf ihre Standardwerte gesetzt.\n\n
 ; and set the masks to a default value.\n\n
 ;
 MSG_PROCEED_WILL_SCRATCH_3
 Trotzdem fortfahren?
-; Continue anyway?
+; Proceed anyway?
 ;
 MSG_FAILED_RECR_FILE_LST
 Konnte die Verarbeitungsliste nicht neu erstellen.\n

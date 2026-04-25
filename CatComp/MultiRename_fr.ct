@@ -1,4 +1,4 @@
-## version $VER: MultiRename.catalog 01.00 (11.04.26)
+## version $VER: MultiRename.catalog 01.00 (25.04.26)
 ## codeset 0
 ## language français
 ;
@@ -256,7 +256,7 @@ MSG_RENAME_FAILED_FOR_SOME
 ;
 MSG_PROCEED_WILL_SCRATCH_1
 
-; Continue to create a new project will clear the processing list\n
+; Creating a new project will clear the processing list\n
 ;
 MSG_PROCEED_WILL_SCRATCH_2
 
@@ -264,7 +264,7 @@ MSG_PROCEED_WILL_SCRATCH_2
 ;
 MSG_PROCEED_WILL_SCRATCH_3
 
-; Continue anyway?
+; Proceed anyway?
 ;
 MSG_FAILED_RECR_FILE_LST
 

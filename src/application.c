@@ -1306,13 +1306,18 @@ void menuFunctionProjectNew(Application *pApp)
 
   if (!pApp->IsResetNeeded && pApp->FilesCount > 0)
   {
+    strncpy(pApp->TempBuf,
+      tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_1), TEMP_BUF_SIZE);
+    strncat(pApp->TempBuf,
+      tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_2), TEMP_BUF_SIZE);
+    strncat(pApp->TempBuf,
+      tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_3), TEMP_BUF_SIZE);
+
     if (!showEasyRequest(pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Continue|Cancel",
-          "Continue to create a new project will clear the processing list\n"
-          "and set the masks to a default value.\n\n"
-          "Continue anyway?"))
+          tr(pApp->pLocaleInfo, MSG_PROCEED_CANCEL_GAD),
+          pApp->TempBuf))
     {
       return;
     }
@@ -1346,7 +1351,7 @@ void menuFunctionProjectNew(Application *pApp)
   }
   else
   {
-    PutStr("Failed to re-create the files list.\n");
+    tr(pApp->pLocaleInfo, MSG_FAILED_RECR_FILE_LST);
     disposeApplication(pApp);
   }
 
@@ -1386,7 +1391,8 @@ static void handleMenu(Application *pApp, ULONG result)
 
     case MENU_PROJECT_ADD_FILES:
     {
-      if ((pFileReq = showMultiFileSelector(pApp->pWinObject,
+      if ((pFileReq = showMultiFileSelector(
+             pApp->pWinObject,
              pApp->pIntuiWindow,
              "Select files to rename",
              getFilesDirPath(pApp->pFiles))))
@@ -1400,7 +1406,8 @@ static void handleMenu(Application *pApp, ULONG result)
 
     case MENU_PROJECT_ABOUT:
     {
-      showEasyRequest(pApp->pWinObject,
+      showEasyRequest(
+        pApp->pWinObject,
         pApp->pIntuiWindow,
         "MultiRename",
         "Ok",
