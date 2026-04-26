@@ -52,6 +52,9 @@
 
 #include "range_select_window.h"
 
+#define CATCOMP_NUMBERS
+#include "multirename_catalog.h"
+
 /*
  * Applies fromLevel and toLevel into RangeSelectWindow data struct and
  * displays the result string in the string gadget
@@ -78,7 +81,6 @@ enum gadids
 };
 
 static Object *m_ppGadgets[MAXGADGETS];
-static Object *pMainLayout;
 struct Hook m_SlidersHook;
 
 /// Hook implementations
@@ -107,7 +109,8 @@ void __ASM__ __SAVE_DS__ SlidersMsgFunc(__REG__(a0, struct Hook *pHook),
 
 /// Public function implementations
 
-RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
+RangeSelectWindow *createRangeSelectWindow(
+  struct Screen *pScreen, struct LocaleInfo* pLocaleInfo)
 {
   Object *pMainLayout;
 
@@ -117,6 +120,8 @@ RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
     return NULL;
   }
 
+  pRsw->pLocaleInfo = pLocaleInfo;
+
   m_SlidersHook.h_Entry = (ULONG(*)())SlidersMsgFunc;
   m_SlidersHook.h_SubEntry = NULL;
   m_SlidersHook.h_Data = pRsw;
@@ -125,10 +130,10 @@ RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
   pMainLayout = NewObject(LAYOUT_GetClass(), NULL,
     LAYOUT_BevelStyle, BVS_GROUP,
     LAYOUT_DeferLayout, TRUE,   /* this tag instructs layout.gadget to
-                                * defer GM_LAYOUT and GM_RENDER and ask
-                                * the application to do them. This
-                                * lessens the load on input.device
-                                */
+                                 * defer GM_LAYOUT and GM_RENDER and ask
+                                 * the application to do them. This
+                                 * lessens the load on input.device
+                                 */
     LAYOUT_LabelWidth, 50,
     LAYOUT_EvenSize, TRUE,
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
@@ -142,7 +147,7 @@ RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
     TAG_DONE),
     CHILD_Label, m_ppGadgets[GID_LABEL_LONGEST_ITEM] = NewObject(LABEL_GetClass(), NULL,
       GA_ID, GID_LABEL_LONGEST_ITEM, 
-      LABEL_Text, (ULONG)"Longest item:",
+      LABEL_Text, tr(pLocaleInfo, MSG_LONGEST_ITEM),
       TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_SLI_FROM] = NewObject(SLIDER_GetClass(), NULL,
       GA_ID, GID_SLI_FROM,
@@ -157,7 +162,9 @@ RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
       SLIDER_LevelDomain, "222",
       SLIDER_DispHook, &m_SlidersHook,
     TAG_DONE),
-    CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"From:", TAG_DONE),
+    CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+      LABEL_Text, tr(pLocaleInfo, MSG_FROM),
+    TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_SLI_TO] = NewObject(SLIDER_GetClass(), NULL,
       GA_ID, GID_SLI_TO,
       GA_RelVerify, TRUE,
@@ -170,35 +177,41 @@ RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
       SLIDER_LevelDomain, "222",
       SLIDER_DispHook, &m_SlidersHook,
     TAG_DONE),
-    CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"To:", TAG_DONE),
+    CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+      LABEL_Text, tr(pLocaleInfo, MSG_TO),
+    TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_STRING_RESULT_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STRING_RESULT_NAME,
       GA_ReadOnly, TRUE,
       GA_RelVerify, TRUE,
       GA_TabCycle, TRUE,
     TAG_DONE),
-    CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Selection result:", TAG_DONE),
+    CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+      LABEL_Text, tr(pLocaleInfo, MSG_SELECTION_RESULT),
+    TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_STRING_RESULT_MASK] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STRING_RESULT_MASK,
       GA_ReadOnly, TRUE,
       GA_RelVerify, TRUE,
       GA_TabCycle, TRUE,
     TAG_DONE),
-    CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Result mask:", TAG_DONE),
+    CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+      LABEL_Text, tr(pLocaleInfo, MSG_RESULT_MASK),
+    TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_EvenSize, TRUE,
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_OK] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_OK,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"Ok",
+        GA_Text, tr(pLocaleInfo, MSG_APPLY_GAD),
         BUTTON_TextPadding, TRUE,
       TAG_DONE),
       CHILD_WeightedWidth, 0,
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_CANCEL] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_CANCEL,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"Cancel",
+        GA_Text, tr(pLocaleInfo, MSG_CANCEL_GAD),
         BUTTON_TextPadding, TRUE,
       TAG_DONE),
       CHILD_WeightedWidth, 0,
@@ -230,9 +243,6 @@ RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen)
   return pRsw;
 }
 
-STRPTR pWindowTitleSelectName = "MultiRename: Select name part";
-STRPTR pWindowTitleSelectExtension = "MultiRename: Select extension part";
-
 BOOL openRangeSelectWindow(RangeSelectWindow *pRsw,
   struct Window *pParentIntuiWin,
   ULONG *pParentSigMask,
@@ -263,13 +273,13 @@ BOOL openRangeSelectWindow(RangeSelectWindow *pRsw,
   switch (pRangeMask->RequestedRangeType)
   {
   case RRT_NAME:
-    pWindowTitle = pWindowTitleSelectName;
+    pWindowTitle = tr(pRsw->pLocaleInfo, MSG_NAME_PART_WIN_TITLE);
 
     // Create a copy of the input string 'pLongestName' with no extension
     strncpy(pRsw->NameBuf, pLongestName, longestNameLen);
     break;
   case RRT_EXTENSION:
-    pWindowTitle = pWindowTitleSelectExtension;
+    pWindowTitle = tr(pRsw->pLocaleInfo, MSG_EXT_PART_WIN_TITLE);
 
     // Create a copy of the input string 'pLongestName' with no extension
     strncpy(pRsw->NameBuf, pLongestName, longestNameLen);

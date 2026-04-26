@@ -1,4 +1,4 @@
-## version $VER: MultiRename.catalog 01.00 (25.04.26)
+## version $VER: MultiRename.catalog 01.00 (26.04.26)
 ## codeset 0
 ## language deutsch
 ;
@@ -421,4 +421,8 @@ Namen aus Datei laden...
 MSG_WRONG_NUMBER_OF_LINES
 Die Datei enthält die falsche Anzahl Zeilen: %d statt %d!
 ; File contains wrong number of lines: %d, should be %d!
+;
+MSG_APPLY_GAD
+Anwenden
+; Apply
 ;

@@ -403,7 +403,7 @@ Application* createApplication(
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
                   if ((pApp->pRangeSelectWindow = createRangeSelectWindow(
-                         pApp->pPubScreen)))
+                         pApp->pPubScreen, pApp->pLocaleInfo)))
                   {
                     if ((pApp->pAboutMessage = createAboutMessage(pLocaleInfo)))
                     {

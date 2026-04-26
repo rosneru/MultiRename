@@ -137,6 +137,7 @@
 #define MSG_REPLACE_WITH_GAD 102
 #define MSG_PROJECT_LOAD_FROM_FILE 103
 #define MSG_WRONG_NUMBER_OF_LINES 104
+#define MSG_APPLY_GAD 105
 
 #endif /* CATCOMP_NUMBERS */
 
@@ -251,6 +252,7 @@
 #define MSG_REPLACE_WITH_GAD_STR "Replace With"
 #define MSG_PROJECT_LOAD_FROM_FILE_STR "Load names from file..."
 #define MSG_WRONG_NUMBER_OF_LINES_STR "File contains wrong number of lines: %d, should be %d!"
+#define MSG_APPLY_GAD_STR "Apply"
 
 #endif /* CATCOMP_STRINGS */
 
@@ -472,6 +474,8 @@ static const char CatCompBlock[] =
     MSG_PROJECT_LOAD_FROM_FILE_STR "\x00"
     "\x00\x00\x00\x68\x00\x38"
     MSG_WRONG_NUMBER_OF_LINES_STR "\x00\x00"
+    "\x00\x00\x00\x69\x00\x06"
+    MSG_APPLY_GAD_STR "\x00"
 };
 
 #endif /* CATCOMP_BLOCK */

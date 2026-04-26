@@ -1,6 +1,6 @@
-## version $VER: MultiRename.catalog 01.00 (25.04.26)
+## version $VER: MultiRename.catalog 01.00 (26.04.26)
 ## codeset 0
-## language franÃ§ais
+## language français
 ;
 MSG_TYPE_IS_DIRECTORY
 
@@ -421,4 +421,8 @@ MSG_PROJECT_LOAD_FROM_FILE
 MSG_WRONG_NUMBER_OF_LINES
 
 ; File contains wrong number of lines: %d, should be %d!
+;
+MSG_APPLY_GAD
+
+; Apply
 ;

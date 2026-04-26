@@ -40,7 +40,7 @@ typedef struct Application
   char TempBuf[TEMP_BUF_SIZE + 1];
   long NameGadgetBufferPos;
   long ExtGadgetBufferPos;
-  struct LocaleInfo* pLocaleInfo;
+  struct LocaleInfo *pLocaleInfo;
 } Application;
 
 Application *createApplication(
