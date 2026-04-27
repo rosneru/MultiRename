@@ -89,6 +89,7 @@ void printFileListNewName(FileNodes *pFiles);
 BOOL appendFileNode(FileNodes *pFiles,
   STRPTR pFileFullPath,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications);
 
 /**

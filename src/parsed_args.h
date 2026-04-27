@@ -30,6 +30,7 @@ ParsedArgs *createParsedArgs(int argc,
   char **argv,
   FileNodes *pFiles,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications);
 
 void freeParsedArgs(ParsedArgs *pParsedArgs);

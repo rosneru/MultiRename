@@ -395,6 +395,7 @@ Application* createApplication(
                    argv,
                    pApp->pFiles,
                    pApp->pLocale,
+                   tr(pApp->pLocaleInfo, MSG_TYPE_IS_DIRECTORY),
                    pApp->pNotifications)))
             {
               if ((pMainLayout = createLayout(
@@ -826,9 +827,11 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
       // So next the fileName is appended to the buf
       AddPart(pApp->pParsedArgs->pTempPathBuf, pFileName, MAX_PATH_LEN);
 
-      appendFileNode(pApp->pFiles,
+      appendFileNode(
+        pApp->pFiles,
         pApp->pParsedArgs->pTempPathBuf,
         pApp->pLocale,
+        tr(pApp->pLocaleInfo, MSG_TYPE_IS_DIRECTORY),
         pApp->pNotifications);
     }
     else

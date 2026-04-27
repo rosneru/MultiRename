@@ -24,15 +24,19 @@
 
 /// Forwards / private function declarations
 
-void readCommandLineArgs(ParsedArgs *pParsedArgs,
+void readCommandLineArgs(
+  ParsedArgs *pParsedArgs,
   FileNodes *pFiles,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications);
 
-void readWorkbenchArgs(ParsedArgs *pParsedArgs,
+void readWorkbenchArgs(
+  ParsedArgs *pParsedArgs,
   char **argv,
   FileNodes *pFiles,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications);
 
 static struct RDArgs *pReadArgs = NULL;
@@ -44,6 +48,7 @@ ParsedArgs *createParsedArgs(int argc,
   char **argv,
   FileNodes *pFiles,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications)
 {
   ParsedArgs *pParsedArgs;
@@ -57,12 +62,23 @@ ParsedArgs *createParsedArgs(int argc,
   if (argc == 0)
   {
     // Started from Workbench
-    readWorkbenchArgs(pParsedArgs, argv, pFiles, pLocale, pNotifications);
+    readWorkbenchArgs(
+      pParsedArgs,
+      argv,
+      pFiles,
+      pLocale,
+      pDirEntryMarkerName,
+      pNotifications);
   }
   else
   {
     // Started from CLI
-    readCommandLineArgs(pParsedArgs, pFiles, pLocale, pNotifications);
+    readCommandLineArgs(
+      pParsedArgs,
+      pFiles,
+      pLocale,
+      pDirEntryMarkerName,
+      pNotifications);
   }
 
   return pParsedArgs;
@@ -84,9 +100,11 @@ void freeParsedArgs(ParsedArgs *pParsedArgs)
 ///
 /// Private function implementations
 
-void readCommandLineArgs(ParsedArgs *pParsedArgs,
+void readCommandLineArgs(
+  ParsedArgs *pParsedArgs,
   FileNodes *pFiles,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications)
 {
   BPTR lock;
@@ -118,7 +136,11 @@ void readCommandLineArgs(ParsedArgs *pParsedArgs,
           }
 
           appendFileNode(
-            pFiles, pParsedArgs->pTempPathBuf, pLocale, pNotifications);
+            pFiles,
+            pParsedArgs->pTempPathBuf,
+            pLocale,
+            pDirEntryMarkerName,
+            pNotifications);
         }
         else
         {
@@ -162,6 +184,7 @@ void readWorkbenchArgs(ParsedArgs *pParsedArgs,
   char **argv,
   FileNodes *pFiles,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications)
 {
   int i;
@@ -219,7 +242,11 @@ void readWorkbenchArgs(ParsedArgs *pParsedArgs,
 
           AddPart(pParsedArgs->pTempPathBuf, pFileName, MAX_PATH_LEN);
           appendFileNode(
-            pFiles, pParsedArgs->pTempPathBuf, pLocale, pNotifications);
+            pFiles,
+            pParsedArgs->pTempPathBuf,
+            pLocale,
+            pDirEntryMarkerName,
+            pNotifications);
         }
         else
         {

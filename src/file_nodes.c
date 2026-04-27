@@ -58,7 +58,9 @@
 ///
 /// Private function implementations
 
-struct Node *createFileNode(struct Locale *pLocale,
+struct Node *createFileNode(
+  struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   BPTR pLock,
   STRPTR pFileName,
   struct List *pNotifications)
@@ -100,7 +102,7 @@ struct Node *createFileNode(struct Locale *pLocale,
   }
   else if (pFib->fib_DirEntryType > 0)
   {
-    pSizeValue = "DIR";
+    pSizeValue = pDirEntryMarkerName;
   }
   else
   {
@@ -376,6 +378,7 @@ void printFileListNewName(FileNodes *pFiles)
 BOOL appendFileNode(FileNodes *pFiles,
   STRPTR pFileFullPath,
   struct Locale *pLocale,
+  STRPTR pDirEntryMarkerName,
   struct List *pNotifications)
 {
   BPTR pLock;
@@ -393,7 +396,12 @@ BOOL appendFileNode(FileNodes *pFiles,
     return FALSE;
   }
 
-  if (!(pNode = createFileNode(pLocale, pLock, pFileFullPath, pNotifications)))
+  if (!(pNode = createFileNode(
+    pLocale,
+    pDirEntryMarkerName,
+    pLock,
+    pFileFullPath,
+    pNotifications)))
   {
     return FALSE;
   }
