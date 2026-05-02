@@ -14,7 +14,7 @@
 #include "range_mask.h"
 #include "range_select_window.h"
 
-#include "translation.h"
+#include "localization.h"
 
 #define TEMP_BUF_SIZE 1024
 

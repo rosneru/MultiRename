@@ -9,7 +9,8 @@
 // clang-format on
 
 #define CATCOMP_BLOCK
-#include "translation.h"
+#include "multirename_catalog.h"
+#include "localization.h"
 
 
 struct CatCompBlockType

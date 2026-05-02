@@ -14,6 +14,10 @@
 
 #include "notifications.h"
 
+#define CATCOMP_NUMBERS
+#include "multirename_catalog.h"
+
+
 struct List *createNotificationList(void)
 {
   struct List *pList;
@@ -101,14 +105,14 @@ void clearNotificationsExcept(
   }
 }
 
-void printNotifications(struct List *pList)
+void printNotifications(struct List *pList, struct LocaleInfo *pLocaleInfo)
 {
   ULONG count;
   struct Node *pNode;
 
   if ((pNode = findFirstNotificationByType(pList, NNT_SELECTED_PATH_INFO)))
   {
-    Printf("Selected path is '%s'\n\n", pNode->ln_Name);
+    Printf(tr(pLocaleInfo, MSG_LOG_SELECTED_PATH), pNode->ln_Name);
   }
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH)))

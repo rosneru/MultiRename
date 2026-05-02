@@ -21,7 +21,9 @@
 // clang-format on
 
 #include "application.h"
-#include "translation.h"
+#define CATCOMP_NUMBERS
+#include "multirename_catalog.h"
+#include "localization.h"
 
 /// Forwards / private function declarations
 

@@ -479,17 +479,4 @@ static const char CatCompBlock[] =
 };
 
 #endif /* CATCOMP_BLOCK */
-
-
-/****************************************************************************/
-
-
-struct LocaleInfo
-{
-    APTR li_LocaleBase;
-    APTR li_Catalog;
-};
-
-
-
 #endif /* MULTIRENAME_CATALOG_H */

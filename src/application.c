@@ -644,7 +644,7 @@ void notifyUserAboutSkippedFiles(Application *pApp)
           tr(pApp->pLocaleInfo, MSG_CONTINUE_SHOW_LOG_GAD),
           tr(pApp->pLocaleInfo, MSG_FAILED_TO_ADD_FILES)))
     {
-      printNotifications(pApp->pNotifications);
+      printNotifications(pApp->pNotifications, pApp->pLocaleInfo);
     }
 
     clearNotificationsExcept(pApp->pNotifications, NNT_SELECTED_PATH_INFO);
@@ -1291,7 +1291,7 @@ static void handleGadgets(Application *pApp, ULONG result)
               tr(pApp->pLocaleInfo, MSG_CONTINUE_SHOW_LOG_GAD),
               tr(pApp->pLocaleInfo, MSG_RENAME_FAILED_FOR_SOME)))
         {
-          printNotifications(pApp->pNotifications);
+          printNotifications(pApp->pNotifications, pApp->pLocaleInfo);
         }
       }
     }

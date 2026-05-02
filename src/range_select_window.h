@@ -4,7 +4,7 @@
 #include "file_node.h" // MAXNAMELEN
 #include "range_mask.h"
 
-#include "translation.h"
+#include "localization.h"
 
 typedef enum
 {
