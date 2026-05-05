@@ -114,6 +114,7 @@ void printNotifications(struct List *pList, struct LocaleInfo *pLocaleInfo)
   {
     Printf(tr(pLocaleInfo, MSG_LOG_SELECTED_PATH), pNode->ln_Name);
   }
+  
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH)))
   {

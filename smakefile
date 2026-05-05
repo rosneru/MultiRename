@@ -64,15 +64,15 @@ $(OBJDIR)requester.o : src/requester.c
 $(OBJDIR)string_tools.o : src/string_tools.c
 	$(CC) nolink src/string_tools.c
 
-$(OBJDIR)translation.o : src/translation.c
-	$(CC) nolink src/translation.c
+$(OBJDIR)localization.o : src/localization.c
+	$(CC) nolink src/localization.c
 
 $(OBJDIR)ui_tools.o : src/ui_tools.c
 	$(CC) nolink src/ui_tools.c
 
 OBJS = $(OBJDIR)application.o $(OBJDIR)date_tools.o $(OBJDIR)file_nodes.o
-OBJS = $(OBJS) $(OBJDIR)file_tools.o $(OBJDIR)localisation.o 
-OBJS = $(OBJDIR)menu_tools.o $(OBJDIR)main.o $(OBJDIR)notifications.o
+OBJS = $(OBJS) $(OBJDIR)file_tools.o $(OBJDIR)localization.o
+OBJS = $(OBJS) $(OBJDIR)menu_tools.o $(OBJDIR)main.o $(OBJDIR)notifications.o
 OBJS = $(OBJS) $(OBJDIR)parsed_args.o $(OBJDIR)range_mask.o
 OBJS = $(OBJS) $(OBJDIR)range_select_window.o $(OBJDIR)rename_algorithm.o
 OBJS = $(OBJS) $(OBJDIR)rename_counter.o $(OBJDIR)rename_parser.o
