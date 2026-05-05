@@ -2,14 +2,13 @@
 #ifdef __clang__
   #include <clib/alib_protos.h>
   #include <clib/exec_protos.h>
-  #include <clib/dos_protos.h>
 #else
   #include <proto/alib.h>
-  #include <proto/dos.h>
   #include <proto/exec.h>
 #endif
 // clang-format on
 
+#include <stdio.h>
 #include <string.h>
 
 #include "notifications.h"
@@ -112,29 +111,29 @@ void printNotifications(struct List *pList, struct LocaleInfo *pLocaleInfo)
 
   if ((pNode = findFirstNotificationByType(pList, NNT_SELECTED_PATH_INFO)))
   {
-    Printf(tr(pLocaleInfo, MSG_LOG_SELECTED_PATH), pNode->ln_Name);
+    printf(tr(pLocaleInfo, MSG_LOG_SELECTED_PATH), pNode->ln_Name);
   }
-  
+
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_WRONG_PATH)))
   {
-    Printf("Skipped %lu input file(s) because of wrong paths:\n", count);
+    printf(tr(pLocaleInfo, MSG_LOG_WRONG_PATHS), count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if (pNode->ln_Type == NNT_SKIPPED_WRONG_PATH)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 
   if (0 <
     (count = getNotificationCountByType(pList, NNT_SKIPPED_PATH_TOO_LONG)))
   {
-    Printf(
+    printf(
       "Skipped %lu input file(s) because of over long / truncated paths:\n",
       count);
 
@@ -142,17 +141,17 @@ void printNotifications(struct List *pList, struct LocaleInfo *pLocaleInfo)
     {
       if (pNode->ln_Type == NNT_SKIPPED_PATH_TOO_LONG)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 
   if (0 < (count = getNotificationCountByType(
              pList, NNT_SKIPPED_FAILED_DATETIMEPARTS)))
   {
-    Printf("Skipped %lu input file(s) because their date stamp couldn't be "
+    printf("Skipped %lu input file(s) because their date stamp couldn't be "
            "split into parts:\n",
       count);
 
@@ -160,65 +159,65 @@ void printNotifications(struct List *pList, struct LocaleInfo *pLocaleInfo)
     {
       if (pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 
   if (0 <
     (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_EXAMINE)))
   {
-    Printf(
+    printf(
       "Skipped %lu input file(s) because they couldn't be examined:\n", count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if (pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_FAILED_LOCK)))
   {
-    Printf("Failed to add (lock) %lu input file(s) / dir(s):\n", count);
+    printf("Failed to add (lock) %lu input file(s) / dir(s):\n", count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if (pNode->ln_Type == NNT_SKIPPED_FAILED_LOCK)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 
   if (0 < (count = getNotificationCountByType(
              pList, NNT_SKIPPED_LINKS_NOT_SUPPORTED)))
   {
-    Printf(
+    printf(
       "Skipped %lu input file(s) because links are not supported:\n", count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if (pNode->ln_Type == NNT_SKIPPED_LINKS_NOT_SUPPORTED)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 
   if (0 < (count = getNotificationCountByType(pList, NNT_SKIPPED_DUPLICATE)))
   {
-    Printf("Skipped %lu input file(s) because they are already in processing "
+    printf("Skipped %lu input file(s) because they are already in processing "
            "list:\n",
       count);
 
@@ -226,26 +225,26 @@ void printNotifications(struct List *pList, struct LocaleInfo *pLocaleInfo)
     {
       if (pNode->ln_Type == NNT_SKIPPED_DUPLICATE)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 
   if (0 < (count = getNotificationCountByType(pList, NNT_RENAME_FAILED)))
   {
-    Printf("Rename failed for %lu new file names:\n", count);
+    printf("Rename failed for %lu new file names:\n", count);
 
     for (pNode = pList->lh_Head; pNode->ln_Succ; pNode = pNode->ln_Succ)
     {
       if (pNode->ln_Type == NNT_RENAME_FAILED)
       {
-        Printf("  %s\n", pNode->ln_Name);
+        printf("  %s\n", pNode->ln_Name);
       }
     }
 
-    PutStr("\n");
+    printf("\n");
   }
 }
 
