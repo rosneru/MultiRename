@@ -82,18 +82,6 @@ OBJS = $(OBJS) $(OBJDIR)ui_tools.o
 $(EXE) : $(OBJS)
 	$(LD) link $(OBJS)
 
-
-# target localize PATCH
-# NOTE: Manually do step 1 before:
-#  	Create the localize_file by running
-# 		'localize *.c > localize_file'
-#	and then edit it by
-#	1) Only keep the lines that should be translated
-#   2) Change the string
-localize:
-	localize localize_file PATCH TEMPLATE "tr(pApp->pLocaleInfo, %I)" MERGECATALOG CatComp/MultiRename.cd
-
-
 # target translations
 
 translations: CatComp/$(APP).cd

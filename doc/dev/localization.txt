@@ -1,0 +1,26 @@
+Localization was done in April 2026 using the 'localize' tool from
+NDK3.2 (or Aminet). It was a multi-step process:
+
+1. Created the localize_file by running
+
+    'localize *.c > localize_file'
+
+2. Edited the 'localize_file':
+
+2.1 Only kept the lines that should be translated
+
+2.2 Changed the string id's to meaningful values like `MSG_OK_GAD`
+
+3. Run `localize` a 2nd time
+
+    localize localize_file PATCH TEMPLATE "tr(pApp->pLocaleInfo, %I)" MERGECATALOG CatComp/MultiRename.cd
+
+This call
+- created the .cd file to be used with CatComp
+- created copies of all translated files in directory `src-localize`
+- all those copies have the `tr(pApp->pLocaleInfo, %I)` inserted at
+the appropriate positions where %I is replaced with the string id's
+as created above.
+
+4. Applied the file copies step-by-step to the new files in src dir.
+
