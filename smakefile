@@ -89,6 +89,10 @@ translations: CatComp/$(APP).cd
 	CatComp CatComp/$(APP).cd CTFILE CatComp/$(APP)_fr.ct
 
 # target catalog-header
+# NOTE: After this, manually delete the `struct LocaleInfo` declaration
+#       in multirename_catalog.h
+# REASON: I needed to have 'an own' definition of `struct LocaleInfo`
+#					in `localization.h` to avoid an circular include issue.
 catalog-header: CatComp/$(APP).cd
 	CatComp CatComp/$(APP).cd CFILE src/$(APP)_catalog.h NOARRAY NOCODE
 
