@@ -1,4 +1,4 @@
-## version $VER: MultiRename.catalog 01.00 (26.04.26)
+## version $VER: MultiRename.catalog 01.00 (13.05.26)
 ## codeset 0
 ## language français
 ;
@@ -425,4 +425,12 @@ MSG_WRONG_NUMBER_OF_LINES
 MSG_APPLY_GAD
 
 ; Apply
+;
+MSG_CLOSE_GAD
+
+; Close
+;
+MSG_LOG_WIN_TITLE
+
+; MultiRename: Log
 ;

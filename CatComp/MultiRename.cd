@@ -318,3 +318,9 @@ File contains wrong number of lines: %d, should be %d!
 ;
 MSG_APPLY_GAD (//)
 Apply
+;
+MSG_CLOSE_GAD (//)
+Close
+;
+MSG_LOG_WIN_TITLE (//)
+MultiRename: Log

@@ -138,6 +138,8 @@
 #define MSG_PROJECT_LOAD_FROM_FILE 103
 #define MSG_WRONG_NUMBER_OF_LINES 104
 #define MSG_APPLY_GAD 105
+#define MSG_CLOSE_GAD 106
+#define MSG_LOG_WIN_TITLE 107
 
 #endif /* CATCOMP_NUMBERS */
 
@@ -253,6 +255,8 @@
 #define MSG_PROJECT_LOAD_FROM_FILE_STR "Load names from file..."
 #define MSG_WRONG_NUMBER_OF_LINES_STR "File contains wrong number of lines: %d, should be %d!"
 #define MSG_APPLY_GAD_STR "Apply"
+#define MSG_CLOSE_GAD_STR "Close"
+#define MSG_LOG_WIN_TITLE_STR "MultiRename: Log"
 
 #endif /* CATCOMP_STRINGS */
 
@@ -476,7 +480,12 @@ static const char CatCompBlock[] =
     MSG_WRONG_NUMBER_OF_LINES_STR "\x00\x00"
     "\x00\x00\x00\x69\x00\x06"
     MSG_APPLY_GAD_STR "\x00"
+    "\x00\x00\x00\x6A\x00\x06"
+    MSG_CLOSE_GAD_STR "\x00"
+    "\x00\x00\x00\x6B\x00\x12"
+    MSG_LOG_WIN_TITLE_STR "\x00\x00"
 };
 
 #endif /* CATCOMP_BLOCK */
+
 #endif /* MULTIRENAME_CATALOG_H */

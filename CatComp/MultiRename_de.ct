@@ -1,4 +1,4 @@
-## version $VER: MultiRename.catalog 01.00 (26.04.26)
+## version $VER: MultiRename.catalog 01.00 (13.05.26)
 ## codeset 0
 ## language deutsch
 ;
@@ -425,4 +425,12 @@ Die Datei enth‰lt die falsche Anzahl Zeilen: %d statt %d!
 MSG_APPLY_GAD
 Anwenden
 ; Apply
+;
+MSG_CLOSE_GAD
+Schlieﬂen
+; Close
+;
+MSG_LOG_WIN_TITLE
+MultiRename: Log
+; MultiRename: Log
 ;
