@@ -2,7 +2,7 @@
 
 {TODO The placeholders ? * (one/multiple characters) and regular expressions are supported}.
 
-{TODO Several texts can be replaced at once: Ã¤|Ã¶|Ã¼ => ae|oe|ue}
+{TODO Several texts can be replaced at once: ä|ö|ü => ae|oe|ue}
 
 ## Case sensitive 
 

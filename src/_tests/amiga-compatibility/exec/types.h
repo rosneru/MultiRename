@@ -17,6 +17,7 @@ typedef signed char	BYTE;		/* signed 8-bit quantity */
 typedef unsigned char	UBYTE;		/* unsigned 8-bit quantity */
 typedef unsigned char	BYTEBITS;	/* 8 bits manipulated individually */
 typedef unsigned short	RPTR;		/* unsigned relative pointer */
+typedef void *		APTR;		/* absolute pointer */
 
 typedef unsigned char*	STRPTR;
 

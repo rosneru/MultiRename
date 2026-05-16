@@ -27,6 +27,7 @@ add_executable (MultiRename_gcc
                 rename.c
                 requester.c
                 string_tools.c
+                localization.c
                 ui_tools.c)
 
 add_custom_command(TARGET MultiRename_gcc

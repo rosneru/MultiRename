@@ -4,6 +4,8 @@
 #include <exec/lists.h>
 #include <exec/types.h>
 
+#include "localization.h"
+
 typedef enum NotificationNodeType
 {
   NNT_NONE = 200,
@@ -27,7 +29,7 @@ void addNotification(
 void clearNotifications(struct List *pList);
 void clearNotificationsExcept(
   struct List *pList, NotificationNodeType exceptType);
-void printNotifications(struct List *pList);
+void printNotifications(struct List *pList, struct LocaleInfo *pLocaleInfo);
 
 BOOL containsSkippedNotifications(struct List *pList);
 

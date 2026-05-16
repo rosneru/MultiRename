@@ -18,8 +18,9 @@ AllowShortLoopsOnASingleLine: false
 # Argumente und Parameter
 BinPackArguments: false
 BinPackParameters: false
-AlignAfterOpenBracket: DontAlign
+AlignAfterOpenBracket: AlwaysBreak
 PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyBreakAssignment: 100000
 
 # Operatoren und Ausrichtung
 AlignOperands: false

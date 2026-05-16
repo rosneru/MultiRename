@@ -62,20 +62,26 @@
 #include "string_tools.h"
 #include "ui_tools.h"
 
-#include "MultiRename_rev.h"
+#define CATCOMP_NUMBERS
+#include "multirename_catalog.h"
+#include "multirename_rev.h"
 
 /// Defines
 
-#define COPYRIGHT "\n\nCopyright(c) 2025 Uwe Rosner (u.rosner@ymail.com)\n\n"
-#define DISTRIBUTION                                                           \
-  "This release of MultiRename may be freely distributed.\n"                   \
-  "It may not be commercially distributed without the\n"                       \
-  "explicit permission of the author.\n"
+#define COPYRIGHT "\n\nCopyright(c) 2026 Uwe Rosner (u.rosner@ymail.com)\n\n"
 
 ///
 /// Forwards / private function declarations
 
-BOOL startRename(Application *pApp);
+enum StartRenameResult
+{
+  SRR_SUCCESS = 1,
+  SRR_CANCELLED,
+  SRR_ERROR_SEE_LOG,
+  SRR_ERROR_NOTIFIED
+};
+
+enum StartRenameResult startRename(Application *pApp);
 
 /**
  * Iterate the given array of WbArgs and (try to) add each file to the
@@ -139,7 +145,7 @@ void intuiEventLoop(Application *pApp);
 /**
  * Create layout for main window.
  */
-Object *createLayout(struct List *pFilesList);
+Object *createLayout(struct List *pFilesList, struct LocaleInfo* pLocaleInfo);
 
 ///
 /// Private variables
@@ -176,11 +182,6 @@ struct Hook m_AppHook;
 ///
 /// Helper implementation
 
-// clang-format off
-struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
-struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECKIT|MENUTOGGLE, 0, NULL};
-// clang-format on
-
 enum
 {
   MENU_PROJECT_NEW = 1,
@@ -192,6 +193,9 @@ enum
 };
 
 // clang-format off
+struct NewMenu longFileNamesItem =  { NM_ITEM, "Allow long filenames", 0 , CHECKIT|MENUTOGGLE, 0, NULL};
+struct NewMenu skipIconsItem =      { NM_ITEM, "Skip icons",           0 , CHECKIT|MENUTOGGLE, 0, NULL};
+
 struct NewMenu mainWindowNewMenu[] =
 {
   { NM_TITLE,   "Project",                 0 , 0,                  0, NULL},
@@ -208,36 +212,37 @@ struct NewMenu mainWindowNewMenu[] =
 };
 // clang-format on
 
-STRPTR createAboutMessage(void)
-{
-  STRPTR pAboutMsg;
-  ULONG totalLength =
-    strlen(VERSTAG + 7) + strlen(COPYRIGHT) + strlen(DISTRIBUTION) + 1;
-
-  if (!(pAboutMsg = AllocVec(totalLength * sizeof(char), MEMF_CLEAR)))
-  {
-    return NULL;
-  }
-
-  strcpy(pAboutMsg, VERSTAG + 7);
-  strcat(pAboutMsg, COPYRIGHT);
-  strcat(pAboutMsg, DISTRIBUTION);
-
-  return pAboutMsg;
-}
-
 /**
  * In `createMainWindow` this function is set to a hook to be called by
  * Intuition/BOOPSI when app messages are received. These messages can
  * contain some WbArgs, e.g. files that have been dragged to app window.
  * This function adds these WbArgs/files to the processing list.
  */
-void __ASM__ __SAVE_DS__ AppMsgFunc(__REG__(a0, struct Hook *pHook),
+void __ASM__ __SAVE_DS__ AppMsgFunc(
+  __REG__(a0, struct Hook *pHook),
   __REG__(a2, Object *pWindow),
   __REG__(a1, struct AppMessage *pMsg))
 {
   Application *pApp = (Application *)pHook->h_Data;
   appendFilesByWbArgs(pApp, pMsg->am_ArgList, pMsg->am_NumArgs);
+}
+
+void initMenuLabels(struct LocaleInfo* pLocaleInfo)
+{
+  // A 'pragmatic' way to localize the menu. Until I find something better..
+  mainWindowNewMenu[0].nm_Label = tr(pLocaleInfo, MSG_PROJECT_MENU);
+  mainWindowNewMenu[1].nm_Label = tr(pLocaleInfo, MSG_PROJECT_NEW);
+  mainWindowNewMenu[2].nm_Label = tr(pLocaleInfo, MSG_PROJECT_ADD_FILES);
+  // 3 is BARLABEL
+  mainWindowNewMenu[4].nm_Label = tr(pLocaleInfo, MSG_PROJECT_ABOUT);
+  // 5 is BARLABEL
+  mainWindowNewMenu[6].nm_Label = tr(pLocaleInfo, MSG_PROJECT_QUIT);
+  mainWindowNewMenu[7].nm_Label = tr(pLocaleInfo, MSG_SETTINGS_MENU);
+  mainWindowNewMenu[8].nm_Label = tr(pLocaleInfo, MSG_SETTINGS_LONG_NAMES);
+  mainWindowNewMenu[9].nm_Label = tr(pLocaleInfo, MSG_SETTINGS_SKIP_ICONS);
+
+  longFileNamesItem.nm_Label = tr(pLocaleInfo, MSG_SETTINGS_LONG_NAMES);
+  skipIconsItem.nm_Label = tr(pLocaleInfo, MSG_SETTINGS_SKIP_ICONS);
 }
 
 Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
@@ -257,8 +262,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
 
   if (pApp->pParsedArgs->AreLongNamesAllowed)
   {
-    if ((pNewMenuItem =
-            findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_LONGNAMES)))
+    if ((pNewMenuItem = findNewMenuItem(
+           mainWindowNewMenu, MENU_SETTINGS_LONGNAMES)))
     {
       pNewMenuItem->nm_Flags |= CHECKED;
     }
@@ -266,8 +271,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
 
   if (pApp->pParsedArgs->AreIconsSkipped)
   {
-    if ((pNewMenuItem =
-            findNewMenuItem(mainWindowNewMenu, MENU_SETTINGS_SKIPICONS)))
+    if ((pNewMenuItem = findNewMenuItem(
+           mainWindowNewMenu, MENU_SETTINGS_SKIPICONS)))
     {
       pNewMenuItem->nm_Flags |= CHECKED;
     }
@@ -277,7 +282,8 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   {
     if (!(pApp->pPubScreen = LockPubScreen(pApp->pParsedArgs->pPubScreenName)))
     {
-      Printf("Failed to lock public screen '%s'\n",
+      Printf(
+        tr(pApp->pLocaleInfo, MSG_FAILED_LOCK_PUBSCR),
         pApp->pParsedArgs->pPubScreenName);
       return NULL;
     }
@@ -286,7 +292,7 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   {
     if (!(pApp->pPubScreen = LockPubScreen(NULL)))
     {
-      PutStr("Failed to lock default public screen.\n");
+      PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_LOCK_DEF_PUBSCR));
       return NULL;
     }
   }
@@ -333,16 +339,49 @@ Object *createMainWindow(Application *pApp, Object *pMainWindowLayout)
   return pWindowObject;
 }
 
+STRPTR createAboutMessage(struct LocaleInfo* pLocaleInfo)
+{
+  STRPTR pAboutMsg;
+  ULONG totalLength;
+  STRPTR pDistrib1 = tr(pLocaleInfo, MSG_ABOUT_1);
+  STRPTR pDistrib2 = tr(pLocaleInfo, MSG_ABOUT_2);
+  STRPTR pDistrib3 = tr(pLocaleInfo, MSG_ABOUT_3);
+  
+  totalLength = strlen(VERSTAG + 7)
+              + strlen(COPYRIGHT)
+              + strlen(pDistrib1)
+              + strlen(pDistrib2)
+              + strlen(pDistrib3)
+              + 1;
+
+  if (!(pAboutMsg = AllocVec(totalLength * sizeof(char), MEMF_CLEAR)))
+  {
+    return NULL;
+  }
+
+  strcpy(pAboutMsg, VERSTAG + 7);
+  strcat(pAboutMsg, COPYRIGHT);
+  strcat(pAboutMsg, pDistrib1);
+  strcat(pAboutMsg, pDistrib2);
+  strcat(pAboutMsg, pDistrib3);
+
+  return pAboutMsg;
+}
+
 ///
 /// Public function implementations
 
-Application *createApplication(int argc, char **argv)
+Application* createApplication(
+  int argc, char **argv, struct LocaleInfo *pLocaleInfo)
 {
   Object *pMainLayout;
   Application *pApp;
 
+  initMenuLabels(pLocaleInfo);
+
   if ((pApp = AllocVec(sizeof(Application), MEMF_CLEAR)))
   {
+    pApp->pLocaleInfo = pLocaleInfo;
     if ((pApp->pLocale = OpenLocale(NULL)))
     {
       if ((pApp->pAppWindowPort = CreateMsgPort()))
@@ -351,19 +390,23 @@ Application *createApplication(int argc, char **argv)
         {
           if ((pApp->pFiles = createFileNodes()))
           {
-            if ((pApp->pParsedArgs = createParsedArgs(argc,
+            if ((pApp->pParsedArgs = createParsedArgs(
+                   argc,
                    argv,
                    pApp->pFiles,
                    pApp->pLocale,
+                   tr(pApp->pLocaleInfo, MSG_TYPE_IS_DIRECTORY),
                    pApp->pNotifications)))
             {
-              if ((pMainLayout = createLayout(pApp->pFiles->pList)))
+              if ((pMainLayout = createLayout(
+                     pApp->pFiles->pList, pLocaleInfo)))
               {
                 if ((pApp->pWinObject = createMainWindow(pApp, pMainLayout)))
                 {
-                  if ((pApp->pRangeSelectWindow = createRangeSelectWindow(pApp->pPubScreen)))
+                  if ((pApp->pRangeSelectWindow = createRangeSelectWindow(
+                         pApp->pPubScreen, pApp->pLocaleInfo)))
                   {
-                    if ((pApp->pAboutMessage = createAboutMessage()))
+                    if ((pApp->pAboutMessage = createAboutMessage(pLocaleInfo)))
                     {
                       // Mark the buffer positions as invalid
                       pApp->NameGadgetBufferPos = -1;
@@ -372,62 +415,62 @@ Application *createApplication(int argc, char **argv)
                     }
                     else
                     {
-                      PutStr("Failed to create the about message.\n");
+                      PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_ABOUTMSG));
                       disposeApplication(pApp);
                     }
                   }
                   else
                   {
-                    PutStr("Failed to create the range select window.\n");
+                    PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_RANGEWIN));
                     disposeApplication(pApp);
                   }
                 }
                 else
                 {
-                  PutStr("Failed to create the application main window.\n");
+                  PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_MAINWIN));
                   DisposeObject(pMainLayout);
                   disposeApplication(pApp);
                 }
               }
               else
               {
-                PutStr("Failed to create layout.\n");
+                PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_LAYOUT));
                 disposeApplication(pApp);
               }
             }
             else
             {
-              PutStr("Failed to parse the arguments.\n");
+              PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_PARSE_ARGS));
               disposeApplication(pApp);
             }
           }
           else
           {
-            PutStr("Failed to create the files list.\n");
+            PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_FILE_LST));
             disposeApplication(pApp);
           }
         }
         else
         {
-          PutStr("Failed to create the notifications object.\n");
+          PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_LOG));
           disposeApplication(pApp);
         }
       }
       else
       {
-        PutStr("Failed to create the message port for window drag'n drop.\n");
+        PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_MSG_PORT));
         disposeApplication(pApp);
       }
     }
     else
     {
-      PutStr("Failed to open the default Locale.\n");
+      PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_LOCALE));
       disposeApplication(pApp);
     }
   }
   else
   {
-    PutStr("Failed to allocate memory for application instance data.\n");
+    PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_ALLOC_INST_MEM));
   }
 
   return NULL;
@@ -504,8 +547,8 @@ BOOL runApplication(Application *pApp)
   //  browser. In the `WM_OPEN` call below it will be attached and displayed.
   calculateNewNames(pApp);
 
-  if ((pApp->pIntuiWindow =
-          (struct Window *)DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
+  if ((pApp->pIntuiWindow = (struct Window *)
+         DoMethod(pApp->pWinObject, WM_OPEN, NULL)))
   {
     updateMainWindowTitle(pApp);
     notifyUserAboutSkippedFiles(pApp);
@@ -518,7 +561,7 @@ BOOL runApplication(Application *pApp)
   }
   else
   {
-    PutStr("Failed to open window.\n");
+    PutStr(tr(pApp->pLocaleInfo, MSG_FAILED_OPEN_WINDOW));
   }
 
   return FALSE;
@@ -531,7 +574,7 @@ void updateMainWindowTitle(Application *pApp)
   // If a files directory is already set (e.e. a lock exists)
   if (getFilesDirLock(pApp->pFiles))
   {
-    strcpy(pApp->WindowTitle, "MultiRename in [");
+    strcpy(pApp->WindowTitle, tr(pApp->pLocaleInfo, MSG_MAIN_WINDOW));
     strcat(pApp->WindowTitle, getFilesDirPath(pApp->pFiles));
     strcat(pApp->WindowTitle, "]");
   }
@@ -594,20 +637,21 @@ void notifyUserAboutSkippedFiles(Application *pApp)
 {
   if (containsSkippedNotifications(pApp->pNotifications))
   {
-    if (!showEasyRequest(pApp->pWinObject,
+    if (!showEasyRequest(
+          pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Ok|Show errors",
-          "Failed to add some of the input files"))
+          tr(pApp->pLocaleInfo, MSG_CONTINUE_SHOW_LOG_GAD),
+          tr(pApp->pLocaleInfo, MSG_FAILED_TO_ADD_FILES)))
     {
-      printNotifications(pApp->pNotifications);
+      printNotifications(pApp->pNotifications, pApp->pLocaleInfo);
     }
 
     clearNotificationsExcept(pApp->pNotifications, NNT_SELECTED_PATH_INFO);
   }
 }
 
-BOOL startRename(Application *pApp)
+enum StartRenameResult startRename(Application *pApp)
 {
   ULONG fileCount;
   TokenCount *pTokenCounts;
@@ -625,9 +669,9 @@ BOOL startRename(Application *pApp)
     showEasyRequest(pApp->pWinObject,
       pApp->pIntuiWindow,
       "MultiRename",
-      "Ok",
-      "No files to rename.");
-    return FALSE;
+      tr(pApp->pLocaleInfo, MSG_OK_GAD),
+      tr(pApp->pLocaleInfo, MSG_NO_FILES_TO_RENAME));
+    return SRR_CANCELLED;
   }
 
   if (!(pTokenCounts = createTokenCounts(fileCount)))
@@ -635,9 +679,9 @@ BOOL startRename(Application *pApp)
     showEasyRequest(pApp->pWinObject,
       pApp->pIntuiWindow,
       "MultiRename",
-      "Cancel",
-      "Error, failed to create file name tokens!");
-    return FALSE;
+      tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
+      tr(pApp->pLocaleInfo, MSG_FAILED_CREATE_TOKENS));
+    return SRR_ERROR_NOTIFIED;
   }
 
   fillTokenOccurrences(pApp->pFiles, pTokenCounts, fileCount);
@@ -654,23 +698,26 @@ BOOL startRename(Application *pApp)
         // already allocated 2k temporary buffer from `ParsedArgs`. It surely is
         // big enough for the 136 bytes message text + max. 107 bytes file name.
         sprintf(pApp->pParsedArgs->pTempPathBuf,
-          "Warning, duplicate names! Proceed anyway?\n"
+          "%s"
           "%s\n\n"
-          "NOTE: Proceed will auto rename duplicate files to \n"
+          "%s"
           "  name (2).ext\n"
           "  name (3).ext\n"
-          "and so on.",
-          pFileNode->NewName);
+          "%s",
+          tr(pApp->pLocaleInfo, MSG_WARN_DUPLICATES_1),
+          pFileNode->NewName,
+          tr(pApp->pLocaleInfo, MSG_WARN_DUPLICATES_2),
+          tr(pApp->pLocaleInfo, MSG_WARN_DUPLICATES_3));
 
         if (!showEasyRequest(pApp->pWinObject,
               pApp->pIntuiWindow,
               "MultiRename",
-              "Proceed|Cancel",
+              tr(pApp->pLocaleInfo, MSG_PROCEED_CANCEL_GAD),
               pApp->pParsedArgs->pTempPathBuf))
         {
           // User clicked on `Cancel`
           freeTokenCounts(pTokenCounts);
-          return FALSE;
+          return SRR_CANCELLED;
         }
 
         hasAlreadyAskedToProceed = TRUE;
@@ -701,10 +748,10 @@ BOOL startRename(Application *pApp)
         showEasyRequest(pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Cancel",
-          "Error, failed to automatically create name for duplicate file!");
+          tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
+          tr(pApp->pLocaleInfo, MSG_ERROR_AUTOCREATE_NAMES));
         freeTokenCounts(pTokenCounts);
-        return FALSE;
+        return SRR_ERROR_NOTIFIED;
       }
 
       // Check if name length (+ the possible '.info') is allowed by
@@ -715,10 +762,10 @@ BOOL startRename(Application *pApp)
         showEasyRequest(pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Cancel",
-          "Error, auto-renamed file name would be too long for file system!");
+          tr(pApp->pLocaleInfo, MSG_CANCEL_GAD),
+          tr(pApp->pLocaleInfo, MSG_ERROR_NAMES_TOO_LONG));
         freeTokenCounts(pTokenCounts);
-        return FALSE;
+        return SRR_ERROR_NOTIFIED;
       }
 
       strcpy(pFileNode->NewName, pApp->TempBuf);
@@ -728,13 +775,18 @@ BOOL startRename(Application *pApp)
   // Change to files directory, perform the rename and change back to former
   // directory
   pFormerDirLock = CurrentDir(pApp->pFiles->DirLock);
-  renameSucceeded = renameFiles(
-    pApp->pFiles, pApp->pNotifications, pApp->pParsedArgs->AreIconsSkipped);
+  renameSucceeded = renameFiles(pApp->pFiles, 
+    pApp->pNotifications, pApp->pParsedArgs->AreIconsSkipped);
   CurrentDir(pFormerDirLock);
   freeTokenCounts(pTokenCounts);
   pApp->IsResetNeeded = TRUE;
 
-  return renameSucceeded;
+  if(!renameSucceeded)
+  {
+    return SRR_ERROR_SEE_LOG;
+  }
+
+  return SRR_SUCCESS;
 }
 
 void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
@@ -775,9 +827,11 @@ void appendFilesByWbArgs(Application *pApp, struct WBArg *pArgs, ULONG numArgs)
       // So next the fileName is appended to the buf
       AddPart(pApp->pParsedArgs->pTempPathBuf, pFileName, MAX_PATH_LEN);
 
-      appendFileNode(pApp->pFiles,
+      appendFileNode(
+        pApp->pFiles,
         pApp->pParsedArgs->pTempPathBuf,
         pApp->pLocale,
+        tr(pApp->pLocaleInfo, MSG_TYPE_IS_DIRECTORY),
         pApp->pNotifications);
     }
     else
@@ -845,13 +899,13 @@ BOOL calculateNewNames(Application *pApp)
   STRPTR pName, pExt;
   FileNode *pFileNode;
   LONG counterStart, counterStep, counterPlacesId, counterPlacesValue;
-  STRPTR pTextOk = "Ok";
+  STRPTR pTextOk = tr(pApp->pLocaleInfo, MSG_STATE_OK);
   STRPTR pTruncatedLongNoIcons = "> 107";
   STRPTR pTruncatedLong = "> 102";
   STRPTR pTruncatedShortNoIcons = "> 32";
   STRPTR pTruncatedShort = "> 27";
   STRPTR pTextTruncated = NULL;
-  STRPTR pTextCommandError = "Cmd";
+  STRPTR pTextCommandError = tr(pApp->pLocaleInfo, MSG_STATE_COMMAND_ERROR);
   STRPTR pStateText;
   long maxAllowedNameLength;
 
@@ -947,7 +1001,7 @@ BOOL calculateNewNames(Application *pApp)
                               LBNA_Column, 0,
                                 LBNCA_Text, pTextCommandError,
                               LBNA_Column, 3,
-                                LBNCA_Text, "<Error!>",
+                                LBNCA_Text, tr(pApp->pLocaleInfo, MSG_NAME_ERROR),
                               TAG_DONE);
       // clang-format on
     }
@@ -1038,7 +1092,7 @@ BOOL applySelectedRange(Application *pApp)
              &pApp->RangeMask, pApp->TempBuf, TEMP_BUF_SIZE, pText, bufferPos)))
   {
     // TODO: Notify user
-    printf("insertRangeMaskString() failed.\n");
+    printf("Internal error: insertRangeMaskString() failed.\n");
     return FALSE;
   }
 
@@ -1098,7 +1152,7 @@ void insertCommandToStrGadget(
 
 static void handleGadgets(Application *pApp, ULONG result)
 {
-  BOOL renameSucceeded = FALSE;
+  enum StartRenameResult startRenameResult;
   FileNode *pFileNode;
   switch ((result & WMHI_GADGETMASK))
   {
@@ -1136,10 +1190,9 @@ static void handleGadgets(Application *pApp, ULONG result)
     {
       showEasyRequest(pApp->pWinObject,
         pApp->pIntuiWindow,
-        "MultiRename: Select name part",
-        "Ok",
-        "This tool is only available if you have files in the processing "
-        "list.");
+        tr(pApp->pLocaleInfo, MSG_NAME_TOOL_ITEMS_TITLE),
+        tr(pApp->pLocaleInfo, MSG_OK_GAD),
+        tr(pApp->pLocaleInfo, MSG_NAME_TOOL_NEEDS_ITEMS));
     }
     break;
   }
@@ -1181,12 +1234,16 @@ static void handleGadgets(Application *pApp, ULONG result)
     }
     else
     {
+      strncpy(pApp->TempBuf,
+        tr(pApp->pLocaleInfo, MSG_ITEMS_AND_EXT_NEEDED_1), TEMP_BUF_SIZE);
+      strncat(pApp->TempBuf,
+        tr(pApp->pLocaleInfo, MSG_ITEMS_AND_EXT_NEEDED_2), TEMP_BUF_SIZE);
+
       showEasyRequest(pApp->pWinObject,
         pApp->pIntuiWindow,
-        "MultiRename: Select extension part",
-        "Ok",
-        "This tool is only available if you have files in the processing list "
-        "and if at least one of them has an extension like '.iff'.");
+        tr(pApp->pLocaleInfo, MSG_EXT_TOOL_ITEMS_TITLE),
+        tr(pApp->pLocaleInfo, MSG_OK_GAD),
+        pApp->TempBuf);
     }
     break;
   }
@@ -1211,7 +1268,7 @@ static void handleGadgets(Application *pApp, ULONG result)
                       TAG_DONE);
       // clang-format on
 
-      renameSucceeded = startRename(pApp);
+      startRenameResult = startRename(pApp);
 
       // clang-format off
       SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_LBR_PROCESSING_LIST],
@@ -1221,16 +1278,20 @@ static void handleGadgets(Application *pApp, ULONG result)
                       TAG_DONE);
       // clang-format on
 
-      setAllGadgetsDisabledState(pApp, TRUE);
-      if (!renameSucceeded)
+      if (startRenameResult == SRR_SUCCESS)
+      {
+        setAllGadgetsDisabledState(pApp, TRUE);
+      }
+
+      if (startRenameResult == SRR_ERROR_SEE_LOG)
       {
         if (!showEasyRequest(pApp->pWinObject,
               pApp->pIntuiWindow,
               "MultiRename",
-              "Ok|Show errors",
-              "Failed to rename some of the input files"))
+              tr(pApp->pLocaleInfo, MSG_CONTINUE_SHOW_LOG_GAD),
+              tr(pApp->pLocaleInfo, MSG_RENAME_FAILED_FOR_SOME)))
         {
-          printNotifications(pApp->pNotifications);
+          printNotifications(pApp->pNotifications, pApp->pLocaleInfo);
         }
       }
     }
@@ -1248,13 +1309,18 @@ void menuFunctionProjectNew(Application *pApp)
 
   if (!pApp->IsResetNeeded && pApp->FilesCount > 0)
   {
+    strncpy(pApp->TempBuf,
+      tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_1), TEMP_BUF_SIZE);
+    strncat(pApp->TempBuf,
+      tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_2), TEMP_BUF_SIZE);
+    strncat(pApp->TempBuf,
+      tr(pApp->pLocaleInfo, MSG_PROCEED_WILL_SCRATCH_3), TEMP_BUF_SIZE);
+
     if (!showEasyRequest(pApp->pWinObject,
           pApp->pIntuiWindow,
           "MultiRename",
-          "Continue|Cancel",
-          "Continue to create a new project will clear the processing list\n"
-          "and set the masks to a default value.\n\n"
-          "Continue anyway?"))
+          tr(pApp->pLocaleInfo, MSG_PROCEED_CANCEL_GAD),
+          pApp->TempBuf))
     {
       return;
     }
@@ -1284,11 +1350,21 @@ void menuFunctionProjectNew(Application *pApp)
                     NULL,
                     LISTBROWSER_Labels, (ULONG)pApp->pFiles->pList,
                     TAG_DONE);
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_NAME],
+                    pApp->pIntuiWindow,
+                    NULL,
+                    STRINGA_TextVal, (ULONG)"[N]",
+                    TAG_DONE);
+    SetGadgetAttrs((struct Gadget *) m_ppGadgets[GID_STR_EXTENSION],
+                    pApp->pIntuiWindow,
+                    NULL,
+                    STRINGA_TextVal, (ULONG)"[E]",
+                    TAG_DONE);
     // clang-format on
   }
   else
   {
-    PutStr("Failed to re-create the files list.\n");
+    tr(pApp->pLocaleInfo, MSG_FAILED_RECR_FILE_LST);
     disposeApplication(pApp);
   }
 
@@ -1328,9 +1404,10 @@ static void handleMenu(Application *pApp, ULONG result)
 
     case MENU_PROJECT_ADD_FILES:
     {
-      if ((pFileReq = showMultiFileSelector(pApp->pWinObject,
+      if ((pFileReq = showMultiFileSelector(
+             pApp->pWinObject,
              pApp->pIntuiWindow,
-             "Select files to rename",
+             tr(pApp->pLocaleInfo, MSG_FILESELECTOR_TITLE),
              getFilesDirPath(pApp->pFiles))))
       {
         appendFilesByWbArgs(pApp, pFileReq->fr_ArgList, pFileReq->fr_NumArgs);
@@ -1342,7 +1419,8 @@ static void handleMenu(Application *pApp, ULONG result)
 
     case MENU_PROJECT_ABOUT:
     {
-      showEasyRequest(pApp->pWinObject,
+      showEasyRequest(
+        pApp->pWinObject,
         pApp->pIntuiWindow,
         "MultiRename",
         "Ok",
@@ -1433,13 +1511,13 @@ void intuiEventLoop(Application *pApp)
       }
       else
       {
-        printf("Failed to apply selected range\n");
+        printf("%s\n", tr(pApp->pLocaleInfo, MSG_FAILED_APPLY_RANGE));
       }
     }
   }
 }
 
-Object *createLayout(struct List *pFilesList)
+Object *createLayout(struct List *pFilesList, struct LocaleInfo* pLocaleInfo)
 {
   Object *pMainLayout = NULL, *pTopParentHLayout = NULL,
          *pTopVLayoutName = NULL, *pTopVLayoutExt = NULL,
@@ -1449,25 +1527,25 @@ Object *createLayout(struct List *pFilesList)
   m_pColumnInfo = AllocLBColumnInfo(4,
                                     LBCIA_Column, 0,
                                       LBCIA_Sortable, FALSE,
-                                      LBCIA_Title, "State",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_STATE),
                                     LBCIA_Column, 1,
                                       LBCIA_Sortable, FALSE,
-                                      LBCIA_Title, "Type",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_TYPE),
                                     LBCIA_Column, 2,
                                       LBCIA_AutoSort, TRUE,
                                       LBCIA_SortArrow, TRUE,
                                       LBCIA_SortDirection, LBMSORT_FORWARD,
-                                      LBCIA_Title, "Old name",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_OLD_NAME),
                                     LBCIA_Column, 3,
                                       LBCIA_Sortable, FALSE,
-                                      LBCIA_Title, "New name",
+                                      LBCIA_Title, tr(pLocaleInfo, MSG_COL_TITLE_NEW_NAME),
                                     TAG_DONE);
 
   pTopVLayoutName = NewObject(LAYOUT_GetClass(), NULL,
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_Label, (ULONG)"Name",
+    LAYOUT_Label, tr(pLocaleInfo, MSG_NAME_GROUP),
     LAYOUT_AddChild, m_ppGadgets[GID_STR_NAME] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_NAME,
       GA_RelVerify, TRUE,
@@ -1478,10 +1556,10 @@ Object *createLayout(struct List *pFilesList)
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"[N] Name",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_NAME_GAD),
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_DATE] = NewObject(BUTTON_GetClass(), NULL,
-        GA_Text, (ULONG)"[YMD] Date",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_DATE_GAD),
         GA_ID, GID_BTN_NAME_DATE,
         GA_RelVerify, TRUE,
       TAG_DONE),
@@ -1491,18 +1569,18 @@ Object *createLayout(struct List *pFilesList)
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_PART] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_PART,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"[N#-#] Part...",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_PART_GAD),
       TAG_DONE),
       LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_TIME] = NewObject(BUTTON_GetClass(), NULL,
         GA_ID, GID_BTN_NAME_TIME,
         GA_RelVerify, TRUE,
-        GA_Text, (ULONG)"[hms] Time",
+        GA_Text, tr(pLocaleInfo, MSG_NAME_TIME_GAD),
       TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_NAME_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_NAME_COUNTER,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[C] Counter",
+      GA_Text, tr(pLocaleInfo, MSG_NAME_CNT_GAD),
     TAG_DONE),
   TAG_DONE);
 
@@ -1510,7 +1588,7 @@ Object *createLayout(struct List *pFilesList)
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_Label, (ULONG)"Extension",
+    LAYOUT_Label, tr(pLocaleInfo, MSG_EXTENSION_GROUP),
     LAYOUT_AddChild, m_ppGadgets[GID_STR_EXTENSION] = NewObject(STRING_GetClass(), NULL,
       GA_ID, GID_STR_EXTENSION,
       GA_RelVerify, TRUE,
@@ -1519,17 +1597,17 @@ Object *createLayout(struct List *pFilesList)
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[E] Ext.",
+      GA_Text, tr(pLocaleInfo, MSG_EXT_EXT_GAD),
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_PART] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_PART,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[E#-#] Part...",
+      GA_Text, tr(pLocaleInfo, MSG_EXT_PART_GAD),
     TAG_DONE),
     LAYOUT_AddChild, m_ppGadgets[GID_BTN_EXTENSION_COUNTER] = NewObject(BUTTON_GetClass(), NULL,
       GA_ID, GID_BTN_EXTENSION_COUNTER,
       GA_RelVerify, TRUE,
-      GA_Text, (ULONG)"[C] Counter",
+      GA_Text, tr(pLocaleInfo, MSG_EXT_CNT_GAD),
     TAG_DONE),
   TAG_DONE),
 
@@ -1537,7 +1615,7 @@ Object *createLayout(struct List *pFilesList)
     LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
     LAYOUT_SpaceOuter, TRUE,
     LAYOUT_BevelStyle, BVS_GROUP,
-    LAYOUT_Label, (ULONG)"Define counter",
+    LAYOUT_Label, tr(pLocaleInfo, MSG_CNT_GROUP),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
       LAYOUT_AddChild, m_ppGadgets[GID_INT_COUNTER_START] = NewObject(INTEGER_GetClass(), NULL,
@@ -1549,7 +1627,9 @@ Object *createLayout(struct List *pFilesList)
         INTEGER_Minimum, 0,
         INTEGER_Maximum, 10,
       TAG_DONE),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Start:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL, 
+        LABEL_Text, tr(pLocaleInfo, MSG_CNT_START_GAD),
+      TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -1562,8 +1642,9 @@ Object *createLayout(struct List *pFilesList)
         INTEGER_Minimum, 1,
         INTEGER_Maximum, 10,
       TAG_DONE),
-      LABEL_Text, (ULONG)"Step",
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Step:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+        LABEL_Text, tr(pLocaleInfo, MSG_CNT_STEP_GAD),
+      TAG_DONE),
     TAG_DONE),
     LAYOUT_AddChild, NewObject(LAYOUT_GetClass(), NULL,
       LAYOUT_Orientation, LAYOUT_ORIENT_HORIZ,
@@ -1577,7 +1658,9 @@ Object *createLayout(struct List *pFilesList)
         CHOOSER_AutoFit, TRUE,
         CHOOSER_PopUp, TRUE,
       TAG_DONE),
-      CHILD_Label, NewObject(LABEL_GetClass(), NULL, LABEL_Text, (ULONG)"Places:", TAG_DONE),
+      CHILD_Label, NewObject(LABEL_GetClass(), NULL,
+        LABEL_Text, tr(pLocaleInfo, MSG_CNT_PLACES_GAD),
+      TAG_DONE),
     TAG_DONE),
   TAG_DONE);
 
@@ -1608,7 +1691,7 @@ Object *createLayout(struct List *pFilesList)
       LAYOUT_Orientation, LAYOUT_ORIENT_VERT,
       LAYOUT_SpaceOuter, TRUE,
       LAYOUT_BevelStyle, BVS_GROUP,
-      LAYOUT_Label, (ULONG)"Processing list",
+      LAYOUT_Label, tr(pLocaleInfo, MSG_PROC_LST_GROUP),
       LAYOUT_AddChild, m_ppGadgets[GID_LBR_PROCESSING_LIST] = NewObject(LISTBROWSER_GetClass(), NULL,
         GA_ID, GID_LBR_PROCESSING_LIST,
         GA_RelVerify, TRUE,
@@ -1624,7 +1707,7 @@ Object *createLayout(struct List *pFilesList)
         LAYOUT_AddChild, m_ppGadgets[GID_BTN_START] = NewObject(BUTTON_GetClass(), NULL,
           GA_ID, GID_BTN_START,
           GA_RelVerify, TRUE,
-          GA_Text, (ULONG)"Start rename",
+          GA_Text, tr(pLocaleInfo, MSG_START_RENAME_GAD),
         TAG_DONE),
         CHILD_WeightedWidth, 0,
       TAG_DONE),

@@ -4,6 +4,8 @@
 #include "file_node.h" // MAXNAMELEN
 #include "range_mask.h"
 
+#include "localization.h"
+
 typedef enum
 {
   RSW_STATE_IDLE = 0,
@@ -23,9 +25,11 @@ typedef struct RangeSelectWindow
   RangeSelectWindowState WindowState;
   RangeMask *pRangeMask;
   unsigned char NameBuf[MAX_NAME_LEN + 1];
+  struct LocaleInfo *pLocaleInfo;
 } RangeSelectWindow;
 
-RangeSelectWindow *createRangeSelectWindow(struct Screen *pScreen);
+RangeSelectWindow *createRangeSelectWindow(
+  struct Screen *pScreen, struct LocaleInfo* pLocaleInfo);
 BOOL openRangeSelectWindow(RangeSelectWindow *pRangeSelectWindow,
   struct Window *pParentIntuiWin,
   ULONG *pParentSigMask,

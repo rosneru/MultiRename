@@ -3,7 +3,8 @@
 
 # paths are relative to the project directory (current directory during make)
 
-EXE    = MultiRename_sas
+APP    = MultiRename
+EXE    = $(APP)_sas
 OBJDIR = build-sas/
 
 # compiler and linker
@@ -63,20 +64,51 @@ $(OBJDIR)requester.o : src/requester.c
 $(OBJDIR)string_tools.o : src/string_tools.c
 	$(CC) nolink src/string_tools.c
 
+$(OBJDIR)localization.o : src/localization.c
+	$(CC) nolink src/localization.c
+
 $(OBJDIR)ui_tools.o : src/ui_tools.c
 	$(CC) nolink src/ui_tools.c
 
 OBJS = $(OBJDIR)application.o $(OBJDIR)date_tools.o $(OBJDIR)file_nodes.o
-OBJS = $(OBJS) $(OBJDIR)file_tools.o $(OBJDIR)menu_tools.o $(OBJDIR)main.o
-OBJS = $(OBJS) $(OBJDIR)notifications.o $(OBJDIR)parsed_args.o
-OBJS = $(OBJS) $(OBJDIR)range_mask.o $(OBJDIR)range_select_window.o
-OBJS = $(OBJS) $(OBJDIR)rename_algorithm.o $(OBJDIR)rename_counter.o
-OBJS = $(OBJS) $(OBJDIR)rename_parser.o $(OBJDIR)rename.o
-OBJS = $(OBJS) $(OBJDIR)requester.o $(OBJDIR)string_tools.o
+OBJS = $(OBJS) $(OBJDIR)file_tools.o $(OBJDIR)localization.o
+OBJS = $(OBJS) $(OBJDIR)menu_tools.o $(OBJDIR)main.o $(OBJDIR)notifications.o
+OBJS = $(OBJS) $(OBJDIR)parsed_args.o $(OBJDIR)range_mask.o
+OBJS = $(OBJS) $(OBJDIR)range_select_window.o $(OBJDIR)rename_algorithm.o
+OBJS = $(OBJS) $(OBJDIR)rename_counter.o $(OBJDIR)rename_parser.o
+OBJS = $(OBJS) $(OBJDIR)rename.o $(OBJDIR)requester.o $(OBJDIR)string_tools.o
 OBJS = $(OBJS) $(OBJDIR)ui_tools.o
 
 $(EXE) : $(OBJS)
 	$(LD) link $(OBJS)
+
+# target translations
+
+translations: CatComp/$(APP).cd
+	CatComp CatComp/$(APP).cd CTFILE CatComp/$(APP)_de.ct
+	CatComp CatComp/$(APP).cd CTFILE CatComp/$(APP)_fr.ct
+
+# target catalog-header
+# NOTE: After this, manually delete the `struct LocaleInfo` declaration in
+#       multirename_catalog.h
+# REASON: I needed to have 'my own' definition of `struct LocaleInfo`
+#         in `localization.h` to avoid an circular include issue.
+catalog-header: CatComp/$(APP).cd
+	CatComp CatComp/$(APP).cd CFILE src/$(APP)_catalog.h NOARRAY NOCODE
+
+
+# target catalogs
+
+catalogs: CatComp/$(APP).cd CatComp/$(APP)_de.ct CatComp/$(APP)_fr.ct
+  -Makedir Catalogs
+  CatComp CatComp/$(APP).cd CatComp/$(APP)_de.ct CATALOG $(APP)_de.catalog
+  -Makedir catalogs/deutsch
+  -Copy $(APP)_de.catalog Catalogs/deutsch/$(APP).catalog FORCE
+  -Delete $(APP)_de.catalog
+  CatComp CatComp/$(APP).cd CatComp/$(APP)_fr.ct CATALOG $(APP)_fr.catalog
+  -Makedir catalogs/français
+  -Copy $(APP)_fr.catalog Catalogs/français/$(APP).catalog FORCE
+  -Delete $(APP)_fr.catalog
 
 # target 'clean'
 
@@ -84,4 +116,4 @@ clean:
 	-delete $(EXE)
 	-delete $(EXE).info
 	-delete $(EXE).lnk
-	-delete $(OBJDIR)\*.o
+	-delete $(OBJDIR)\#?.o

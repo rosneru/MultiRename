@@ -107,13 +107,16 @@
     "smsrd",
     "TABSIZE"
   ],
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "[c]": {
     "editor.defaultFormatter": "ms-vscode.cpptools"
   },
   "[cpp]": {
     "editor.defaultFormatter": "ms-vscode.cpptools"
   },
-  "C_Cpp.clang_format_style": "file"
+  "C_Cpp.formatting": "clangFormat",
+  "C_Cpp.clang_format_style": "file",
+  "C_Cpp.clang_format_path": "/usr/bin/clang-format",
+  "editor.defaultFormatter": "ms-vscode.cpptools"
 
 }
